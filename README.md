@@ -1,7 +1,3 @@
-;# Settlers LuaDebugger#
-
-
-
 ## About ##
 
 BlueByte has created a debugger for the Lua scripts in their games during development, but hasn't shipped this part of their software. The interface however can still be found in the production executables, and therefore it is possible to recreate the this debugger.
@@ -32,5 +28,3 @@ Unfortunately there is no interface to catch Lua errors, so every call to `lua_p
 
 ### The console ###
 The Lua console gives direct access to the selected lua state, and can display most data types. When the debugger is in Pause mode, all locals and upvalues are copied into `_G` (as long as there is no global with the same name) so the behaves as if commands are executed in the context of the paused function. Before resuming, all values are copied back, and `_G` is cleaned.
-
-
