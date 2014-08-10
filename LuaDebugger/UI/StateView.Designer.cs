@@ -28,14 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("heroinventory.lua");
-            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Map scripts", new System.Windows.Forms.TreeNode[] {
-            treeNode1});
-            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("keybindings.lua");
-            System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode(" gamestate.lua");
-            System.Windows.Forms.TreeNode treeNode5 = new System.Windows.Forms.TreeNode("Internal scripts", new System.Windows.Forms.TreeNode[] {
-            treeNode3,
-            treeNode4});
+            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Map scripts");
+            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Internal scripts");
             this.tvFiles = new System.Windows.Forms.TreeView();
             this.label1 = new System.Windows.Forms.Label();
             this.scUpper = new System.Windows.Forms.SplitContainer();
@@ -74,19 +68,13 @@
             this.tvFiles.Location = new System.Drawing.Point(3, 29);
             this.tvFiles.Margin = new System.Windows.Forms.Padding(2);
             this.tvFiles.Name = "tvFiles";
-            treeNode1.Name = "Node0";
-            treeNode1.Text = "heroinventory.lua";
-            treeNode2.Name = "MapScripts";
-            treeNode2.Text = "Map scripts";
-            treeNode3.Name = "Node3";
-            treeNode3.Text = "keybindings.lua";
-            treeNode4.Name = "Node4";
-            treeNode4.Text = " gamestate.lua";
-            treeNode5.Name = "Internal";
-            treeNode5.Text = "Internal scripts";
+            treeNode1.Name = "MapScripts";
+            treeNode1.Text = "Map scripts";
+            treeNode2.Name = "Internal";
+            treeNode2.Text = "Internal scripts";
             this.tvFiles.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode2,
-            treeNode5});
+            treeNode1,
+            treeNode2});
             this.tvFiles.Size = new System.Drawing.Size(214, 196);
             this.tvFiles.TabIndex = 0;
             this.tvFiles.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.tvFiles_AfterSelect);
@@ -270,6 +258,7 @@
             // 
             // luaConsole
             // 
+            this.luaConsole.BackColor = System.Drawing.SystemColors.ControlDarkDark;
             this.luaConsole.Dock = System.Windows.Forms.DockStyle.Top;
             this.luaConsole.Location = new System.Drawing.Point(0, 180);
             this.luaConsole.Margin = new System.Windows.Forms.Padding(2);

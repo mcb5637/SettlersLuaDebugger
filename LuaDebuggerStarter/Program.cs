@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Windows.Forms;
 
@@ -15,14 +16,32 @@ namespace LuaDebuggerStarter
         static void Main()
         {
             string[] args = Environment.GetCommandLineArgs();
-            if (args.Length > 1 && args[1] == "setkey")
-                SetS6DevKey();
+            if (args.Length > 1 && args[1][0] == '!' && args[1] == "!s6key")
+                ToggleS6DevM();
             else
             {
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
                 Application.Run(new frmLDStarter());
             }
+        }
+
+        public static void ToggleS6DevM()
+        {
+            if (IsS6DevM())
+                RemoveS6DevKey();
+            else
+                SetS6DevKey();
+        }
+
+         public static bool IsS6DevM()
+        {
+            var s6RegKey = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Ubisoft\The Settlers 6\Development", "DevelopmentMachine", 0);
+
+            if (s6RegKey == null || (Int32)s6RegKey == 0 || (Int32)s6RegKey != Program.CalculateDevHash(System.Environment.MachineName))
+                return false;
+            else
+                return true;
         }
 
         public static uint CalculateDevHash(string str)
@@ -44,11 +63,37 @@ namespace LuaDebuggerStarter
 
         public static void SetS6DevKey()
         {
-            UInt32 key = CalculateDevHash(System.Environment.MachineName);
+            int key = (int)CalculateDevHash(System.Environment.MachineName);
+/*
+            RegistryKey installed_versions = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\NET Framework Setup\NDP");
+            string instd = "";
+            foreach (string s in installed_versions.GetSubKeyNames())
+                instd += s + ", ";
+            MessageBox.Show("Running CLR: " + Environment.Version.ToString()+
+                "\n.NET Installs: " + instd +
+                "\nKey: 0x" + key.ToString("x"), "twA Debug");*/
 
             try
             {
                 Registry.SetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Ubisoft\The Settlers 6\Development", "DevelopmentMachine", key, RegistryValueKind.DWord);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+
+        public static void RemoveS6DevKey()
+        {
+            try
+            {
+                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Ubisoft\The Settlers 6\Development", true))
+                {
+                    if (key != null)
+                    {
+                        key.DeleteValue("DevelopmentMachine");
+                    }
+                }
             }
             catch (Exception ex)
             {

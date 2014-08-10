@@ -49,8 +49,7 @@ namespace LuaDebugger
             int nextHistory = this.History.Count - 1;
             this.History[nextHistory] = cmd;
             this.History.Add("");
-            if (this.historyPos == nextHistory)
-                this.historyPos++;
+            this.historyPos = nextHistory + 1;
 
             rtbOutput.AppendText("\n> " + cmd);
             string answer = ls.EvaluateLua(cmd);

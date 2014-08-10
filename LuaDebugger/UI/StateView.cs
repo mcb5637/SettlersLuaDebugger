@@ -81,6 +81,10 @@ namespace LuaDebugger
         protected void ShowStackLevel(int n)
         {
             LuaFunctionInfo lfi = this.debugEngine.CurrentStackTrace[n];
+
+            if (this.ls.UpdateFileList)
+                UpdateView();
+
             LuaFile file;
 
             if (this.ls.LoadedFiles.TryGetValue(lfi.Source, out file))

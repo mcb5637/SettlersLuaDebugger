@@ -53,14 +53,18 @@ namespace LuaDebuggerStarter
             RecheckAll();
         }
 
+
+
         public void CheckS6DevM()
         {
-            var s6RegKey = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Ubisoft\The Settlers 6\Development", "DevelopmentMachine", 0);
-
-            if (s6RegKey == null || (Int32)s6RegKey == 0 || (Int32)s6RegKey != Program.CalculateDevHash(System.Environment.MachineName))
-                btnS6DevM.Visible = true;
+            if (Program.IsS6DevM())
+                lblDevMS6.Text = "ON";
             else
-                btnS6DevM.Visible = false;
+            {
+                lblDevMS6.Text = "OFF";
+                btnS6Main.Enabled = false;
+                btnS6AO1.Enabled = false;
+            }
         }
 
         public void RecheckAll()
@@ -109,6 +113,7 @@ namespace LuaDebuggerStarter
             ProcessStartInfo si = new ProcessStartInfo(startDict[sender], "-DevM");
             si.EnvironmentVariables["Path"] += ";" + tmpPath;
             si.UseShellExecute = false;
+            si.Arguments += string.Join(" ", Environment.GetCommandLineArgs());
             Process p = Process.Start(si);
         }
 
@@ -173,25 +178,24 @@ namespace LuaDebuggerStarter
                 proc.UseShellExecute = true;
                 proc.WorkingDirectory = Environment.CurrentDirectory;
                 proc.FileName = Application.ExecutablePath;
-                proc.Arguments = "setkey";
+                proc.Arguments = "!s6key";
                 proc.Verb = "runas";
 
                 try
                 {
                     Process.Start(proc).WaitForExit();
-                    CheckS6DevM();
+                    RecheckAll();
                 }
                 catch
                 {
                     // The user refused the elevation.
-                    // Do nothing and return directly ...
                     return;
                 }
             }
             else
             {
-                Program.SetS6DevKey();
-                CheckS6DevM();
+                Program.ToggleS6DevM();
+                RecheckAll();
             }
 
             

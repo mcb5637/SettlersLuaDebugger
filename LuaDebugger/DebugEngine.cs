@@ -144,7 +144,7 @@ namespace LuaDebugger
             GlobalState.FreezeCount++;
             while (this.CurrentRequest == DebugRequest.Pause)
             {
-                Application.DoEvents();
+                //Application.DoEvents(); //can cause crashes
                 Thread.Sleep(10);
             }
             UnfakeIfNeccessary();
@@ -158,13 +158,18 @@ namespace LuaDebugger
 
         protected void FireStateChangedEvent()
         {
-            if (this.OnDebugStateChange == null)
-                return;
-
             if (GlobalState.DebuggerWindow.InvokeRequired)
                 GlobalState.DebuggerWindow.BeginInvoke(this.fireStateChangedEvent);
             else
-                this.OnDebugStateChange(this, new DebugStateChangedEventArgs(this.CurrentState));
+            {
+                if (this.OnDebugStateChange == null)
+                    GlobalState.DebuggerWindow.UpdateGUI();
+
+                if (this.OnDebugStateChange != null)
+                    this.OnDebugStateChange(this, new DebugStateChangedEventArgs(this.CurrentState));
+                else
+                    MessageBox.Show("GUI not connected for Lua Event!", "WTF?");
+            }
         }
 
         public void SetBreakpoint(Breakpoint bp)

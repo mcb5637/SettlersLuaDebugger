@@ -67,10 +67,10 @@ namespace LuaDebugger
 
         public string TosToString()
         {
-            return TosToString(true, 20);
+            return TosToString(true, false, new Dictionary<IntPtr,bool>());
         }
 
-        public string TosToString(bool popStack, int expandTables)
+        public string TosToString(bool popStack, bool noExpand, Dictionary<IntPtr, bool> printedTables)
         {
             LuaType type = BBLua.lua_type(this.L, -1);
             string result;
@@ -90,40 +90,38 @@ namespace LuaDebugger
                     result = "\"" + BBLua.lua_tostring(this.L, -1) + "\"";
                     break;
                 case LuaType.Function:
-                    return GetTosFunctionInfo(); // pops stack
+                    result = GetTosFunctionInfo();
+                    break;
                 case LuaType.Table:
-                    if (expandTables == 0)
+                    if (noExpand)
                         goto default;
+
+                    IntPtr tblPtr = BBLua.lua_topointer(this.L, -1);
+                    if (printedTables.ContainsKey(tblPtr))
+                    {
+                        result = "<Table, recursion>";
+                        break;
+                    }
 
                     result = "{";
                     BBLua.lua_pushnil(this.L);
                     while (BBLua.lua_next(this.L, -2) != 0)
                     {
-                        //read key first to check whether it is _G, and stop recursion ;)
-                        BBLua.lua_insert(this.L, -2);
-                        string key = TosToString(false, 0);
-                        BBLua.lua_insert(this.L, -2);
+                        printedTables.Add(tblPtr, true);
+                        string val = IndentMultiLine(TosToString(true, false, printedTables));
+                        string key = TosToString(false, true, printedTables);
+                        printedTables.Remove(tblPtr);
 
-                        if (key == "\"_G\"")
+                        if (key[0] == '\"')
                         {
-                            result += "\n    [\"_G\"] = <_G>,";
-                            BBLua.lua_settop(this.L, -2); //remove val
-                        }
-                        else
-                        {
-                            string val = IndentMultiLine(TosToString(true, expandTables - 1));
-
-                            if (key[0] == '\"')
-                            {
-                                string rawString = key.Substring(1, key.Length - 2);
-                                if (alphaNumeric.IsMatch(rawString))
-                                    result += "\n    " + rawString + " = " + val + ",";
-                                else
-                                    result += "\n    [" + key + "] = " + val + ",";
-                            }
+                            string rawString = key.Substring(1, key.Length - 2);
+                            if (alphaNumeric.IsMatch(rawString))
+                                result += "\n    " + rawString + " = " + val + ",";
                             else
                                 result += "\n    [" + key + "] = " + val + ",";
                         }
+                        else
+                            result += "\n    [" + key + "] = " + val + ",";
                     }
                     result += "\n}";
                     break;
@@ -140,13 +138,13 @@ namespace LuaDebugger
         protected string GetTosFunctionInfo()
         {
             IntPtr memBlock = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(LuaDebugRecord)));
-            BBLua.lua_getinfo(this.L, ">nS", memBlock);
+            BBLua.lua_getinfo(this.L, ">nSf", memBlock); //fill structure and pop func back onto stack after removing it
             LuaDebugRecord ldr = (LuaDebugRecord)Marshal.PtrToStructure(memBlock, typeof(LuaDebugRecord));
             Marshal.FreeHGlobal(memBlock);
 
             string source;
             if (ldr.what == "C")
-                source = "Game Engine";
+                source = "Game Engine at 0x" + BBLua.lua_tocfunction(this.L, -1).ToInt32().ToString("X");
             else
                 source = ldr.source + " (line " + ldr.linedefined + ")";
 
