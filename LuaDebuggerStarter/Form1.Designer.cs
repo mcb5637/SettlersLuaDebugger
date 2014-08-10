@@ -44,6 +44,8 @@
             this.btnS6Main = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.lblDevMS6 = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.SuspendLayout();
@@ -125,6 +127,8 @@
             // panel2
             // 
             this.panel2.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.panel2.Controls.Add(this.lblDevMS6);
+            this.panel2.Controls.Add(this.label6);
             this.panel2.Controls.Add(this.btnS6DevM);
             this.panel2.Controls.Add(this.label5);
             this.panel2.Controls.Add(this.lblInstS6);
@@ -139,13 +143,12 @@
             // 
             // btnS6DevM
             // 
-            this.btnS6DevM.Location = new System.Drawing.Point(169, 14);
+            this.btnS6DevM.Location = new System.Drawing.Point(293, 51);
             this.btnS6DevM.Name = "btnS6DevM";
-            this.btnS6DevM.Size = new System.Drawing.Size(213, 47);
+            this.btnS6DevM.Size = new System.Drawing.Size(89, 23);
             this.btnS6DevM.TabIndex = 8;
-            this.btnS6DevM.Text = "Set Development Key";
+            this.btnS6DevM.Text = "Dev Mode";
             this.btnS6DevM.UseVisualStyleBackColor = true;
-            this.btnS6DevM.Visible = false;
             this.btnS6DevM.Click += new System.EventHandler(this.btnS6DevM_Click);
             // 
             // label5
@@ -153,7 +156,7 @@
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label5.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.label5.Location = new System.Drawing.Point(302, 60);
+            this.label5.Location = new System.Drawing.Point(86, 6);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(75, 13);
             this.label5.TabIndex = 7;
@@ -173,7 +176,7 @@
             // btnS6AO1
             // 
             this.btnS6AO1.Enabled = false;
-            this.btnS6AO1.Location = new System.Drawing.Point(293, 38);
+            this.btnS6AO1.Location = new System.Drawing.Point(293, 27);
             this.btnS6AO1.Name = "btnS6AO1";
             this.btnS6AO1.Size = new System.Drawing.Size(89, 23);
             this.btnS6AO1.TabIndex = 3;
@@ -183,7 +186,7 @@
             // btnS6Main
             // 
             this.btnS6Main.Enabled = false;
-            this.btnS6Main.Location = new System.Drawing.Point(293, 14);
+            this.btnS6Main.Location = new System.Drawing.Point(293, 3);
             this.btnS6Main.Name = "btnS6Main";
             this.btnS6Main.Size = new System.Drawing.Size(89, 23);
             this.btnS6Main.TabIndex = 2;
@@ -208,6 +211,24 @@
             this.label4.Size = new System.Drawing.Size(90, 13);
             this.label4.TabIndex = 1;
             this.label4.Text = "Rise of an Empire";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(139, 51);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(103, 13);
+            this.label6.TabIndex = 9;
+            this.label6.Text = "Development Mode:";
+            // 
+            // lblDevMS6
+            // 
+            this.lblDevMS6.AutoSize = true;
+            this.lblDevMS6.Location = new System.Drawing.Point(239, 51);
+            this.lblDevMS6.Name = "lblDevMS6";
+            this.lblDevMS6.Size = new System.Drawing.Size(23, 13);
+            this.lblDevMS6.TabIndex = 10;
+            this.lblDevMS6.Text = "ON";
             // 
             // frmLDStarter
             // 
@@ -246,6 +267,8 @@
         private System.Windows.Forms.Label lblInstS6;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Button btnS6DevM;
+        private System.Windows.Forms.Label lblDevMS6;
+        private System.Windows.Forms.Label label6;
     }
 }
 

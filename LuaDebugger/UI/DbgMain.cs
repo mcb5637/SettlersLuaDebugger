@@ -89,6 +89,11 @@ namespace LuaDebugger
 
         private void tmUpdateView_Tick(object sender, EventArgs e)
         {
+            UpdateGUI();
+        }
+
+        public void UpdateGUI()
+        {
             lock (GlobalState.GuiUpdateLock)
             {
                 tmUpdateView.Enabled = false;

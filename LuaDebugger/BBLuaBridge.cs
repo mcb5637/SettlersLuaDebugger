@@ -175,16 +175,16 @@ namespace LuaDebugger
         public static extern int lua_strlen(UIntPtr L, int idx);
 
         [DllImport(GlobalState.LuaDll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern UIntPtr lua_tocfunction(UIntPtr L, int idx);
+        public static extern IntPtr lua_tocfunction(UIntPtr L, int idx);
 
         [DllImport(GlobalState.LuaDll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern UIntPtr lua_touserdata(UIntPtr L, int idx);
+        public static extern IntPtr lua_touserdata(UIntPtr L, int idx);
 
         [DllImport(GlobalState.LuaDll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern UIntPtr lua_tothread(UIntPtr L, int idx);
+        public static extern IntPtr lua_tothread(UIntPtr L, int idx);
 
         [DllImport(GlobalState.LuaDll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern UIntPtr lua_topointer(UIntPtr L, int idx);
+        public static extern IntPtr lua_topointer(UIntPtr L, int idx);
 
 
         /*
