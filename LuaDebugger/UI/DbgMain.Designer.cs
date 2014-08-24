@@ -125,7 +125,6 @@
             // 
             // tsmLS
             // 
-            this.tsmLS.Enabled = false;
             this.tsmLS.Name = "tsmLS";
             this.tsmLS.ShowShortcutKeys = false;
             this.tsmLS.Size = new System.Drawing.Size(76, 23);
@@ -178,7 +177,7 @@
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "DbgMain";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
-            this.Text = "Lua Debugger v0.2.3";
+            this.Text = "Lua Debugger v0.2.4";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.DbgMain_FormClosing);
             this.Load += new System.EventHandler(this.DbgMain_Load);
             this.menuStrip1.ResumeLayout(false);

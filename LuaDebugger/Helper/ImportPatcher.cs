@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Windows.Forms;
 
 namespace LuaDebugger
 {
@@ -48,6 +49,7 @@ namespace LuaDebugger
                     return false;
 
                 string moduleName = Marshal.PtrToStringAnsi(new IntPtr(imageBase.ToInt32() + iDesc.Name));
+                
                 if (moduleName != dllName)
                     continue;
 

@@ -27,7 +27,7 @@ namespace LuaDebugger
 
             ErrorHook.pcallHook = new LuaPcallHook(ErrorHook.FakePcall);
             IntPtr pcallHookPtr = Marshal.GetFunctionPointerForDelegate(ErrorHook.pcallHook);
-            
+
             return ImportPatcher.ReplaceIATEntry(GlobalState.LuaDll, "lua_pcall", pcallHookPtr);
         }
 

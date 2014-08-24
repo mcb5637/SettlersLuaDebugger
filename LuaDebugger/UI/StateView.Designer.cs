@@ -28,8 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Map scripts");
-            System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Internal scripts");
+            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Map scripts");
+            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Internal scripts");
             this.tvFiles = new System.Windows.Forms.TreeView();
             this.label1 = new System.Windows.Forms.Label();
             this.scUpper = new System.Windows.Forms.SplitContainer();
@@ -45,7 +45,7 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.scSV = new System.Windows.Forms.SplitContainer();
-            this.luaConsole = new LuaDebugger.LuaConsole();
+            this.LuaConsole = new LuaDebugger.LuaConsole();
             this.stackTraceView = new LuaDebugger.StackTraceView();
             this.errorView = new LuaDebugger.ErrorView();
             this.scUpper.Panel1.SuspendLayout();
@@ -68,13 +68,13 @@
             this.tvFiles.Location = new System.Drawing.Point(3, 29);
             this.tvFiles.Margin = new System.Windows.Forms.Padding(2);
             this.tvFiles.Name = "tvFiles";
-            treeNode3.Name = "MapScripts";
-            treeNode3.Text = "Map scripts";
-            treeNode4.Name = "Internal";
-            treeNode4.Text = "Internal scripts";
+            treeNode1.Name = "MapScripts";
+            treeNode1.Text = "Map scripts";
+            treeNode2.Name = "Internal";
+            treeNode2.Text = "Internal scripts";
             this.tvFiles.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode3,
-            treeNode4});
+            treeNode1,
+            treeNode2});
             this.tvFiles.Size = new System.Drawing.Size(214, 196);
             this.tvFiles.TabIndex = 0;
             this.tvFiles.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.tvFiles_AfterSelect);
@@ -246,7 +246,7 @@
             // 
             // scSV.Panel2
             // 
-            this.scSV.Panel2.Controls.Add(this.luaConsole);
+            this.scSV.Panel2.Controls.Add(this.LuaConsole);
             this.scSV.Panel2.Controls.Add(this.stackTraceView);
             this.scSV.Panel2.Controls.Add(this.errorView);
             this.scSV.Panel2.RightToLeft = System.Windows.Forms.RightToLeft.No;
@@ -256,17 +256,17 @@
             this.scSV.SplitterWidth = 3;
             this.scSV.TabIndex = 4;
             // 
-            // luaConsole
+            // LuaConsole
             // 
-            this.luaConsole.AccessibleDescription = "";
-            this.luaConsole.BackColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.luaConsole.Dock = System.Windows.Forms.DockStyle.Top;
-            this.luaConsole.Location = new System.Drawing.Point(0, 180);
-            this.luaConsole.Margin = new System.Windows.Forms.Padding(2);
-            this.luaConsole.Name = "luaConsole";
-            this.luaConsole.Size = new System.Drawing.Size(633, 117);
-            this.luaConsole.TabIndex = 2;
-            this.luaConsole.LocationChanged += new System.EventHandler(this.luaConsole_LocationChanged);
+            this.LuaConsole.AccessibleDescription = "";
+            this.LuaConsole.BackColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.LuaConsole.Dock = System.Windows.Forms.DockStyle.Top;
+            this.LuaConsole.Location = new System.Drawing.Point(0, 180);
+            this.LuaConsole.Margin = new System.Windows.Forms.Padding(2);
+            this.LuaConsole.Name = "LuaConsole";
+            this.LuaConsole.Size = new System.Drawing.Size(633, 117);
+            this.LuaConsole.TabIndex = 2;
+            this.LuaConsole.LocationChanged += new System.EventHandler(this.luaConsole_LocationChanged);
             // 
             // stackTraceView
             // 
@@ -331,6 +331,6 @@
         private System.Windows.Forms.Label label10;
         private ErrorView errorView;
         private StackTraceView stackTraceView;
-        public LuaConsole luaConsole;
+        public LuaConsole LuaConsole;
     }
 }

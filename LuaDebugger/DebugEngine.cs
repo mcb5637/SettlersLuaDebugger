@@ -39,11 +39,13 @@ namespace LuaDebugger
 
     public class DebugStateChangedEventArgs : EventArgs
     {
+        public LuaState LuaState { get; protected set; }
         public DebugState State { get; protected set; }
 
-        public DebugStateChangedEventArgs(DebugState newState)
+        public DebugStateChangedEventArgs(DebugState newState, LuaState ls)
         {
             this.State = newState;
+            this.LuaState = ls;
         }
     }
 
@@ -51,7 +53,7 @@ namespace LuaDebugger
     {
         protected LuaState ls;
         protected Dictionary<int, List<Breakpoint>> lineToBP = new Dictionary<int, List<Breakpoint>>();
-        
+
         //prevent the gc from deleting the delegates
         protected LuaDebugHook debugHook;
         protected LuaCFunc logCallback;
@@ -97,7 +99,7 @@ namespace LuaDebugger
             for (int i = 0; i < lines.Length; i++)
                 lines[i] = "Log: " + lines[i];
 
-            this.ls.StateView.luaConsole.AppendText(string.Join("\n", lines));
+            this.ls.StateView.LuaConsole.AppendText(string.Join("\n", lines));
             return 0;
         }
 
@@ -192,7 +194,7 @@ namespace LuaDebugger
                     GlobalState.DebuggerWindow.UpdateGUI();
 
                 if (this.OnDebugStateChange != null)
-                    this.OnDebugStateChange(this, new DebugStateChangedEventArgs(this.CurrentState));
+                    this.OnDebugStateChange(this, new DebugStateChangedEventArgs(this.CurrentState, this.ls));
                 else
                     MessageBox.Show("GUI not connected for Lua Event!", "WTF?");
             }
@@ -261,7 +263,7 @@ namespace LuaDebugger
         {
             this.CurrentRequest = DebugRequest.Resume;
 
-            while (this.CurrentState != DebugState.Running && this.CurrentRequest == DebugRequest.Resume )
+            while (this.CurrentState != DebugState.Running && this.CurrentRequest == DebugRequest.Resume)
                 Thread.Sleep(10);
         }
 

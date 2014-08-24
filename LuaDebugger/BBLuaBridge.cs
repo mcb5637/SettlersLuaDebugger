@@ -37,11 +37,20 @@ namespace LuaDebugger
         Thread
     }
 
-    public enum LuaPseudoIndices
+#if S5
+    public enum LuaPseudoIndices  //lua 5.0
     {
         REGISTRYINDEX = (-10000),
         GLOBALSINDEX = (-10001)
     }
+#elif S6
+    public enum LuaPseudoIndices //lua 5.1
+    {
+        REGISTRYINDEX = (-10000),
+        ENVIRONINDEX = (-10001),
+        GLOBALSINDEX = (-10002)
+    }
+#endif
 
     public enum LuaResult
     {
@@ -226,11 +235,20 @@ namespace LuaDebugger
         [DllImport(GlobalState.LuaDll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void lua_rawgeti(UIntPtr L, int idx, int n);
 
+#if S5
         [DllImport(GlobalState.LuaDll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void lua_newtable(UIntPtr L);
+#elif S6
+        [DllImport(GlobalState.LuaDll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void lua_createtable(UIntPtr L, int narr, int nrec);
+        public static void lua_newtable(UIntPtr L)
+        {
+            BBLua.lua_createtable(L, 0, 0);
+        }
+#endif
 
         [DllImport(GlobalState.LuaDll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern UIntPtr lua_newuserdata(UIntPtr L, int sz);
+        public static extern IntPtr lua_newuserdata(UIntPtr L, int sz);
 
         [DllImport(GlobalState.LuaDll, CallingConvention = CallingConvention.Cdecl)]
         public static extern int lua_getmetatable(UIntPtr L, int objindex);
@@ -283,15 +301,13 @@ namespace LuaDebugger
 
         [DllImport(GlobalState.LuaDll, CallingConvention = CallingConvention.Cdecl)]
         public static extern LuaResult lua_cpcall(UIntPtr L, UIntPtr func, UIntPtr ud);
-        /*
-[DllImport(GlobalState.LuaDll, CallingConvention = CallingConvention.Cdecl)]
-public static extern int   lua_load (UIntPtr L, lua_Chunkreader reader, UIntPtr dt,
-                        string chunkname);
 
+        [DllImport(GlobalState.LuaDll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int lua_load(UIntPtr L, IntPtr reader, IntPtr data, string chunkname);
 
-[DllImport(GlobalState.LuaDll, CallingConvention = CallingConvention.Cdecl)]
-public static extern int lua_dump (UIntPtr L, lua_Chunkwriter writer, void *data);
-        */
+        [DllImport(GlobalState.LuaDll, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int lua_dump(UIntPtr L, IntPtr writer, IntPtr data);
+
 
         /*
         ** coroutine functions

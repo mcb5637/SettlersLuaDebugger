@@ -105,10 +105,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helper\Extensions.cs" />
     <Compile Include="ErrorHook.cs" />
     <Compile Include="Helper\SpecialMarks.cs" />
     <Compile Include="DebugEngine.cs" />
     <Compile Include="Helper\MySyntaxModeProvider.cs" />
+    <Compile Include="LuaStackTrace.cs" />
     <Compile Include="UI\DbgMain.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -15,10 +15,13 @@ namespace DebugDummy
         static void Main()
         {
             ProcessStartInfo si;
-            if(LuaDebugger.GlobalState.SettlersExe == "settlershok")
+
+#pragma warning disable 0162
+            if (LuaDebugger.GlobalState.SettlersExe == "settlershok")
                 si = new ProcessStartInfo("D:/Program Files (x86)/DEdK/extra2/bin/settlershok.exe");
             else
                 si = new ProcessStartInfo("D:/Program Files (x86)/S6/extra1/bin/Settlers6_.exe", "-DevM");
+#pragma warning restore 0162
 
             si.EnvironmentVariables["Path"] += ";c:/dbgenv";
             si.UseShellExecute = false;

@@ -23,13 +23,14 @@ namespace LuaDebugger
         protected DebugEngine debugEngine = null;
         protected LuaFile currentFile;
         protected TreeNode mapScripts, internalScripts;
+        protected int fileSaveTimeout = 5;
 
         public event EventHandler<DebugStateChangedEventArgs> OnDebugStateChange;
 
         public StateView()
         {
             InitializeComponent();
-            luaConsole.Location = new Point(0, 0);
+            LuaConsole.Location = new Point(0, 0);
             luaConsole_LocationChanged(this, new EventArgs());
         }
 
@@ -44,7 +45,7 @@ namespace LuaDebugger
             this.debugEngine = ls.DebugEngine;
             this.debugEngine.OnDebugStateChange += debugEngine_OnDebugStateChange;
             state.StateView = this;
-            this.luaConsole.InitState(state);
+            this.LuaConsole.InitState(state);
             mapScripts = this.tvFiles.Nodes["MapScripts"];
             internalScripts = this.tvFiles.Nodes["Internal"];
         }
@@ -82,6 +83,9 @@ namespace LuaDebugger
         {
             LuaFunctionInfo lfi = this.debugEngine.CurrentStackTrace[n];
 
+            if (this.ls.LoadedFiles.Count == 0 && this.fileSaveTimeout > 0) 
+                this.ls.RestoreLoadedFiles();
+                
             if (this.ls.UpdateFileList)
                 UpdateView();
 
@@ -128,6 +132,7 @@ namespace LuaDebugger
             if (this.ls.UpdateFileList)
             {
                 this.ls.UpdateFileList = false;
+                this.fileSaveTimeout = 3;
 
                 this.mapScripts.Nodes.Clear();
                 this.internalScripts.Nodes.Clear();
@@ -151,7 +156,18 @@ namespace LuaDebugger
                 //this.tvFiles.Sort();
             }
 
-            //todo: watch
+            if (this.fileSaveTimeout >= 0)
+            {
+                this.fileSaveTimeout--;
+
+                if (this.fileSaveTimeout == 0)
+                {
+                    if (this.ls.LoadedFiles.Count > 0)
+                        this.ls.SaveLoadedFiles();
+                    else
+                        this.ls.RestoreLoadedFiles();
+                }
+            }
         }
 
         private void tvFiles_AfterSelect(object sender, TreeViewEventArgs e)
@@ -215,7 +231,7 @@ namespace LuaDebugger
         {
             string selected = this.currentFile.Editor.ActiveTextAreaControl.SelectionManager.SelectedText;
             if (selected != "" && !selected.Contains("(") && !selected.Contains("\n"))
-                this.luaConsole.RunCommand(selected);
+                this.LuaConsole.RunCommand(selected);
         }
 
 
@@ -305,13 +321,13 @@ namespace LuaDebugger
 
         private void luaConsole_LocationChanged(object sender, EventArgs e)
         {
-            luaConsole.Height = scSV.Panel2.Height - luaConsole.Top;
+            LuaConsole.Height = scSV.Panel2.Height - LuaConsole.Top;
         }
 
         private void scSV_Panel2_Resize(object sender, EventArgs e)
         {
 
-            luaConsole.Height = scSV.Panel2.Height - luaConsole.Top;
+            LuaConsole.Height = scSV.Panel2.Height - LuaConsole.Top;
         }
 
         private void btnLoadFile_Click(object sender, EventArgs e)
@@ -319,7 +335,7 @@ namespace LuaDebugger
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Filter = "Lua files (*.lua)|*.lua|All files (*.*)|*.*";
             if (ofd.ShowDialog() == DialogResult.OK)
-                this.luaConsole.RunCommand("Script.Load(\"" + ofd.FileName.Replace('\\', '/') + "\")");
+                this.LuaConsole.RunCommand("Script.Load(\"" + ofd.FileName.Replace('\\', '/') + "\")");
         }
 
         private void tvFiles_MouseEnter(object sender, EventArgs e)

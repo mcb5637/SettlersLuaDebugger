@@ -35,7 +35,7 @@ namespace LuaDebugger
 
                 CreateParams cp = base.CreateParams;
                 cp.ExStyle |= WS_EX_COMPOSITED;
-              //  cp.ClassStyle |= CS_NOCLOSE;
+                cp.ClassStyle |= CS_NOCLOSE;
                 return cp;
             }
         }
@@ -84,7 +84,10 @@ namespace LuaDebugger
 
         void stateViews_OnDebugStateChange(object sender, DebugStateChangedEventArgs e)
         {
-            UpdateDebuggerButtons();
+            if (this.activeState != e.LuaState.StateView)
+                SwitchToState(e.LuaState);
+            else
+                UpdateDebuggerButtons();
         }
 
         private void tmUpdateView_Tick(object sender, EventArgs e)
@@ -145,8 +148,8 @@ namespace LuaDebugger
                 this.pnlMain.Controls.Add(ls.StateView);
                 this.tcbState.SelectedItem = ls;
                 PRtoolStripMenuItem.Enabled = true;
-
                 this.activeState = ls.StateView;
+                UpdateDebuggerButtons();
             }
         }
 
@@ -209,7 +212,7 @@ namespace LuaDebugger
 
         private void DbgMain_FormClosing(object sender, FormClosingEventArgs e)
         {
-         //   e.Cancel = true;
+            //   e.Cancel = true;
         }
 
         private void toolStripMenuItem_MouseHover(object sender, EventArgs e)

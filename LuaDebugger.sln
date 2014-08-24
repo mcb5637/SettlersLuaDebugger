@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LuaDebugger", "LuaDebugger\LuaDebugger.csproj", "{707CEB10-EA0D-4A8A-AB18-BA41800DB0BF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DebugSHOK", "DebugDummy\DebugSHOK.csproj", "{9C66C249-83DA-4DD5-AB47-1372248AD9D3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DebugSettlers", "DebugDummy\DebugSettlers.csproj", "{9C66C249-83DA-4DD5-AB47-1372248AD9D3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DebugStandalone", "DebugStandalone\DebugStandalone.csproj", "{72B8959A-9443-4AF8-B76A-794CD74675B4}"
 EndProject
