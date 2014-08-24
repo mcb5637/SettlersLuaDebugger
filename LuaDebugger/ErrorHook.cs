@@ -11,9 +11,6 @@ namespace LuaDebugger
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         delegate LuaResult LuaPcallHook(UIntPtr L, int nargs, int nresults, int errfunc);
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        delegate int LuaCFunc(UIntPtr L);
-
         public delegate void LuaErrorCaught(string message);
 
         static LuaPcallHook pcallHook;
@@ -83,7 +80,7 @@ namespace LuaDebugger
             return LuaResult.OK;
         }
 
-        static int ErrorCatcher(UIntPtr L)
+        static int ErrorCatcher(UIntPtr L) //could be moved into DebugEngine, but this would cost perfomance to fetch the correct delegate for each pcall
         {
             string errMsg = BBLua.lua_tostring(L, -1);
             BBLua.lua_settop(L, -2);

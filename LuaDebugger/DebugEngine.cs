@@ -51,7 +51,10 @@ namespace LuaDebugger
     {
         protected LuaState ls;
         protected Dictionary<int, List<Breakpoint>> lineToBP = new Dictionary<int, List<Breakpoint>>();
-        protected LuaDebugHook hookFnPtr; //prevent the gc from deleting the delegate
+        
+        //prevent the gc from deleting the delegates
+        protected LuaDebugHook debugHook;
+        protected LuaCFunc logCallback;
 
         protected int callStack = 0;
         protected int targetCallStackLevel = 0;
@@ -69,10 +72,33 @@ namespace LuaDebugger
         public DebugEngine(LuaState ls)
         {
             this.ls = ls;
-            this.hookFnPtr = new LuaDebugHook(this.DebugHook);
+            this.debugHook = new LuaDebugHook(this.DebugHook);
+            this.logCallback = new LuaCFunc(this.LogCallback);
+            RegisterLogFunction();
             ErrorHook.SetErrorHandler(ls.L, new ErrorHook.LuaErrorCaught(this.ErrorCaughtHook));
             this.fireStateChangedEvent = new Action(FireStateChangedEvent);
             SetHook();
+        }
+
+        protected void RegisterLogFunction()
+        {
+            BBLua.lua_pushstring(this.ls.L, "LuaDebugger");
+            BBLua.lua_newtable(this.ls.L);
+            BBLua.lua_pushstring(this.ls.L, "Log");
+            BBLua.lua_pushcclosure(this.ls.L, Marshal.GetFunctionPointerForDelegate(this.logCallback), 0);
+            BBLua.lua_rawset(this.ls.L, -3);
+            BBLua.lua_rawset(this.ls.L, (int)LuaPseudoIndices.GLOBALSINDEX);
+        }
+
+        protected int LogCallback(UIntPtr L)
+        {
+            string text = this.ls.TosToString();
+            string[] lines = text.Split('\n');
+            for (int i = 0; i < lines.Length; i++)
+                lines[i] = "Log: " + lines[i];
+
+            this.ls.StateView.luaConsole.AppendText(string.Join("\n", lines));
+            return 0;
         }
 
         protected void DebugHook(UIntPtr L, IntPtr ptr)
@@ -241,12 +267,12 @@ namespace LuaDebugger
 
         public void SetHook()
         {
-            BBLua.lua_sethook(this.ls.L, this.hookFnPtr, LuaHookType.Line | LuaHookType.Call | LuaHookType.Return, 0);
+            BBLua.lua_sethook(this.ls.L, this.debugHook, LuaHookType.Line | LuaHookType.Call | LuaHookType.Return, 0);
         }
 
         public void RemoveHook()
         {
-            BBLua.lua_sethook(this.ls.L, this.hookFnPtr, LuaHookType.Nothing, 0);
+            BBLua.lua_sethook(this.ls.L, this.debugHook, LuaHookType.Nothing, 0);
         }
 
         protected void UnfakeIfNeccessary()

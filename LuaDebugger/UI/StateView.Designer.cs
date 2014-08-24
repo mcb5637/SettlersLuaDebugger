@@ -28,8 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Map scripts");
-            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Internal scripts");
+            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Map scripts");
+            System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Internal scripts");
             this.tvFiles = new System.Windows.Forms.TreeView();
             this.label1 = new System.Windows.Forms.Label();
             this.scUpper = new System.Windows.Forms.SplitContainer();
@@ -68,13 +68,13 @@
             this.tvFiles.Location = new System.Drawing.Point(3, 29);
             this.tvFiles.Margin = new System.Windows.Forms.Padding(2);
             this.tvFiles.Name = "tvFiles";
-            treeNode1.Name = "MapScripts";
-            treeNode1.Text = "Map scripts";
-            treeNode2.Name = "Internal";
-            treeNode2.Text = "Internal scripts";
+            treeNode3.Name = "MapScripts";
+            treeNode3.Text = "Map scripts";
+            treeNode4.Name = "Internal";
+            treeNode4.Text = "Internal scripts";
             this.tvFiles.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode1,
-            treeNode2});
+            treeNode3,
+            treeNode4});
             this.tvFiles.Size = new System.Drawing.Size(214, 196);
             this.tvFiles.TabIndex = 0;
             this.tvFiles.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.tvFiles_AfterSelect);
@@ -258,6 +258,7 @@
             // 
             // luaConsole
             // 
+            this.luaConsole.AccessibleDescription = "";
             this.luaConsole.BackColor = System.Drawing.SystemColors.ControlDarkDark;
             this.luaConsole.Dock = System.Windows.Forms.DockStyle.Top;
             this.luaConsole.Location = new System.Drawing.Point(0, 180);
@@ -329,7 +330,7 @@
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Label label10;
         private ErrorView errorView;
-        private LuaConsole luaConsole;
         private StackTraceView stackTraceView;
+        public LuaConsole luaConsole;
     }
 }

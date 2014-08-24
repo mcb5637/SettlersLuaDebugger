@@ -58,6 +58,12 @@ namespace LuaDebugger
             rtbOutput.ScrollToCaret();
         }
 
+        public void AppendText(string text)
+        {
+            rtbOutput.AppendText("\n" + text);
+            rtbOutput.ScrollToCaret();
+        }
+
         private void tbInput_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)

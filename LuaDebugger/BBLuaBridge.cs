@@ -40,7 +40,7 @@ namespace LuaDebugger
     public enum LuaPseudoIndices
     {
         REGISTRYINDEX = (-10000),
-        LUA_GLOBALSINDEX = (-10001)
+        GLOBALSINDEX = (-10001)
     }
 
     public enum LuaResult
@@ -83,8 +83,11 @@ namespace LuaDebugger
         private int privateInt;  /* active function */
     }
 
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl, SetLastError = false, ThrowOnUnmappableChar = false)]
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void LuaDebugHook(UIntPtr L, IntPtr ptr);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate int LuaCFunc(UIntPtr L);
 
     public static class BBLua
     {
@@ -238,7 +241,7 @@ namespace LuaDebugger
         public static void lua_getglobal(UIntPtr L, string name)
         {
             BBLua.lua_pushstring(L, name);
-            BBLua.lua_rawget(L, (int)LuaPseudoIndices.LUA_GLOBALSINDEX);
+            BBLua.lua_rawget(L, (int)LuaPseudoIndices.GLOBALSINDEX);
         }
 
         /*
@@ -264,7 +267,7 @@ namespace LuaDebugger
         {
             BBLua.lua_pushstring(L, name);
             BBLua.lua_insert(L, -2);
-            BBLua.lua_rawset(L, (int)LuaPseudoIndices.LUA_GLOBALSINDEX);
+            BBLua.lua_rawset(L, (int)LuaPseudoIndices.GLOBALSINDEX);
         }
 
 
