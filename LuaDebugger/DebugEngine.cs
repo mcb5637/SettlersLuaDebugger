@@ -198,7 +198,7 @@ namespace LuaDebugger
 
             if (block) //Timeout: lua state inactive -> no problem to issue commands via the console
             {
-                for (int timeOut = 0; this.CurrentState != DebugState.Paused && timeOut < 5; timeOut--)
+                for (int timeOut = 0; this.CurrentState != DebugState.Paused && timeOut < 5; timeOut++)
                     Thread.Sleep(10);
             }
         }
