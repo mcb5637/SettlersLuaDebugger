@@ -153,3 +153,4 @@ $RECYCLE.BIN/
 Thumbs.db
 ehthumbs.db
 Desktop.ini
+dbgenv\LuaDebugger.dll

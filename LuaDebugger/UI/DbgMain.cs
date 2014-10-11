@@ -7,6 +7,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Globalization;
 using System.Threading;
+using System.Reflection;
 
 namespace LuaDebugger
 {
@@ -66,6 +67,7 @@ namespace LuaDebugger
 
         private void DbgMain_Load(object sender, EventArgs e)
         {
+            this.Text += VersionHelper.GetVersion();
             this.menuStrip1.Renderer = new MyRenderer();
             this.tcbState.ComboBox.SelectedIndexChanged += ComboBox_SelectedIndexChanged;
             tcbState.ComboBox.MouseWheel += ComboBox_MouseWheel;

@@ -15,6 +15,10 @@ namespace LuaDebuggerStarter
         [STAThread]
         static void Main()
         {
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
+            Application.ThreadException += Application_ThreadException;
+
             string[] args = Environment.GetCommandLineArgs();
             if (args.Length > 1 && args[1][0] == '!' && args[1] == "!s6key")
                 ToggleS6DevM();
@@ -99,6 +103,18 @@ namespace LuaDebuggerStarter
             {
                 MessageBox.Show(ex.ToString());
             }
+        }
+
+
+
+        static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
+        {
+            MessageBox.Show("Unhandled ThreadException:\n" + e.Exception.ToString());
+        }
+
+        static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            MessageBox.Show("Unhandled Exception:\n" + (e.ExceptionObject as Exception).ToString());
         }
     }
 

@@ -57,7 +57,7 @@ namespace LuaDebugger
 
     public class StackTraceClickedEventArgs : EventArgs
     {
-        public int StackLevel{ get; protected set; }
+        public int StackLevel { get; protected set; }
 
         public StackTraceClickedEventArgs(int level)
         {

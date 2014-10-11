@@ -55,7 +55,7 @@ namespace LuaDebugger
             //todo
             if (this.OnDebugStateChange != null)
                 this.OnDebugStateChange(this, e);
-
+            
             if (e.State == DebugState.Running)
             {
                 if (this.currentFile != null)
@@ -367,5 +367,4 @@ namespace LuaDebugger
                 return sc.Compare(tx.Text, ty.Text);
         }
     }
-
 }

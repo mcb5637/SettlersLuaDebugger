@@ -173,6 +173,7 @@ namespace LuaDebugger
             while (this.CurrentRequest == DebugRequest.Pause)
             {
                 //Application.DoEvents(); //can cause crashes
+                
                 Thread.Sleep(10);
             }
             UnfakeIfNeccessary();

@@ -37,6 +37,8 @@
             this.btnS5AO1 = new System.Windows.Forms.Button();
             this.btnS5Main = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.lblDevMS6 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
             this.btnS6DevM = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
             this.lblInstS6 = new System.Windows.Forms.Label();
@@ -44,8 +46,6 @@
             this.btnS6Main = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
-            this.lblDevMS6 = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.SuspendLayout();
@@ -141,6 +141,24 @@
             this.panel2.Size = new System.Drawing.Size(391, 77);
             this.panel2.TabIndex = 5;
             // 
+            // lblDevMS6
+            // 
+            this.lblDevMS6.AutoSize = true;
+            this.lblDevMS6.Location = new System.Drawing.Point(239, 51);
+            this.lblDevMS6.Name = "lblDevMS6";
+            this.lblDevMS6.Size = new System.Drawing.Size(23, 13);
+            this.lblDevMS6.TabIndex = 10;
+            this.lblDevMS6.Text = "ON";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(139, 51);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(103, 13);
+            this.label6.TabIndex = 9;
+            this.label6.Text = "Development Mode:";
+            // 
             // btnS6DevM
             // 
             this.btnS6DevM.Location = new System.Drawing.Point(293, 51);
@@ -212,24 +230,6 @@
             this.label4.TabIndex = 1;
             this.label4.Text = "Rise of an Empire";
             // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(139, 51);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(103, 13);
-            this.label6.TabIndex = 9;
-            this.label6.Text = "Development Mode:";
-            // 
-            // lblDevMS6
-            // 
-            this.lblDevMS6.AutoSize = true;
-            this.lblDevMS6.Location = new System.Drawing.Point(239, 51);
-            this.lblDevMS6.Name = "lblDevMS6";
-            this.lblDevMS6.Size = new System.Drawing.Size(23, 13);
-            this.lblDevMS6.TabIndex = 10;
-            this.lblDevMS6.Text = "ON";
-            // 
             // frmLDStarter
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -241,7 +241,8 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "frmLDStarter";
-            this.Text = "Lua Debugger";
+            this.Text = "Lua Debugger v";
+            this.Load += new System.EventHandler(this.frmLDStarter_Load);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.panel2.ResumeLayout(false);

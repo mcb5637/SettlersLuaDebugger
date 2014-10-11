@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Forms;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace DebugDummy
 {
@@ -14,8 +17,10 @@ namespace DebugDummy
         [STAThread]
         static void Main()
         {
-            ProcessStartInfo si;
+            string solutionDir = Environment.CurrentDirectory.Substring(0, Environment.CurrentDirectory.IndexOf("DebugDummy")-1);
 
+            ProcessStartInfo si;
+            
 #pragma warning disable 0162
             if (LuaDebugger.GlobalState.SettlersExe == "settlershok")
                 si = new ProcessStartInfo("D:/Program Files (x86)/DEdK/extra2/bin/settlershok.exe");
@@ -23,10 +28,11 @@ namespace DebugDummy
                 si = new ProcessStartInfo("D:/Program Files (x86)/S6/extra1/bin/Settlers6_.exe", "-DevM");
 #pragma warning restore 0162
 
-            si.EnvironmentVariables["Path"] += ";c:/dbgenv";
+            si.EnvironmentVariables["Path"] += ";" + solutionDir + "/dbgenv";
             si.UseShellExecute = false;
             proc = Process.Start(si);
             proc.WaitForExit();
+            
             return;
         }
     }

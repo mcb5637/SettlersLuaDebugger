@@ -76,12 +76,11 @@ namespace LuaDebuggerStarter
                 lblInstS5.Text = "Installation not found!";
 
             if (s6Path != null && CheckPaths(s6Paths, s6Path))
-            {
                 lblInstS6.Text = "Installation found";
-                CheckS6DevM();
-            }
             else
                 lblInstS6.Text = "Installation not found!";
+            
+            CheckS6DevM();
         }
 
         public bool CheckPaths(Dictionary<Button, string> dic, string basePath)
@@ -206,6 +205,11 @@ namespace LuaDebuggerStarter
             WindowsIdentity id = WindowsIdentity.GetCurrent();
             WindowsPrincipal principal = new WindowsPrincipal(id);
             return principal.IsInRole(WindowsBuiltInRole.Administrator);
+        }
+
+        private void frmLDStarter_Load(object sender, EventArgs e)
+        {
+            this.Text += VersionHelper.GetVersion();
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
@@ -28,7 +29,20 @@ namespace LuaDebugger
             ErrorHook.pcallHook = new LuaPcallHook(ErrorHook.FakePcall);
             IntPtr pcallHookPtr = Marshal.GetFunctionPointerForDelegate(ErrorHook.pcallHook);
 
-            return ImportPatcher.ReplaceIATEntry(GlobalState.LuaDll, "lua_pcall", pcallHookPtr);
+            try
+            {
+                return ImportPatcher.ReplaceIATEntry(GlobalState.LuaDll, "lua_pcall", pcallHookPtr);
+            }
+            catch (Exception e)
+            {
+                Process p = Process.GetCurrentProcess();
+                string modules = "";
+                foreach (ProcessModule pm in p.Modules)
+                    modules += pm.ModuleName + " (@ 0x" + pm.BaseAddress.ToString("X") + ") " + pm.FileName + "\n";
+                GlobalState.CatchErrors = false;
+                MessageBox.Show("Patching the Import Table for lua_pcall failed!\nLua Errors won't be caught by the Debugger.\nProblem: " + e.Message+"\n\n"+modules.TrimEnd(),"Press Ctrl+C and send to yoq!");
+                return false;
+            }
         }
 
         public static void SetErrorHandler(UIntPtr L, LuaErrorCaught callback)
