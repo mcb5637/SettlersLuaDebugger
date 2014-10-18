@@ -35,7 +35,7 @@ namespace LuaDebugger
             if (this.CurrentState == DebugState.Running)
             {
                 unfreeze = true;
-                this.DebugEngine.ManualPause(true);
+                this.DebugEngine.ManualPause(true, true);
             }
             this.DebugEngine.RemoveHook();
 
@@ -59,7 +59,7 @@ namespace LuaDebugger
 
             this.DebugEngine.SetHook();
             if (unfreeze)
-                this.DebugEngine.Resume();
+                this.DebugEngine.Resume(true);
 
             return result;
         }
@@ -228,7 +228,7 @@ namespace LuaDebugger
 
             bool wasRunning = this.DebugEngine.CurrentState == DebugState.Running;
             if (wasRunning)
-                this.DebugEngine.ManualPause(true);
+                this.DebugEngine.ManualPause(true, true);
 
             BBLua.lua_newtable(this.L);
             int i = 1;
@@ -241,20 +241,20 @@ namespace LuaDebugger
             BBLua.lua_setglobal(this.L, "_LuaDebugger_FileData");
 
             if (wasRunning)
-                this.DebugEngine.Resume();
+                this.DebugEngine.Resume(true);
         }
 
         public void RestoreLoadedFiles()
         {
             bool wasRunning = this.DebugEngine.CurrentState == DebugState.Running;
             if (wasRunning)
-                this.DebugEngine.ManualPause(true);
+                this.DebugEngine.ManualPause(true, true);
 
             BBLua.lua_getglobal(this.L, "_LuaDebugger_FileData");
             if (BBLua.lua_type(this.L, -1) != LuaType.Table)
             {
                 if (wasRunning)
-                    this.DebugEngine.Resume();
+                    this.DebugEngine.Resume(true);
                 return;
             }
 

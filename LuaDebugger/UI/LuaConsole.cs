@@ -52,10 +52,14 @@ namespace LuaDebugger
             this.historyPos = nextHistory + 1;
 
             rtbOutput.AppendText("\n> " + cmd);
-            string answer = ls.EvaluateLua(cmd);
-            if (answer != "")
-                rtbOutput.AppendText("\n" + answer);
-            rtbOutput.ScrollToCaret();
+
+            System.Threading.ThreadPool.QueueUserWorkItem(delegate
+            {
+                string answer = ls.EvaluateLua(cmd);
+                if (answer != "")
+                    rtbOutput.AppendText("\n" + answer);
+                rtbOutput.ScrollToCaret();
+            }, null);
         }
 
         public void AppendText(string text)

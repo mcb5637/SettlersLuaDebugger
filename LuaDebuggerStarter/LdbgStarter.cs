@@ -19,8 +19,14 @@ namespace LuaDebuggerStarter
     {
         protected string tmpPath, s5Path, s6Path;
 
+        protected bool s5Found = false, s6Found = false;
         protected Dictionary<Button, string> s5Paths, s6Paths;
         protected Dictionary<object, string> startDict = new Dictionary<object, string>();
+
+        protected const string s5KeyName = @"HKEY_LOCAL_MACHINE\SOFTWARE\Blue Byte\The Settlers - Heritage of Kings";
+        protected const string s5ValueName = "InstallPath";
+        protected const string s6KeyName = @"HKEY_LOCAL_MACHINE\SOFTWARE\Ubisoft\The Settlers 6\GameUpdate";
+        protected const string s6ValueName = "InstallDir";
 
         public frmLDStarter()
         {
@@ -47,8 +53,8 @@ namespace LuaDebuggerStarter
                 };
 
 
-            s5Path = (string)Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Blue Byte\The Settlers - Heritage of Kings", "InstallPath", null);
-            s6Path = (string)Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Ubisoft\The Settlers 6\GameUpdate", "InstallDir", null);
+            s5Path = (string)Registry.GetValue(s5KeyName, s5ValueName, null);
+            s6Path = (string)Registry.GetValue(s6KeyName, s6ValueName, null);
 
             RecheckAll();
         }
@@ -70,16 +76,20 @@ namespace LuaDebuggerStarter
         public void RecheckAll()
         {
             startDict.Clear();
-            if (s5Path != null && CheckPaths(s5Paths, s5Path))
+
+            s5Found = (s5Path != null && CheckPaths(s5Paths, s5Path));
+            s6Found = (s6Path != null && CheckPaths(s6Paths, s6Path));
+
+            if(s5Found)
                 lblInstS5.Text = "Installation found";
             else
                 lblInstS5.Text = "Installation not found!";
 
-            if (s6Path != null && CheckPaths(s6Paths, s6Path))
+            if (s6Found)
                 lblInstS6.Text = "Installation found";
             else
                 lblInstS6.Text = "Installation not found!";
-            
+
             CheckS6DevM();
         }
 
@@ -112,7 +122,9 @@ namespace LuaDebuggerStarter
             ProcessStartInfo si = new ProcessStartInfo(startDict[sender], "-DevM");
             si.EnvironmentVariables["Path"] += ";" + tmpPath;
             si.UseShellExecute = false;
-            si.Arguments += string.Join(" ", Environment.GetCommandLineArgs());
+            string[] cmdLineArgs = Environment.GetCommandLineArgs();
+            if (cmdLineArgs.Length > 1)
+                si.Arguments += " " + string.Join(" ", cmdLineArgs, 1, cmdLineArgs.Length - 1);
             Process p = Process.Start(si);
         }
 
@@ -126,9 +138,9 @@ namespace LuaDebuggerStarter
 
             try
             {
-                string s6Path = tmpPath + "/base/_dbg/bin/release/";
+                string s6DllPath = tmpPath + "/base/_dbg/bin/release/";
                 Directory.CreateDirectory(tmpPath);
-                Directory.CreateDirectory(s6Path);
+                Directory.CreateDirectory(s6DllPath);
 
                 Stream s5Stream = localAssembly.GetManifestResourceStream(res + "LuaDebugger.dll");
                 Stream s6Stream = localAssembly.GetManifestResourceStream(res + "BBLuaDebugger.dll");
@@ -136,7 +148,7 @@ namespace LuaDebuggerStarter
                 using (FileStream fs = new FileStream(tmpPath + "LuaDebugger.dll", FileMode.Create))
                     s5Stream.CopyTo(fs);
 
-                using (FileStream fs = new FileStream(s6Path + "BBLuaDebugger.dll", FileMode.Create))
+                using (FileStream fs = new FileStream(s6DllPath + "BBLuaDebugger.dll", FileMode.Create))
                     s6Stream.CopyTo(fs);
 
             }
@@ -147,23 +159,34 @@ namespace LuaDebuggerStarter
             }
         }
 
+        private bool ConfirmPathSave()
+        {
+            return MessageBox.Show("Do you want to permanently save the selected path?", "Save", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes;
+        }
+
         private void lblInstS5_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog fbd = new FolderBrowserDialog();
+            fbd.SelectedPath = s5Path;
             if (fbd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 s5Path = fbd.SelectedPath;
                 RecheckAll();
+                if (s5Found && ConfirmPathSave())
+                    WriteRegistryString(s5KeyName, s5ValueName, s5Path);
             }
         }
 
         private void lblS6Inst_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog fbd = new FolderBrowserDialog();
+            fbd.SelectedPath = s6Path;
             if (fbd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 s6Path = fbd.SelectedPath;
                 RecheckAll();
+                if (s6Found && ConfirmPathSave())
+                    WriteRegistryString(s6KeyName, s6ValueName, s6Path);
             }
         }
 
@@ -196,9 +219,28 @@ namespace LuaDebuggerStarter
                 Program.ToggleS6DevM();
                 RecheckAll();
             }
-
-            
         }
+
+        private void WriteRegistryString(string keyName, string valueName, string value)
+        {
+            ProcessStartInfo proc = new ProcessStartInfo();
+            proc.UseShellExecute = true;
+            proc.FileName = "REG";
+            proc.Arguments = "ADD \"" + keyName + "\" /v \"" + valueName + "\" /t REG_SZ /d \"" + value + "\" /f";
+
+            if (Environment.GetEnvironmentVariable("PROCESSOR_ARCHITEW6432") != null)
+                proc.Arguments += " /reg:32";
+
+            if (!IsRunAsAdmin())
+                proc.Verb = "runas";
+
+            try
+            {
+                Process.Start(proc).WaitForExit();
+            }
+            catch { }
+        }
+
 
         internal bool IsRunAsAdmin()
         {

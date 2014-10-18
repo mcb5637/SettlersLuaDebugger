@@ -57,9 +57,6 @@ namespace LuaDebugger
 
         static LuaResult FakePcall(UIntPtr L, int nargs, int nresults, int errfunc)
         {
-            /*if (GlobalState.DebuggerWindow != null && !GlobalState.DebuggerWindow.InvokeRequired)
-                MessageBox.Show("WAT");*/
-            //StartMenu.S00_ToSingleplayerMenu=function()return lol[9];end
             if (!GlobalState.CatchErrors)
                 return BBLua.lua_pcall(L, nargs, nresults, errfunc);
 

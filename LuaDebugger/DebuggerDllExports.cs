@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Diagnostics;
 using System.Text;
 using System.Windows.Forms;
 using System.Threading;
@@ -21,6 +22,11 @@ namespace LuaDebugger
                 MessageBox.Show("This DLL only works with " + GlobalState.SettlersExe);
                 Environment.Exit(0);
             }
+
+            GlobalState.settlersWindowHandle = Process.GetCurrentProcess().MainWindowHandle;
+            WindowStyle settlersWndStyle = (WindowStyle)WinAPI.GetWindowLong(GlobalState.settlersWindowHandle, WinAPI.GWL_STYLE);
+            settlersWndStyle |= WindowStyle.WS_MINIMIZEBOX; // | WindowStyle.WS_SIZEBOX | WindowStyle.WS_MAXIMIZEBOX;
+            WinAPI.SetWindowLong(GlobalState.settlersWindowHandle, WinAPI.GWL_STYLE, (uint)settlersWndStyle);
 
             ErrorHook.InstallHook();
             Thread uiThread = new Thread(new ThreadStart(DbgThread.RunMessageLoop));

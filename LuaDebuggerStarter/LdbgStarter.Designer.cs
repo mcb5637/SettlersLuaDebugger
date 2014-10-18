@@ -40,7 +40,6 @@
             this.lblDevMS6 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.btnS6DevM = new System.Windows.Forms.Button();
-            this.label5 = new System.Windows.Forms.Label();
             this.lblInstS6 = new System.Windows.Forms.Label();
             this.btnS6AO1 = new System.Windows.Forms.Button();
             this.btnS6Main = new System.Windows.Forms.Button();
@@ -130,7 +129,6 @@
             this.panel2.Controls.Add(this.lblDevMS6);
             this.panel2.Controls.Add(this.label6);
             this.panel2.Controls.Add(this.btnS6DevM);
-            this.panel2.Controls.Add(this.label5);
             this.panel2.Controls.Add(this.lblInstS6);
             this.panel2.Controls.Add(this.btnS6AO1);
             this.panel2.Controls.Add(this.btnS6Main);
@@ -146,9 +144,9 @@
             this.lblDevMS6.AutoSize = true;
             this.lblDevMS6.Location = new System.Drawing.Point(239, 51);
             this.lblDevMS6.Name = "lblDevMS6";
-            this.lblDevMS6.Size = new System.Drawing.Size(23, 13);
+            this.lblDevMS6.Size = new System.Drawing.Size(36, 13);
             this.lblDevMS6.TabIndex = 10;
-            this.lblDevMS6.Text = "ON";
+            this.lblDevMS6.Text = "active";
             // 
             // label6
             // 
@@ -168,17 +166,6 @@
             this.btnS6DevM.Text = "Dev Mode";
             this.btnS6DevM.UseVisualStyleBackColor = true;
             this.btnS6DevM.Click += new System.EventHandler(this.btnS6DevM_Click);
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label5.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.label5.Location = new System.Drawing.Point(86, 6);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(75, 13);
-            this.label5.TabIndex = 7;
-            this.label5.Text = "experimental ;)";
             // 
             // lblInstS6
             // 
@@ -266,7 +253,6 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label lblInstS5;
         private System.Windows.Forms.Label lblInstS6;
-        private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Button btnS6DevM;
         private System.Windows.Forms.Label lblDevMS6;
         private System.Windows.Forms.Label label6;

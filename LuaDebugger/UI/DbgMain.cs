@@ -8,6 +8,8 @@ using System.Windows.Forms;
 using System.Globalization;
 using System.Threading;
 using System.Reflection;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace LuaDebugger
 {
@@ -84,8 +86,23 @@ namespace LuaDebugger
             SwitchToState(this.tcbState.SelectedItem as LuaState);
         }
 
+        bool IsSettlersFullscreen()
+        {
+            WindowStyle settlersWndStyle = (WindowStyle)WinAPI.GetWindowLong(GlobalState.settlersWindowHandle, WinAPI.GWL_STYLE);
+            return ((settlersWndStyle & WindowStyle.WS_POPUP) != 0);
+        }
+
         void stateViews_OnDebugStateChange(object sender, DebugStateChangedEventArgs e)
         {
+            if (IsSettlersFullscreen())
+                if (e.State == DebugState.Running)
+                {
+                    WinAPI.SetForegroundWindow(GlobalState.settlersWindowHandle);
+                    WinAPI.ShowWindow(GlobalState.settlersWindowHandle, WindowShowStyle.Restore);
+                }
+                else
+                    WinAPI.SetForegroundWindow(this.Handle);
+
             if (this.activeState != e.LuaState.StateView)
                 SwitchToState(e.LuaState);
             else
@@ -225,6 +242,13 @@ namespace LuaDebugger
         private void toolStripMenuItem_MouseLeave(object sender, EventArgs e)
         {
             toolTip1.Hide(this);
+        }
+
+        private void tmrAlive_Tick(object sender, EventArgs e)
+        {
+            //watchdog, check whether the game has been closed but failed to kill the debugger thread
+            if (!WinAPI.IsWindow(GlobalState.settlersWindowHandle))
+                Environment.Exit(0);
         }
     }
 

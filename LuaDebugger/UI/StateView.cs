@@ -293,7 +293,7 @@ namespace LuaDebugger
         public void PauseResume()
         {
             if (this.CurrentState == DebugState.Running)
-                this.debugEngine.ManualPause(false);
+                this.debugEngine.ManualPause();
             else
                 this.debugEngine.Resume();
         }

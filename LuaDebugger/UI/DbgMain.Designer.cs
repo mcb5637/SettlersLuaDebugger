@@ -42,6 +42,7 @@
             this.lblNoStates = new System.Windows.Forms.Label();
             this.pnlMain = new System.Windows.Forms.Panel();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.tmrAlive = new System.Windows.Forms.Timer(this.components);
             this.menuStrip1.SuspendLayout();
             this.pnlMain.SuspendLayout();
             this.SuspendLayout();
@@ -165,6 +166,12 @@
             this.pnlMain.Size = new System.Drawing.Size(624, 585);
             this.pnlMain.TabIndex = 6;
             // 
+            // tmrAlive
+            // 
+            this.tmrAlive.Enabled = true;
+            this.tmrAlive.Interval = 1000;
+            this.tmrAlive.Tick += new System.EventHandler(this.tmrAlive_Tick);
+            // 
             // DbgMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -203,5 +210,6 @@
         private System.Windows.Forms.Label lblNoStates;
         private System.Windows.Forms.Panel pnlMain;
         private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.Timer tmrAlive;
     }
 }

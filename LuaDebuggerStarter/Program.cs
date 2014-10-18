@@ -38,17 +38,20 @@ namespace LuaDebuggerStarter
                 SetS6DevKey();
         }
 
-         public static bool IsS6DevM()
+        public static bool IsS6DevM()
         {
-            var s6RegKey = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Ubisoft\The Settlers 6\Development", "DevelopmentMachine", 0);
+            var s6RegKey = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Ubisoft\The Settlers 6\Development", "DevelopmentMachine", null);
 
-            if (s6RegKey == null || (Int32)s6RegKey == 0 || (Int32)s6RegKey != Program.CalculateDevHash(System.Environment.MachineName))
+            if (s6RegKey == null || 
+                s6RegKey.GetType() != typeof(Int32) || 
+                (Int32)s6RegKey == 0 || 
+                (Int32)s6RegKey != Program.CalculateDevHash(System.Environment.MachineName))
                 return false;
             else
                 return true;
         }
 
-        public static uint CalculateDevHash(string str)
+        public static int CalculateDevHash(string str)
         {
             str = str.ToLower();
             uint sum = 0;
@@ -61,21 +64,21 @@ namespace LuaDebuggerStarter
                     sum ^= upperNibble ^ (upperNibble >> 24);
             }
             uint tmp = 1812433253 * (sum >> 16) - 1989869568 * sum;
-            return 1142332463 * tmp;
+            return (Int32)(1142332463 * tmp);
 
         }
 
         public static void SetS6DevKey()
         {
-            int key = (int)CalculateDevHash(System.Environment.MachineName);
-/*
-            RegistryKey installed_versions = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\NET Framework Setup\NDP");
-            string instd = "";
-            foreach (string s in installed_versions.GetSubKeyNames())
-                instd += s + ", ";
-            MessageBox.Show("Running CLR: " + Environment.Version.ToString()+
-                "\n.NET Installs: " + instd +
-                "\nKey: 0x" + key.ToString("x"), "twA Debug");*/
+            int key = CalculateDevHash(System.Environment.MachineName);
+            /*
+                        RegistryKey installed_versions = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\NET Framework Setup\NDP");
+                        string instd = "";
+                        foreach (string s in installed_versions.GetSubKeyNames())
+                            instd += s + ", ";
+                        MessageBox.Show("Running CLR: " + Environment.Version.ToString()+
+                            "\n.NET Installs: " + instd +
+                            "\nKey: 0x" + key.ToString("x"), "twA Debug");*/
 
             try
             {

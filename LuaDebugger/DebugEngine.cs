@@ -67,6 +67,7 @@ namespace LuaDebugger
         public LuaStackTrace CurrentStackTrace { get; protected set; }
         public string CurrentError { get; protected set; }
 
+        protected bool surpressStateChangedEvent = false;
         protected delegate void Action(); //.net3 WHY?!?!
         protected Action fireStateChangedEvent;
         protected Action unfakeCallback = null;
@@ -173,7 +174,8 @@ namespace LuaDebugger
             while (this.CurrentRequest == DebugRequest.Pause)
             {
                 //Application.DoEvents(); //can cause crashes
-                
+                FreezeMsgLoop.ProcessBasicEvents();
+
                 Thread.Sleep(10);
             }
             UnfakeIfNeccessary();
@@ -187,6 +189,9 @@ namespace LuaDebugger
 
         protected void FireStateChangedEvent()
         {
+            if (surpressStateChangedEvent)
+                return;
+
             if (GlobalState.DebuggerWindow.InvokeRequired)
                 GlobalState.DebuggerWindow.BeginInvoke(this.fireStateChangedEvent);
             else
@@ -221,8 +226,16 @@ namespace LuaDebugger
                 bpsAtLine.Remove(bp);
         }
 
-        public void ManualPause(bool block)
+        public void ManualPause()
         {
+            ManualPause(false, false);
+        }
+
+        public void ManualPause(bool block, bool silent)
+        {
+            if (silent)
+                this.surpressStateChangedEvent = true;
+
             this.CurrentRequest = DebugRequest.Pause;
 
             if (block) //Timeout: lua state inactive -> no problem to issue commands via the console
@@ -230,19 +243,37 @@ namespace LuaDebugger
                 for (int timeOut = 0; this.CurrentState != DebugState.Paused && timeOut < 5; timeOut++)
                     Thread.Sleep(10);
             }
+
+            this.surpressStateChangedEvent = false;
         }
 
         public void StepLine()
         {
+            StepLine(false);
+        }
+
+        public void StepLine(bool surpressEvent)
+        {
+            this.surpressStateChangedEvent = surpressEvent;
+
             this.targetCallStackLevel = this.callStack;
             this.CurrentRequest = DebugRequest.StepToLevel;
 
             while (this.CurrentState != DebugState.Paused && this.CurrentRequest == DebugRequest.Pause)
                 Thread.Sleep(10);
+
+            this.surpressStateChangedEvent = false;
         }
 
         public void StepOut()
         {
+            StepOut(false);
+        }
+
+        public void StepOut(bool surpressEvent)
+        {
+            this.surpressStateChangedEvent = surpressEvent;
+
             this.targetCallStackLevel = this.callStack - 1;
             if (this.targetCallStackLevel < 0)
                 this.targetCallStackLevel = 0;
@@ -250,22 +281,44 @@ namespace LuaDebugger
 
             while (this.CurrentState != DebugState.Paused && this.CurrentRequest == DebugRequest.Pause)
                 Thread.Sleep(10);
+
+            this.surpressStateChangedEvent = false;
         }
+
 
         public void StepIn()
         {
+            StepIn(false);
+        }
+
+        public void StepIn(bool surpressEvent)
+        {
+            this.surpressStateChangedEvent = surpressEvent;
+
             this.CurrentRequest = DebugRequest.StepIn;
 
             while (this.CurrentState != DebugState.Paused && this.CurrentRequest == DebugRequest.Pause)
                 Thread.Sleep(10);
+
+            this.surpressStateChangedEvent = false;
         }
+
 
         public void Resume()
         {
+            Resume(false);
+        }
+
+        public void Resume(bool surpressEvent)
+        {
+            this.surpressStateChangedEvent = surpressEvent;
+
             this.CurrentRequest = DebugRequest.Resume;
 
             while (this.CurrentState != DebugState.Running && this.CurrentRequest == DebugRequest.Resume)
                 Thread.Sleep(10);
+
+            this.surpressStateChangedEvent = false;
         }
 
         public void SetHook()

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Threading;
 
@@ -15,6 +16,7 @@ namespace LuaDebugger
         public const string SettlersExe = "settlers6";
 #endif
 
+        public static IntPtr settlersWindowHandle;
         public static Thread UIThread;
         public static DbgMain DebuggerWindow;
         public static List<LuaState> LuaStates = new List<LuaState>();
