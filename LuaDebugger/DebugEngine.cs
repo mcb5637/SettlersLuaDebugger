@@ -104,12 +104,12 @@ namespace LuaDebugger
             return 0;
         }
 
-        protected void DebugHook(UIntPtr L, IntPtr ptr)
+        protected unsafe void DebugHook(UIntPtr L, IntPtr ptr) //unsafe for speed
         {
-            LuaStackRecord sr = (LuaStackRecord)Marshal.PtrToStructure(ptr, typeof(LuaStackRecord));
-            if (sr.debugEvent == LuaEvent.Call)
+            LuaStackRecord* sr = (LuaStackRecord*)ptr;
+            if (sr->debugEvent == LuaEvent.Call)
                 this.callStack++;
-            else if (sr.debugEvent == LuaEvent.Return || sr.debugEvent == LuaEvent.TailReturn)
+            else if (sr->debugEvent == LuaEvent.Return || sr->debugEvent == LuaEvent.TailReturn)
             {
                 this.callStack--;
 
@@ -125,20 +125,25 @@ namespace LuaDebugger
             else if (this.CurrentRequest == DebugRequest.Pause || this.CurrentRequest == DebugRequest.StepIn)
                 NormalBreak();
             else if (this.CurrentRequest == DebugRequest.StepToLevel && (this.callStack <= this.targetCallStackLevel))
-                NormalBreak();
+                NormalBreak();            
             // request == resume
             else
             {
                 List<Breakpoint> bpsAtLine;
-                if (!this.lineToBP.TryGetValue(sr.currentline, out bpsAtLine))
+                if (!this.lineToBP.TryGetValue(sr->currentline, out bpsAtLine))
                     return; //no breakpoints on this line
 
-                BBLua.lua_getinfo(L, "nSl", ptr);
-                LuaDebugRecord dr = (LuaDebugRecord)Marshal.PtrToStructure(ptr, typeof(LuaDebugRecord));
+                BBLua.lua_getinfo(L, "S", ptr);
+                LuaDebugSourceRecord dr = (LuaDebugSourceRecord)Marshal.PtrToStructure(ptr, typeof(LuaDebugSourceRecord));
+
                 foreach (Breakpoint bp in bpsAtLine)
                 {
                     if (bp.File.Filename == dr.source)
+                    {
                         NormalBreak();
+                        break;
+                    }
+
                 }
             }
         }

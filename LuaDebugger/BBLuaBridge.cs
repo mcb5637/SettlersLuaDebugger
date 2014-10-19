@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Security;
 using System.Text;
 
 namespace LuaDebugger
@@ -69,6 +70,13 @@ namespace LuaDebugger
         public LuaEvent debugEvent;
         [FieldOffset(20)]
         public int currentline;
+    }
+
+    [StructLayout(LayoutKind.Explicit)]
+    public struct LuaDebugSourceRecord
+    {
+        [FieldOffset(16)]
+        public string source;
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -434,7 +442,7 @@ public static extern int luaL_findstring (string st, string const lst[]);*/
         public static extern int luaL_loadfile(UIntPtr L, string filename);
 
         [DllImport(GlobalState.LuaDll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int luaL_loadbuffer(UIntPtr L, string buff, int sz,
+        public static extern LuaResult luaL_loadbuffer(UIntPtr L, string buff, int sz,
                                         string name);
 
         /*

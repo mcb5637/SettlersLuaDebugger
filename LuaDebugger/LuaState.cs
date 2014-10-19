@@ -29,7 +29,7 @@ namespace LuaDebugger
             this.DebugEngine = new DebugEngine(this);
         }
 
-        public string EvaluateLua(string cmd)
+        public string EvaluateLua(string expression)
         {
             bool unfreeze = false;
             if (this.CurrentState == DebugState.Running)
@@ -39,22 +39,24 @@ namespace LuaDebugger
             }
             this.DebugEngine.RemoveHook();
 
-            string fallback = cmd;
-            cmd = "return " + cmd;
+            string asStatement = expression;
+            expression = "return " + expression;
 
-            BBLua.luaL_loadbuffer(this.L, cmd, cmd.Length, "from console");
-            LuaResult
-                err = BBLua.lua_pcall(this.L, 0, 1, 0);
-            string result = TosToString();
-
-            if (err != LuaResult.OK)
+            string result = "";
+            LuaResult err = BBLua.luaL_loadbuffer(this.L, expression, expression.Length, "from console");
+            if (err == LuaResult.OK)
             {
-                BBLua.luaL_loadbuffer(this.L, fallback, fallback.Length, "from console");
-                LuaResult err2 = BBLua.lua_pcall(this.L, 0, 1, 0);
-                if (err2 == LuaResult.OK)
+                err = BBLua.lua_pcall(this.L, 0, 1, 0);
+                result = TosToString();
+            }
+            else
+            {
+                err = BBLua.luaL_loadbuffer(this.L, asStatement, asStatement.Length, "from console");
+                if (err == LuaResult.OK)
+                    err = BBLua.lua_pcall(this.L, 0, 1, 0);
+
+                if (err != LuaResult.OK)
                     result = TosToString();
-                else
-                    result = "As Expression: " + result + "\nAs Statement: " + TosToString();
             }
 
             this.DebugEngine.SetHook();

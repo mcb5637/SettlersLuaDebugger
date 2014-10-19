@@ -52,6 +52,7 @@ namespace LuaDebugger
             this.historyPos = nextHistory + 1;
 
             rtbOutput.AppendText("\n> " + cmd);
+            tbInput.ReadOnly = true;
 
             System.Threading.ThreadPool.QueueUserWorkItem(delegate
             {
@@ -59,6 +60,7 @@ namespace LuaDebugger
                 if (answer != "")
                     rtbOutput.AppendText("\n" + answer);
                 rtbOutput.ScrollToCaret();
+                tbInput.ReadOnly = false;
             }, null);
         }
 
@@ -75,7 +77,13 @@ namespace LuaDebugger
                 string cmd = tbInput.Text;
                 tbInput.Text = "";
 
-                RunCommand(cmd);
+                if (cmd != "")
+                    RunCommand(cmd);
+                else
+                {
+                    rtbOutput.AppendText("\n>");
+                    rtbOutput.ScrollToCaret();
+                }
                 e.Handled = true;
                 e.SuppressKeyPress = true;
             }

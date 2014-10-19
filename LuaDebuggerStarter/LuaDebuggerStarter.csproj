@@ -79,8 +79,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="bug.ico" />
-    <None Include="Resources\path17.png" />
-    <None Include="Resources\test.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
