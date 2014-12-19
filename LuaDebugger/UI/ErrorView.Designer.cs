@@ -30,6 +30,7 @@
         {
             this.label1 = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.chkErrorBreak = new System.Windows.Forms.CheckBox();
             this.tbErrorMessage = new System.Windows.Forms.TextBox();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -54,13 +55,29 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.panel1.BackColor = System.Drawing.Color.Black;
+            this.panel1.Controls.Add(this.chkErrorBreak);
             this.panel1.Controls.Add(this.tbErrorMessage);
             this.panel1.Controls.Add(this.label1);
             this.panel1.Location = new System.Drawing.Point(3, 0);
-            this.panel1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.panel1.Margin = new System.Windows.Forms.Padding(2);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(332, 83);
             this.panel1.TabIndex = 1;
+            // 
+            // chkErrorBreak
+            // 
+            this.chkErrorBreak.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.chkErrorBreak.AutoSize = true;
+            this.chkErrorBreak.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(204)))), ((int)(((byte)(35)))));
+            this.chkErrorBreak.Checked = true;
+            this.chkErrorBreak.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkErrorBreak.Location = new System.Drawing.Point(235, 5);
+            this.chkErrorBreak.Name = "chkErrorBreak";
+            this.chkErrorBreak.Size = new System.Drawing.Size(94, 17);
+            this.chkErrorBreak.TabIndex = 3;
+            this.chkErrorBreak.Text = "Break on Error";
+            this.chkErrorBreak.UseVisualStyleBackColor = false;
+            this.chkErrorBreak.CheckedChanged += new System.EventHandler(this.chkErrorBreak_CheckedChanged);
             // 
             // tbErrorMessage
             // 
@@ -72,7 +89,7 @@
             this.tbErrorMessage.CausesValidation = false;
             this.tbErrorMessage.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F);
             this.tbErrorMessage.Location = new System.Drawing.Point(0, 25);
-            this.tbErrorMessage.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.tbErrorMessage.Margin = new System.Windows.Forms.Padding(2);
             this.tbErrorMessage.Multiline = true;
             this.tbErrorMessage.Name = "tbErrorMessage";
             this.tbErrorMessage.ReadOnly = true;
@@ -86,10 +103,9 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.panel1);
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "ErrorView";
             this.Size = new System.Drawing.Size(338, 85);
-            this.Load += new System.EventHandler(this.ErrorView_Load);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.ResumeLayout(false);
@@ -101,5 +117,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.TextBox tbErrorMessage;
+        private System.Windows.Forms.CheckBox chkErrorBreak;
     }
 }

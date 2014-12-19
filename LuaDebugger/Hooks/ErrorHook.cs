@@ -39,8 +39,7 @@ namespace LuaDebugger
                 string modules = "";
                 foreach (ProcessModule pm in p.Modules)
                     modules += pm.ModuleName + " (@ 0x" + pm.BaseAddress.ToString("X") + ") " + pm.FileName + "\n";
-                GlobalState.CatchErrors = false;
-                MessageBox.Show("Patching the Import Table for lua_pcall failed!\nLua Errors won't be caught by the Debugger.\nProblem: " + e.Message+"\n\n"+modules.TrimEnd(),"Press Ctrl+C and send to yoq!");
+                MessageBox.Show("Patching the Import Table for lua_pcall failed!\nLua Errors won't be caught by the Debugger.\nProblem: " + e.Message + "\n\n" + modules.TrimEnd(), "Press Ctrl+C and send to yoq!");
                 return false;
             }
         }
@@ -74,7 +73,7 @@ namespace LuaDebugger
                 int stackNow = BBLua.lua_gettop(L);
 
                 if (res == LuaResult.OK)
-                    nresults = stackNow - stackBefore + 1;
+                    nresults = stackNow - stackBefore + nargs + 1;
                 else
                     nresults = 0;
             }
@@ -83,7 +82,7 @@ namespace LuaDebugger
             {
                 BBLua.lua_settop(L, -2); //remove errormsg
 
-                for (int i = 0; i < nresults; i++)  //push dummy returns, hopefully shok accepts this
+                for (int i = 0; i < nresults; i++)  //push dummy returns, hopefully settlers accepts this
                     BBLua.lua_pushnil(L);
             }
             BBLua.lua_remove(L, -nresults - 1); //remove error handler

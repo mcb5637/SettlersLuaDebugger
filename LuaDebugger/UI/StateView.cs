@@ -23,7 +23,8 @@ namespace LuaDebugger
         protected DebugEngine debugEngine = null;
         protected LuaFile currentFile;
         protected TreeNode mapScripts, internalScripts;
-        protected int fileSaveTimeout = 5;
+        protected const int fileSaveTimeoutInitial = 5;
+        protected int fileSaveTimeout = fileSaveTimeoutInitial;
 
         public event EventHandler<DebugStateChangedEventArgs> OnDebugStateChange;
 
@@ -46,16 +47,17 @@ namespace LuaDebugger
             this.debugEngine.OnDebugStateChange += debugEngine_OnDebugStateChange;
             state.StateView = this;
             this.LuaConsole.InitState(state);
+            this.errorView.InitState(state);
             mapScripts = this.tvFiles.Nodes["MapScripts"];
             internalScripts = this.tvFiles.Nodes["Internal"];
+            this.tvFiles.TreeViewNodeSorter = new MyNodeSorter(mapScripts);
         }
 
         void debugEngine_OnDebugStateChange(object sender, DebugStateChangedEventArgs e)
         {
-            //todo
             if (this.OnDebugStateChange != null)
                 this.OnDebugStateChange(this, e);
-            
+
             if (e.State == DebugState.Running)
             {
                 if (this.currentFile != null)
@@ -63,7 +65,7 @@ namespace LuaDebugger
                     this.currentFile.Arrow.IsEnabled = false;
                     this.currentFile.Editor.Invalidate();
                 }
-                this.errorView.Visible = false;
+                this.errorView.Visible2 = false;
                 this.stackTraceView.Visible = false;
             }
             else
@@ -73,7 +75,7 @@ namespace LuaDebugger
 
                 if (e.State == DebugState.CaughtError)
                 {
-                    this.errorView.Visible = true;
+                    this.errorView.Visible2 = true;
                     this.errorView.ErrorMessage = this.debugEngine.CurrentError;
                 }
             }
@@ -83,9 +85,9 @@ namespace LuaDebugger
         {
             LuaFunctionInfo lfi = this.debugEngine.CurrentStackTrace[n];
 
-            if (this.ls.LoadedFiles.Count == 0 && this.fileSaveTimeout > 0) 
+            if (this.ls.LoadedFiles.Count == 0 && this.fileSaveTimeout > 0)
                 this.ls.RestoreLoadedFiles();
-                
+
             if (this.ls.UpdateFileList)
                 UpdateView();
 
@@ -132,7 +134,13 @@ namespace LuaDebugger
             if (this.ls.UpdateFileList)
             {
                 this.ls.UpdateFileList = false;
-                this.fileSaveTimeout = 3;
+
+                //only trigger writing filedata to the luastate if the last
+                //change wasn't the result of restoring the file list from the LS
+                if (this.ls.UpdateAfterFileListRestore)
+                    this.ls.UpdateAfterFileListRestore = false;
+                else
+                    this.fileSaveTimeout = fileSaveTimeoutInitial;
 
                 this.mapScripts.Nodes.Clear();
                 this.internalScripts.Nodes.Clear();
@@ -163,9 +171,15 @@ namespace LuaDebugger
                 if (this.fileSaveTimeout == 0)
                 {
                     if (this.ls.LoadedFiles.Count > 0)
-                        this.ls.SaveLoadedFiles();
+                    {
+                        if (!this.ls.SaveLoadedFiles())
+                            fileSaveTimeout = fileSaveTimeoutInitial;
+                    }
                     else
-                        this.ls.RestoreLoadedFiles();
+                    {
+                        if (!this.ls.RestoreLoadedFiles())
+                            fileSaveTimeout = fileSaveTimeoutInitial;
+                    }
                 }
             }
         }
@@ -344,6 +358,8 @@ namespace LuaDebugger
         }
     }
 
+    // sort the treeView but force "Map Scripts" over "Internal Scripts" 
+    // disregarding I>M
     public class MyNodeSorter : System.Collections.IComparer
     {
         protected TreeNode alwaysOnTop;
@@ -359,6 +375,7 @@ namespace LuaDebugger
         {
             TreeNode tx = (TreeNode)x;
             TreeNode ty = (TreeNode)y;
+
             if (tx.Equals(this.alwaysOnTop))
                 return -1;
             else if (ty.Equals(this.alwaysOnTop))

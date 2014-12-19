@@ -36,6 +36,10 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug S5|x86'">
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="ICSharpCode.TextEditor">
       <HintPath>..\packages\ICSharpCode.TextEditor.3.2.1.6466\lib\Net20\ICSharpCode.TextEditor.dll</HintPath>
@@ -54,8 +58,9 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Hooks\TickHook.cs" />
     <Compile Include="Helper\Extensions.cs" />
-    <Compile Include="ErrorHook.cs" />
+    <Compile Include="Hooks\ErrorHook.cs" />
     <Compile Include="Helper\SpecialMarks.cs" />
     <Compile Include="DebugEngine.cs" />
     <Compile Include="Helper\MySyntaxModeProvider.cs" />

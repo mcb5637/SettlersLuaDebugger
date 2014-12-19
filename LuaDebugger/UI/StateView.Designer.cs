@@ -75,6 +75,7 @@
             this.tvFiles.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
             treeNode1,
             treeNode2});
+            this.tvFiles.ShowNodeToolTips = true;
             this.tvFiles.Size = new System.Drawing.Size(214, 196);
             this.tvFiles.TabIndex = 0;
             this.tvFiles.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.tvFiles_AfterSelect);

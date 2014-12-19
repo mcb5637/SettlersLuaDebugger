@@ -17,17 +17,27 @@ namespace LuaDebugger
     {
         static DebuggerDllExports()
         {
+            if (Environment.GetEnvironmentVariable("ldbWaitForDebugger") == "yes")
+            {
+                while (!Debugger.IsAttached)
+                    Thread.Sleep(1);
+
+                GlobalState.IsInVisualStudio = true;
+            }
+
             if (!Application.ExecutablePath.ToLower().Contains(GlobalState.SettlersExe))
             {
                 MessageBox.Show("This DLL only works with " + GlobalState.SettlersExe);
                 Environment.Exit(0);
             }
 
-            GlobalState.settlersWindowHandle = Process.GetCurrentProcess().MainWindowHandle;
-            WindowStyle settlersWndStyle = (WindowStyle)WinAPI.GetWindowLong(GlobalState.settlersWindowHandle, WinAPI.GWL_STYLE);
-            settlersWndStyle |= WindowStyle.WS_MINIMIZEBOX; // | WindowStyle.WS_SIZEBOX | WindowStyle.WS_MAXIMIZEBOX;
-            WinAPI.SetWindowLong(GlobalState.settlersWindowHandle, WinAPI.GWL_STYLE, (uint)settlersWndStyle);
+            GlobalState.SettlersThread = Thread.CurrentThread;
+            GlobalState.SettlersWindowHandle = Process.GetCurrentProcess().MainWindowHandle;
+            //WindowStyle settlersWndStyle = (WindowStyle)WinAPI.GetWindowLong(GlobalState.SettlersWindowHandle, WinAPI.GWL_STYLE);
+            //settlersWndStyle |= WindowStyle.WS_MINIMIZEBOX | WindowStyle.WS_SIZEBOX | WindowStyle.WS_MAXIMIZEBOX;
+            //WinAPI.SetWindowLong(GlobalState.SettlersWindowHandle, WinAPI.GWL_STYLE, (uint)settlersWndStyle);
 
+            TickHook.InstallHook();
             ErrorHook.InstallHook();
             Thread uiThread = new Thread(new ThreadStart(DbgThread.RunMessageLoop));
             uiThread.SetApartmentState(ApartmentState.STA);

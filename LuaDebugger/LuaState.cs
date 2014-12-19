@@ -17,6 +17,7 @@ namespace LuaDebugger
         public string Name { get; protected set; }
         public Dictionary<string, LuaFile> LoadedFiles = new Dictionary<string, LuaFile>();
         public bool UpdateFileList = false;
+        public bool UpdateAfterFileListRestore = false;
         public DebugEngine DebugEngine { get; protected set; }
         public DebugState CurrentState { get { return this.DebugEngine.CurrentState; } }
 
@@ -35,7 +36,8 @@ namespace LuaDebugger
             if (this.CurrentState == DebugState.Running)
             {
                 unfreeze = true;
-                this.DebugEngine.ManualPause(true, true);
+                if (!TickHook.PauseGame())
+                    return "Error: Game is busy!";
             }
             this.DebugEngine.RemoveHook();
 
@@ -46,14 +48,31 @@ namespace LuaDebugger
             LuaResult err = BBLua.luaL_loadbuffer(this.L, expression, expression.Length, "from console");
             if (err == LuaResult.OK)
             {
-                err = BBLua.lua_pcall(this.L, 0, 1, 0);
-                result = TosToString();
+                int stackTop = BBLua.lua_gettop(this.L);
+                err = BBLua.lua_pcall(this.L, 0, -1, 0);
+                int nResults = 1 + BBLua.lua_gettop(this.L) - stackTop;
+
+                if(nResults == 1)
+                    result = TosToString();
+                else if (nResults > 1)
+                {
+                    string[] results = new string[nResults];
+                    do
+                    {
+                        nResults--;
+                        results[nResults] = TosToString(true);
+                    } while (nResults != 0);
+
+                    result = "(" + string.Join(", ", results) + ")";
+                }
             }
             else
             {
+                string parseErrExpr = TosToString();
+
                 err = BBLua.luaL_loadbuffer(this.L, asStatement, asStatement.Length, "from console");
                 if (err == LuaResult.OK)
-                    err = BBLua.lua_pcall(this.L, 0, 1, 0);
+                    err = BBLua.lua_pcall(this.L, 0, 0, 0); //statement -> no return values
 
                 if (err != LuaResult.OK)
                     result = TosToString();
@@ -61,7 +80,7 @@ namespace LuaDebugger
 
             this.DebugEngine.SetHook();
             if (unfreeze)
-                this.DebugEngine.Resume(true);
+                TickHook.ResumeGame();
 
             return result;
         }
@@ -71,6 +90,11 @@ namespace LuaDebugger
         public string TosToString()
         {
             return TosToString(true, false, new Dictionary<IntPtr, bool>());
+        }
+
+        public string TosToString(bool noExpand)
+        {
+            return TosToString(true, noExpand, new Dictionary<IntPtr, bool>());
         }
 
         public string TosToString(bool popStack, bool noExpand, Dictionary<IntPtr, bool> printedTables)
@@ -221,16 +245,21 @@ namespace LuaDebugger
                     }
                 }
             }
+            this.UpdateAfterFileListRestore = true;
             this.UpdateFileList = true;
         }
 
-        public void SaveLoadedFiles()
+        //returns false if game was busy
+        public bool SaveLoadedFiles()
         {
-            string data = CreateFileString();
-
             bool wasRunning = this.DebugEngine.CurrentState == DebugState.Running;
             if (wasRunning)
-                this.DebugEngine.ManualPause(true, true);
+            {
+                if (!TickHook.PauseGame())
+                    return false;
+            }
+
+            string data = CreateFileString();
 
             BBLua.lua_newtable(this.L);
             int i = 1;
@@ -243,21 +272,27 @@ namespace LuaDebugger
             BBLua.lua_setglobal(this.L, "_LuaDebugger_FileData");
 
             if (wasRunning)
-                this.DebugEngine.Resume(true);
+                TickHook.ResumeGame();
+
+            return true;
         }
 
-        public void RestoreLoadedFiles()
+        //returns false if game was busy
+        public bool RestoreLoadedFiles()
         {
             bool wasRunning = this.DebugEngine.CurrentState == DebugState.Running;
             if (wasRunning)
-                this.DebugEngine.ManualPause(true, true);
+            {
+                if (!TickHook.PauseGame())
+                    return false;
+            }
 
             BBLua.lua_getglobal(this.L, "_LuaDebugger_FileData");
             if (BBLua.lua_type(this.L, -1) != LuaType.Table)
             {
                 if (wasRunning)
-                    this.DebugEngine.Resume(true);
-                return;
+                    TickHook.ResumeGame();
+                return true;
             }
 
             StringBuilder sb = new StringBuilder();
@@ -275,11 +310,13 @@ namespace LuaDebugger
             }
 
             if (wasRunning)
-                this.DebugEngine.Resume();
+                TickHook.ResumeGame();
 
             this.LoadedFiles.Clear();
 
             RestoreFromFileString(sb.ToString());
+
+            return true;
         }
     }
 

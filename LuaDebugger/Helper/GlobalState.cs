@@ -16,8 +16,9 @@ namespace LuaDebugger
         public const string SettlersExe = "settlers6";
 #endif
 
-        public static IntPtr settlersWindowHandle;
+        public static IntPtr SettlersWindowHandle;
         public static Thread UIThread;
+        public static Thread SettlersThread;
         public static DbgMain DebuggerWindow;
         public static List<LuaState> LuaStates = new List<LuaState>();
         public static Dictionary<UIntPtr, LuaState> L2State = new Dictionary<UIntPtr, LuaState>();
@@ -28,9 +29,7 @@ namespace LuaDebugger
         public static bool CatchErrors = true;
 
 
-        //debug engine comms
-        public static Breakpoint HitBP;
-        public static bool BreakpointWasHit = false;
+        public static bool IsInVisualStudio = false;
 
     }
 }

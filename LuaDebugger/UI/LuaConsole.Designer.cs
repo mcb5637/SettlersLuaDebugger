@@ -28,11 +28,15 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.rtbOutput = new System.Windows.Forms.RichTextBox();
             this.tbInput = new System.Windows.Forms.TextBox();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.tbSpinner = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.tbPrompt = new System.Windows.Forms.TextBox();
+            this.tmrSpinner = new System.Windows.Forms.Timer(this.components);
+            this.tmrWaitForSpinner = new System.Windows.Forms.Timer(this.components);
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -72,9 +76,10 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.tbSpinner);
             this.panel1.Controls.Add(this.button1);
             this.panel1.Controls.Add(this.tbInput);
-            this.panel1.Controls.Add(this.textBox1);
+            this.panel1.Controls.Add(this.tbPrompt);
             this.panel1.Controls.Add(this.rtbOutput);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(0, 0);
@@ -82,6 +87,21 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(471, 124);
             this.panel1.TabIndex = 2;
+            // 
+            // tbSpinner
+            // 
+            this.tbSpinner.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.tbSpinner.BackColor = System.Drawing.SystemColors.Info;
+            this.tbSpinner.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.tbSpinner.Location = new System.Drawing.Point(0, 109);
+            this.tbSpinner.Margin = new System.Windows.Forms.Padding(0);
+            this.tbSpinner.Name = "tbSpinner";
+            this.tbSpinner.ReadOnly = true;
+            this.tbSpinner.Size = new System.Drawing.Size(11, 13);
+            this.tbSpinner.TabIndex = 4;
+            this.tbSpinner.Text = "◐";
+            this.tbSpinner.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.tbSpinner.Visible = false;
             // 
             // button1
             // 
@@ -101,20 +121,29 @@
             this.button1.UseVisualStyleBackColor = false;
             this.button1.Click += new System.EventHandler(this.btnClear_Click);
             // 
-            // textBox1
+            // tbPrompt
             // 
-            this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox1.BackColor = System.Drawing.SystemColors.Info;
-            this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.textBox1.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox1.Location = new System.Drawing.Point(0, 108);
-            this.textBox1.Margin = new System.Windows.Forms.Padding(0);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.ReadOnly = true;
-            this.textBox1.Size = new System.Drawing.Size(244, 16);
-            this.textBox1.TabIndex = 2;
-            this.textBox1.Text = "> ";
+            this.tbPrompt.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.tbPrompt.BackColor = System.Drawing.SystemColors.Info;
+            this.tbPrompt.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.tbPrompt.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tbPrompt.Location = new System.Drawing.Point(0, 108);
+            this.tbPrompt.Margin = new System.Windows.Forms.Padding(0);
+            this.tbPrompt.Name = "tbPrompt";
+            this.tbPrompt.ReadOnly = true;
+            this.tbPrompt.Size = new System.Drawing.Size(11, 16);
+            this.tbPrompt.TabIndex = 2;
+            this.tbPrompt.Text = ">";
+            this.tbPrompt.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // tmrSpinner
+            // 
+            this.tmrSpinner.Interval = 50;
+            this.tmrSpinner.Tick += new System.EventHandler(this.tmrSpinner_Tick);
+            // 
+            // tmrWaitForSpinner
+            // 
+            this.tmrWaitForSpinner.Tick += new System.EventHandler(this.tmrWaitForSpinner_Tick);
             // 
             // LuaConsole
             // 
@@ -137,7 +166,10 @@
         private System.Windows.Forms.RichTextBox rtbOutput;
         private System.Windows.Forms.TextBox tbInput;
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox tbPrompt;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Timer tmrSpinner;
+        private System.Windows.Forms.TextBox tbSpinner;
+        private System.Windows.Forms.Timer tmrWaitForSpinner;
     }
 }

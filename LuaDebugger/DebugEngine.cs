@@ -61,6 +61,7 @@ namespace LuaDebugger
         protected int callStack = 0;
         protected int targetCallStackLevel = 0;
 
+        public bool BreakOnError = true;
         public DebugState CurrentState { get; protected set; }
         public DebugRequest CurrentRequest { get; set; }
         public event EventHandler<DebugStateChangedEventArgs> OnDebugStateChange;
@@ -150,10 +151,20 @@ namespace LuaDebugger
 
         protected void ErrorCaughtHook(string errMessage)
         {
-            this.CurrentState = DebugState.CaughtError;
-            this.CurrentError = errMessage;
-            this.CurrentStackTrace = new LuaStackTrace(this.ls, 1); //skip error handler
-            FreezeGame();
+            if (this.BreakOnError)
+            {
+                this.CurrentState = DebugState.CaughtError;
+                this.CurrentError = errMessage;
+                this.CurrentStackTrace = new LuaStackTrace(this.ls, 1); //skip error handler
+                FreezeGame();
+            }
+            else
+            {
+                this.ls.StateView.Invoke((MethodInvoker)delegate
+                {
+                    this.ls.StateView.LuaConsole.AppendText("Lua Error: " + errMessage);
+                });
+            }
         }
 
         public void BreakFromGameEngine()
@@ -233,21 +244,17 @@ namespace LuaDebugger
 
         public void ManualPause()
         {
-            ManualPause(false, false);
+            ManualPause(false);
         }
 
-        public void ManualPause(bool block, bool silent)
+        public void ManualPause(bool silent)
         {
-            if (silent)
-                this.surpressStateChangedEvent = true;
+            this.surpressStateChangedEvent = silent;
 
             this.CurrentRequest = DebugRequest.Pause;
 
-            if (block) //Timeout: lua state inactive -> no problem to issue commands via the console
-            {
-                for (int timeOut = 0; this.CurrentState != DebugState.Paused && timeOut < 5; timeOut++)
-                    Thread.Sleep(10);
-            }
+            for (int timeOut = 0; this.CurrentState != DebugState.Paused && timeOut < 10; timeOut++)
+                Thread.Sleep(10);
 
             this.surpressStateChangedEvent = false;
         }

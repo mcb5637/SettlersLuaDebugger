@@ -88,20 +88,23 @@ namespace LuaDebugger
 
         bool IsSettlersFullscreen()
         {
-            WindowStyle settlersWndStyle = (WindowStyle)WinAPI.GetWindowLong(GlobalState.settlersWindowHandle, WinAPI.GWL_STYLE);
+            WindowStyle settlersWndStyle = (WindowStyle)WinAPI.GetWindowLong(GlobalState.SettlersWindowHandle, WinAPI.GWL_STYLE);
             return ((settlersWndStyle & WindowStyle.WS_POPUP) != 0);
         }
 
         void stateViews_OnDebugStateChange(object sender, DebugStateChangedEventArgs e)
         {
-            if (IsSettlersFullscreen())
-                if (e.State == DebugState.Running)
-                {
-                    WinAPI.SetForegroundWindow(GlobalState.settlersWindowHandle);
-                    WinAPI.ShowWindow(GlobalState.settlersWindowHandle, WindowShowStyle.Restore);
-                }
-                else
-                    WinAPI.SetForegroundWindow(this.Handle);
+            //if (IsSettlersFullscreen())
+            if (e.State == DebugState.Running)
+            {
+                WinAPI.SetForegroundWindow(GlobalState.SettlersWindowHandle);
+                WinAPI.ShowWindow(GlobalState.SettlersWindowHandle, WindowShowStyle.Restore);
+            }
+            else
+            {
+                WinAPI.SetForegroundWindow(this.Handle);
+                WinAPI.ShowWindow(this.Handle, WindowShowStyle.Restore);
+            }
 
             if (this.activeState != e.LuaState.StateView)
                 SwitchToState(e.LuaState);
@@ -247,7 +250,11 @@ namespace LuaDebugger
         private void tmrAlive_Tick(object sender, EventArgs e)
         {
             //watchdog, check whether the game has been closed but failed to kill the debugger thread
-            if (!WinAPI.IsWindow(GlobalState.settlersWindowHandle))
+            if (!WinAPI.IsWindow(GlobalState.SettlersWindowHandle))
+                Environment.Exit(0);
+
+            // if this is running in debug mode in visual studio, watch for end of dbg session
+            if (GlobalState.IsInVisualStudio && !Debugger.IsAttached)
                 Environment.Exit(0);
         }
     }

@@ -14,6 +14,17 @@ namespace LuaDebugger
         protected List<string> History = new List<string>() { "" };
         protected int historyPos = 0;
 
+        private string[] waitSpinner = new string[] { 
+        /*"◢", "◣", "◤", "◥"*/
+        "◐", "◓", "◑", "◒"
+        /*"▲", "►", "▼", "◄"*/
+        /*"◰", "◳", "◲", "◱"*/
+        /*".", "o", "O", "o"*/
+        /*"▏", "▎", "▍", "▋", "▊", "▉", "▉", "▊", "▋", "▍", "▎",*/
+        /*"⠁", "⠂", "⠄", "⡀", "⢀", "⠠", "⠐", "⠈"*/
+        /*"┤", "┘", "┴", "└", "├", "┌", "┬", "┐"*/
+        /*"◴", "◷", "◶",  "◵"*/};
+
         public LuaConsole()
         {
             InitializeComponent();
@@ -53,14 +64,19 @@ namespace LuaDebugger
 
             rtbOutput.AppendText("\n> " + cmd);
             tbInput.ReadOnly = true;
+            StartWait();
 
             System.Threading.ThreadPool.QueueUserWorkItem(delegate
             {
                 string answer = ls.EvaluateLua(cmd);
-                if (answer != "")
-                    rtbOutput.AppendText("\n" + answer);
-                rtbOutput.ScrollToCaret();
-                tbInput.ReadOnly = false;
+                rtbOutput.Invoke((MethodInvoker)delegate
+                {
+                    if (answer != "")
+                        rtbOutput.AppendText("\n" + answer);
+                    rtbOutput.ScrollToCaret();
+                    tbInput.ReadOnly = false;
+                    EndWait();
+                });
             }, null);
         }
 
@@ -72,6 +88,13 @@ namespace LuaDebugger
 
         private void tbInput_KeyDown(object sender, KeyEventArgs e)
         {
+            if (tbInput.ReadOnly)
+            {
+                e.Handled = true;
+                e.SuppressKeyPress = true;
+                return;
+            }
+
             if (e.KeyCode == Keys.Enter)
             {
                 string cmd = tbInput.Text;
@@ -140,6 +163,35 @@ namespace LuaDebugger
         private void btnClear_Click(object sender, EventArgs e)
         {
             ClearConsole();
+        }
+
+        private void StartWait()
+        {
+            tbSpinner.Text = "⌛";
+            tbSpinner.Visible = true;
+            tmrWaitForSpinner.Enabled = true;
+        }
+
+        private void EndWait()
+        {
+            tmrWaitForSpinner.Enabled = false;
+            tmrSpinner.Enabled = false;
+            tbSpinner.Visible = false;
+        }
+
+        private int waitSpinnerState = 0;
+        private void tmrSpinner_Tick(object sender, EventArgs e)
+        {
+            tbSpinner.Text = waitSpinner[waitSpinnerState];
+            waitSpinnerState = (waitSpinnerState + 1) % waitSpinner.Length;
+        }
+
+        private void tmrWaitForSpinner_Tick(object sender, EventArgs e)
+        {
+            tmrWaitForSpinner.Enabled = false;
+            waitSpinnerState = 1;
+            tbSpinner.Text = waitSpinner[0];
+            tmrSpinner.Enabled = true;
         }
     }
 }
