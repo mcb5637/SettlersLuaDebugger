@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.rtbOutput = new System.Windows.Forms.RichTextBox();
             this.tbInput = new System.Windows.Forms.TextBox();
             this.panel1 = new System.Windows.Forms.Panel();
             this.tbSpinner = new System.Windows.Forms.TextBox();
@@ -37,27 +36,9 @@
             this.tbPrompt = new System.Windows.Forms.TextBox();
             this.tmrSpinner = new System.Windows.Forms.Timer(this.components);
             this.tmrWaitForSpinner = new System.Windows.Forms.Timer(this.components);
+            this.rtbOutput = new LuaDebugger.RichTextBoxLink();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // rtbOutput
-            // 
-            this.rtbOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.rtbOutput.BackColor = System.Drawing.Color.White;
-            this.rtbOutput.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.rtbOutput.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.rtbOutput.Location = new System.Drawing.Point(0, 1);
-            this.rtbOutput.Margin = new System.Windows.Forms.Padding(2);
-            this.rtbOutput.Name = "rtbOutput";
-            this.rtbOutput.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedVertical;
-            this.rtbOutput.Size = new System.Drawing.Size(471, 106);
-            this.rtbOutput.TabIndex = 0;
-            this.rtbOutput.Text = "> a = 6\n> b = 7\n> a+b\n13\n> foo = function(x, y) return x + y * 2; end\n> a + foo(b" +
-    ", a)\n26";
-            this.rtbOutput.KeyDown += new System.Windows.Forms.KeyEventHandler(this.rtbOutput_KeyDown);
-            this.rtbOutput.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.rtbOutput_KeyPress);
             // 
             // tbInput
             // 
@@ -145,6 +126,28 @@
             // 
             this.tmrWaitForSpinner.Tick += new System.EventHandler(this.tmrWaitForSpinner_Tick);
             // 
+            // rtbOutput
+            // 
+            this.rtbOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.rtbOutput.BackColor = System.Drawing.Color.White;
+            this.rtbOutput.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.rtbOutput.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.rtbOutput.Location = new System.Drawing.Point(0, 1);
+            this.rtbOutput.Margin = new System.Windows.Forms.Padding(2);
+            this.rtbOutput.Name = "rtbOutput";
+            this.rtbOutput.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedVertical;
+            this.rtbOutput.Size = new System.Drawing.Size(471, 106);
+            this.rtbOutput.TabIndex = 0;
+            this.rtbOutput.Text = "> a = 6\n> b = 7\n> a+b\n13\n> foo = function(x, y) return x + y * 2; end\n> a + foo(b" +
+    ", a)\n26";
+            this.rtbOutput.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.rtbOutput_LinkClicked);
+            this.rtbOutput.Enter += new System.EventHandler(this.rtbOutput_Enter);
+            this.rtbOutput.KeyDown += new System.Windows.Forms.KeyEventHandler(this.rtbOutput_KeyDown);
+            this.rtbOutput.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.rtbOutput_KeyPress);
+            this.rtbOutput.Leave += new System.EventHandler(this.rtbOutput_Leave);
+            // 
             // LuaConsole
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -163,7 +166,7 @@
 
         #endregion
 
-        private System.Windows.Forms.RichTextBox rtbOutput;
+        private RichTextBoxLink rtbOutput;
         private System.Windows.Forms.TextBox tbInput;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.TextBox tbPrompt;

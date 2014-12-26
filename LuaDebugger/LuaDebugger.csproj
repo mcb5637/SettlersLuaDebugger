@@ -58,6 +58,7 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Helper\IVCThreadPool.cs" />
     <Compile Include="Hooks\TickHook.cs" />
     <Compile Include="Helper\Extensions.cs" />
     <Compile Include="Hooks\ErrorHook.cs" />
@@ -96,6 +97,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="BBLuaBridge.cs" />
+    <Compile Include="UI\RichTextBoxLink.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="UI\StackTraceView.cs">
       <SubType>UserControl</SubType>
     </Compile>

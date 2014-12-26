@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Data;
 using System.Text;
 using System.Windows.Forms;
+using System.Threading;
 
 namespace LuaDebugger
 {
@@ -62,27 +63,61 @@ namespace LuaDebugger
             this.History.Add("");
             this.historyPos = nextHistory + 1;
 
-            rtbOutput.AppendText("\n> " + cmd);
+            this.AppendText("> " + cmd);
             tbInput.ReadOnly = true;
             StartWait();
 
-            System.Threading.ThreadPool.QueueUserWorkItem(delegate
+            IVCThreadPool.RunAsync(delegate
             {
                 string answer = ls.EvaluateLua(cmd);
                 rtbOutput.Invoke((MethodInvoker)delegate
                 {
                     if (answer != "")
-                        rtbOutput.AppendText("\n" + answer);
+                        this.AppendText(answer);
                     rtbOutput.ScrollToCaret();
                     tbInput.ReadOnly = false;
                     EndWait();
                 });
-            }, null);
+            });
         }
 
         public void AppendText(string text)
         {
-            rtbOutput.AppendText("\n" + text);
+            if (rtbOutput.InvokeRequired)
+            {
+                rtbOutput.Invoke((MethodInvoker)delegate { this.AppendText(text); });
+                return;
+            }
+
+            if (text.Length > 50*1024) //50kB max
+            {
+                rtbOutput.AppendText(text.Replace("\b", ""));
+            }
+            else
+            {
+                string[] cutByLinks = text.Split(new char[] { '\b' });
+                rtbOutput.SuspendUpdate();
+
+                bool isLink = false;
+                int cnt = 0;
+                foreach (string str in cutByLinks)
+                {
+                    if (isLink)
+                        rtbOutput.InsertLink(str);
+                    else
+                        rtbOutput.AppendText(str);
+                    isLink = !isLink;
+                    cnt++;
+                    if (cnt > 10)
+                    {
+                        Application.DoEvents();
+                        cnt = 0;
+                    }
+                }
+                rtbOutput.ResumeUpdate();
+            }
+
+            rtbOutput.AppendText("\n");
             rtbOutput.ScrollToCaret();
         }
 
@@ -103,10 +138,8 @@ namespace LuaDebugger
                 if (cmd != "")
                     RunCommand(cmd);
                 else
-                {
-                    rtbOutput.AppendText("\n>");
-                    rtbOutput.ScrollToCaret();
-                }
+                    this.AppendText(">");
+
                 e.Handled = true;
                 e.SuppressKeyPress = true;
             }
@@ -192,6 +225,47 @@ namespace LuaDebugger
             waitSpinnerState = 1;
             tbSpinner.Text = waitSpinner[0];
             tmrSpinner.Enabled = true;
+        }
+
+        private void EnableCompositeDrawing()
+        {
+            uint exStyle = WinAPI.GetWindowLong(GlobalState.DebuggerWindow.Handle, WinAPI.GWL_EXSTYLE);
+            exStyle |= (uint)ExtendedWindowStyles.WS_EX_COMPOSITED;
+            WinAPI.SetWindowLong(GlobalState.DebuggerWindow.Handle, WinAPI.GWL_EXSTYLE, exStyle);
+        }
+
+        private void DisableCompositeDrawing()
+        {
+            uint exStyle = WinAPI.GetWindowLong(GlobalState.DebuggerWindow.Handle, WinAPI.GWL_EXSTYLE);
+            exStyle &= ~(uint)ExtendedWindowStyles.WS_EX_COMPOSITED;
+            WinAPI.SetWindowLong(GlobalState.DebuggerWindow.Handle, WinAPI.GWL_EXSTYLE, exStyle);
+        }
+
+        private void rtbOutput_Enter(object sender, EventArgs e)
+        {
+            DisableCompositeDrawing();
+        }
+
+        private void rtbOutput_Leave(object sender, EventArgs e)
+        {
+            EnableCompositeDrawing();
+        }
+
+        private void rtbOutput_LinkClicked(object sender, LinkClickedEventArgs e)
+        {
+            string[] parts = e.LinkText.Split(new char[] { ':' });
+            int line = int.Parse(parts[parts.Length - 1]);
+            string path = string.Join(":", parts, 0, parts.Length - 1);
+
+            LuaFile fileObj = null;
+            EnableCompositeDrawing();
+
+            if (this.ls.LoadedFiles.TryGetValue(path, out fileObj))
+                this.ls.StateView.SwitchToFile(fileObj, line);
+            else
+                this.ls.StateView.ShowSourceUnavailable();
+
+            DisableCompositeDrawing();
         }
     }
 }

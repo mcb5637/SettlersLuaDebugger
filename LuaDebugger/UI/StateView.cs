@@ -106,14 +106,10 @@ namespace LuaDebugger
 
         protected void CenterLineInEditor(TextEditorControl tec, int line)
         {
-            if (line > 0)
-                tec.ActiveTextAreaControl.ScrollTo(line - 1);
-            //int centerOffset = (tec.Height / tec.ActiveTextAreaControl.TextArea.TextView.FontHeight + 1) / 2;
-            // tec.ActiveTextAreaControl.sc
-            //tec.Document.TotalNumberOfLines
+            tec.ActiveTextAreaControl.CenterViewOn(line, -1);
         }
 
-        protected void ShowSourceUnavailable()
+        public void ShowSourceUnavailable()
         {
             scUpper.Panel2.Controls.Clear();
             this.currentFile = null;
@@ -193,7 +189,7 @@ namespace LuaDebugger
             SwitchToFile(file, -1);
         }
 
-        private void SwitchToFile(LuaFile file, int line)
+        public void SwitchToFile(LuaFile file, int line)
         {
             this.tvFiles.SelectedNode = file.Node;
             if (this.currentFile == file)

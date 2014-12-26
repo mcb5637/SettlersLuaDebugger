@@ -178,7 +178,7 @@ namespace LuaDebugger
             if (ldr.what == "C")
                 source = "Game Engine at 0x" + BBLua.lua_tocfunction(this.L, -1).ToInt32().ToString("X");
             else
-                source = ldr.source + " (line " + ldr.linedefined + ")";
+                source = '\b' + ldr.source + ':' + ldr.linedefined + '\b';//" (line " + ldr.linedefined + ")";
 
             return "<Function, defined in " + source + ">";
         }

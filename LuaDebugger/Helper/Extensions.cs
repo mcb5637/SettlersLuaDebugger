@@ -21,6 +21,27 @@ namespace LuaDebugger
         }
     }
 }
+
+namespace System.Windows.Forms
+{
+    public static class ControlExtensions
+    {
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        public static extern bool LockWindowUpdate(IntPtr hWndLock);
+
+        public static void SuspendUpdate(this Control control)
+        {
+            LockWindowUpdate(control.Handle);
+        }
+
+        public static void ResumeUpdate(this Control control)
+        {
+            LockWindowUpdate(IntPtr.Zero);
+        }
+
+    }
+}
+
 // .net3 wtf!
 namespace System.Runtime.CompilerServices
 {
