@@ -119,7 +119,7 @@ namespace LuaDebuggerStarter
 
         void btn_Click(object sender, EventArgs e)
         {
-            ProcessStartInfo si = new ProcessStartInfo(startDict[sender], "-DevM");
+            ProcessStartInfo si = new ProcessStartInfo(startDict[sender], "-debugscript -DISPLAYSCRIPTERRORS -DevM");
             si.EnvironmentVariables["Path"] += ";" + tmpPath;
             si.UseShellExecute = false;
             string[] cmdLineArgs = Environment.GetCommandLineArgs();
