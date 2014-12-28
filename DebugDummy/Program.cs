@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Microsoft.Win32;
 
 namespace DebugDummy
 {
@@ -77,10 +78,19 @@ namespace DebugDummy
             ProcessStartInfo si;
 
 #pragma warning disable 0162
-            if (LuaDebugger.GlobalState.SettlersExe == "settlershok")
-                si = new ProcessStartInfo("C:/Program Files (x86)/Ubisoft/Blue Byte/DIE SIEDLER - Das Erbe der Könige - Gold Edition/extra2/bin/settlershok.exe", "-debugscript");
+
+            string s5KeyName = @"HKEY_LOCAL_MACHINE\SOFTWARE\Blue Byte\The Settlers - Heritage of Kings";
+            string s5ValueName = "InstallPath";
+            string s6KeyName = @"HKEY_LOCAL_MACHINE\SOFTWARE\Ubisoft\The Settlers 6\GameUpdate";
+            string s6ValueName = "InstallDir";
+
+            string s5Path = (string)Registry.GetValue(s5KeyName, s5ValueName, null) + "/extra2/bin/settlershok.exe";
+            string s6Path = (string)Registry.GetValue(s6KeyName, s6ValueName, null) + "/extra1/bin/settlers6.exe";
+
+            if (LuaDebugger.GlobalState.SettlersNr == 5)
+                si = new ProcessStartInfo(s5Path, "-debugscript");
             else
-                si = new ProcessStartInfo("D:/Program Files (x86)/S6/extra1/bin/Settlers6_.exe", "-DISPLAYSCRIPTERRORS -DevM");
+                si = new ProcessStartInfo(s6Path, "-DISPLAYSCRIPTERRORS -DevM");
 #pragma warning restore 0162
 
             si.EnvironmentVariables["Path"] += ";" + solutionDir + "/dbgenv";
@@ -121,7 +131,7 @@ namespace DebugDummy
                 "VisualStudio.DTE.10.0",        //VS2010
                 "VisualStudio.DTE.12.0"         //VS2013
             };
-            
+
             foreach (string dteKey in vsDTEs)
             {
                 try
