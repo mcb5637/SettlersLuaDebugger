@@ -19,6 +19,11 @@ namespace LuaDebugger
             get { return this.debugEngine.CurrentState; }
         }
 
+        public LuaState LuaState
+        {
+            get { return this.ls;  }
+        }
+
         protected LuaState ls;
         protected DebugEngine debugEngine = null;
         protected LuaFile currentFile;

@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>LuaDebugger</RootNamespace>
     <AssemblyName>LuaDebugger</AssemblyName>
-    <TargetFrameworkVersion>v3.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -44,6 +44,7 @@
     <Reference Include="ICSharpCode.TextEditor">
       <HintPath>..\packages\ICSharpCode.TextEditor.3.2.1.6466\lib\Net20\ICSharpCode.TextEditor.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="RGiesecke.DllExport.Metadata">
       <HintPath>..\packages\UnmanagedExports.1.2.6\lib\net\RGiesecke.DllExport.Metadata.dll</HintPath>
       <Private>False</Private>
@@ -53,6 +54,7 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\CommonAssemblyInfo.cs">
@@ -67,6 +69,29 @@
     <Compile Include="Helper\MySyntaxModeProvider.cs" />
     <Compile Include="Helper\Win32Window.cs" />
     <Compile Include="LuaStackTrace.cs" />
+    <Compile Include="Plugins\PluginSystem.cs" />
+    <Compile Include="Plugins\S5CutsceneEditor\Cutscene.cs" />
+    <Compile Include="Plugins\S5CutsceneEditor\JoyStick.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Plugins\S5CutsceneEditor\JoyStick.designer.cs">
+      <DependentUpon>JoyStick.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Plugins\S5CutsceneEditor\Point3D.cs" />
+    <Compile Include="Plugins\S5CutsceneEditor\Properties.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Plugins\S5CutsceneEditor\Properties.Designer.cs">
+      <DependentUpon>Properties.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Plugins\S5CutsceneEditor\S5CameraAccess.cs" />
+    <Compile Include="Plugins\S5CutsceneEditor\S5CutsceneEditorMain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Plugins\S5CutsceneEditor\S5CutsceneEditorMain.Designer.cs">
+      <DependentUpon>S5CutsceneEditorMain.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Plugins\S5CutsceneEditor\S5Direct.cs" />
     <Compile Include="UI\DbgMain.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -115,6 +140,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <EmbeddedResource Include="Plugins\S5CutsceneEditor\JoyStick.resx">
+      <DependentUpon>JoyStick.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Plugins\S5CutsceneEditor\Properties.resx">
+      <DependentUpon>Properties.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Plugins\S5CutsceneEditor\S5CutsceneEditorMain.resx">
+      <DependentUpon>S5CutsceneEditorMain.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\Lua.xshd" />
   </ItemGroup>
   <ItemGroup>
@@ -177,6 +211,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\ICSharpCode.TextEditor.dll" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="../packages/UnmanagedExports.1.2.6/tools/RGiesecke.DllExport.targets" Condition="Exists('../packages/UnmanagedExports.1.2.6/tools/RGiesecke.DllExport.targets')" />
   <PropertyGroup>

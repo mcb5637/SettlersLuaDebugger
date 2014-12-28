@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30501.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LuaDebugger", "LuaDebugger\LuaDebugger.csproj", "{707CEB10-EA0D-4A8A-AB18-BA41800DB0BF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DebugSettlers", "DebugDummy\DebugSettlers.csproj", "{9C66C249-83DA-4DD5-AB47-1372248AD9D3}"
@@ -14,27 +16,46 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{5E3A4A
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Dbg S5|Any CPU = Dbg S5|Any CPU
+		Dbg S5|Mixed Platforms = Dbg S5|Mixed Platforms
 		Dbg S5|x86 = Dbg S5|x86
+		Dbg S6|Any CPU = Dbg S6|Any CPU
+		Dbg S6|Mixed Platforms = Dbg S6|Mixed Platforms
 		Dbg S6|x86 = Dbg S6|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{707CEB10-EA0D-4A8A-AB18-BA41800DB0BF}.Dbg S5|Any CPU.ActiveCfg = Debug S5|x86
+		{707CEB10-EA0D-4A8A-AB18-BA41800DB0BF}.Dbg S5|Mixed Platforms.ActiveCfg = DebugS5|x86
+		{707CEB10-EA0D-4A8A-AB18-BA41800DB0BF}.Dbg S5|Mixed Platforms.Build.0 = DebugS5|x86
 		{707CEB10-EA0D-4A8A-AB18-BA41800DB0BF}.Dbg S5|x86.ActiveCfg = DebugS5|x86
 		{707CEB10-EA0D-4A8A-AB18-BA41800DB0BF}.Dbg S5|x86.Build.0 = DebugS5|x86
+		{707CEB10-EA0D-4A8A-AB18-BA41800DB0BF}.Dbg S6|Any CPU.ActiveCfg = Debug S5|x86
+		{707CEB10-EA0D-4A8A-AB18-BA41800DB0BF}.Dbg S6|Mixed Platforms.ActiveCfg = DebugS6|x86
+		{707CEB10-EA0D-4A8A-AB18-BA41800DB0BF}.Dbg S6|Mixed Platforms.Build.0 = DebugS6|x86
 		{707CEB10-EA0D-4A8A-AB18-BA41800DB0BF}.Dbg S6|x86.ActiveCfg = DebugS6|x86
 		{707CEB10-EA0D-4A8A-AB18-BA41800DB0BF}.Dbg S6|x86.Build.0 = DebugS6|x86
+		{9C66C249-83DA-4DD5-AB47-1372248AD9D3}.Dbg S5|Any CPU.ActiveCfg = DebugS6|x86
+		{9C66C249-83DA-4DD5-AB47-1372248AD9D3}.Dbg S5|Mixed Platforms.ActiveCfg = DebugS5|x86
+		{9C66C249-83DA-4DD5-AB47-1372248AD9D3}.Dbg S5|Mixed Platforms.Build.0 = DebugS5|x86
 		{9C66C249-83DA-4DD5-AB47-1372248AD9D3}.Dbg S5|x86.ActiveCfg = DebugS5|x86
 		{9C66C249-83DA-4DD5-AB47-1372248AD9D3}.Dbg S5|x86.Build.0 = DebugS5|x86
+		{9C66C249-83DA-4DD5-AB47-1372248AD9D3}.Dbg S6|Any CPU.ActiveCfg = DebugS6|x86
+		{9C66C249-83DA-4DD5-AB47-1372248AD9D3}.Dbg S6|Mixed Platforms.ActiveCfg = DebugS6|x86
+		{9C66C249-83DA-4DD5-AB47-1372248AD9D3}.Dbg S6|Mixed Platforms.Build.0 = DebugS6|x86
 		{9C66C249-83DA-4DD5-AB47-1372248AD9D3}.Dbg S6|x86.ActiveCfg = DebugS6|x86
 		{9C66C249-83DA-4DD5-AB47-1372248AD9D3}.Dbg S6|x86.Build.0 = DebugS6|x86
+		{16B211B2-5232-4DF1-94F2-BE76C28E1302}.Dbg S5|Any CPU.ActiveCfg = Debug|x86
+		{16B211B2-5232-4DF1-94F2-BE76C28E1302}.Dbg S5|Mixed Platforms.ActiveCfg = Debug|x86
+		{16B211B2-5232-4DF1-94F2-BE76C28E1302}.Dbg S5|Mixed Platforms.Build.0 = Debug|x86
 		{16B211B2-5232-4DF1-94F2-BE76C28E1302}.Dbg S5|x86.ActiveCfg = Debug|x86
 		{16B211B2-5232-4DF1-94F2-BE76C28E1302}.Dbg S5|x86.Build.0 = Debug|x86
+		{16B211B2-5232-4DF1-94F2-BE76C28E1302}.Dbg S6|Any CPU.ActiveCfg = Debug|x86
+		{16B211B2-5232-4DF1-94F2-BE76C28E1302}.Dbg S6|Mixed Platforms.ActiveCfg = Debug|x86
+		{16B211B2-5232-4DF1-94F2-BE76C28E1302}.Dbg S6|Mixed Platforms.Build.0 = Debug|x86
 		{16B211B2-5232-4DF1-94F2-BE76C28E1302}.Dbg S6|x86.ActiveCfg = Debug|x86
 		{16B211B2-5232-4DF1-94F2-BE76C28E1302}.Dbg S6|x86.Build.0 = Debug|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(Performance) = preSolution
-		HasPerformanceSessions = true
 	EndGlobalSection
 EndGlobal

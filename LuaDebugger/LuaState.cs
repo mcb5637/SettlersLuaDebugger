@@ -11,6 +11,16 @@ using System.Windows.Forms;
 
 namespace LuaDebugger
 {
+    public class StateRemovedEventArgs : EventArgs
+    {
+        public LuaState LuaState { get; protected set; }
+
+        public StateRemovedEventArgs(LuaState ls)
+        {
+            this.LuaState = ls;
+        }
+    }
+
     public class LuaState
     {
         public UIntPtr L { get; protected set; }
@@ -20,6 +30,7 @@ namespace LuaDebugger
         public bool UpdateAfterFileListRestore = false;
         public DebugEngine DebugEngine { get; protected set; }
         public DebugState CurrentState { get { return this.DebugEngine.CurrentState; } }
+        public event EventHandler<StateRemovedEventArgs> OnStateRemoved;
 
         public StateView StateView;
 
@@ -83,6 +94,25 @@ namespace LuaDebugger
                 TickHook.ResumeGame();
 
             return result;
+        }
+
+        public bool RunDelegateSafely(MethodInvoker dlg)
+        {
+            bool unfreeze = false;
+            if (this.CurrentState == DebugState.Running)
+            {
+                unfreeze = true;
+                if (!TickHook.PauseGame())
+                    return false;
+            }
+            this.DebugEngine.RemoveHook();
+
+            dlg();
+
+            this.DebugEngine.SetHook();
+            if (unfreeze)
+                TickHook.ResumeGame();
+            return true;
         }
 
         protected static Regex alphaNumeric = new Regex("^[a-zA-Z0-9_]*$");
@@ -317,6 +347,17 @@ namespace LuaDebugger
             RestoreFromFileString(sb.ToString());
 
             return true;
+        }
+
+        public void RemovedByGame()
+        {
+            if (GlobalState.DebuggerWindow.InvokeRequired)
+                GlobalState.DebuggerWindow.BeginInvoke((MethodInvoker)this.RemovedByGame);
+            else
+            {
+                if (this.OnStateRemoved != null)
+                    this.OnStateRemoved(this, new StateRemovedEventArgs(this));
+            }
         }
     }
 

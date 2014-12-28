@@ -10,6 +10,7 @@ using System.Threading;
 using System.Reflection;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using LuaDebugger.Plugins;
 
 namespace LuaDebugger
 {
@@ -256,6 +257,27 @@ namespace LuaDebugger
             // if this is running in debug mode in visual studio, watch for end of dbg session
             if (GlobalState.IsInVisualStudio && !Debugger.IsAttached)
                 Environment.Exit(0);
+        }
+
+        private void pluginsToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
+        {
+            pluginsToolStripMenuItem.DropDownItems.Clear();
+            foreach(ILuaDebuggerPlugin plugin in PluginSystem.Plugins)
+            {
+                ToolStripMenuItem plgItem = new ToolStripMenuItem(plugin.PluginName);
+                plgItem.Tag = plugin;
+                pluginsToolStripMenuItem.DropDownItems.Add(plgItem);
+
+                if (plugin.IsOpenable(activeState.LuaState))
+                    plgItem.Click += plgItem_Click;
+                else
+                    plgItem.Enabled = false;
+            }
+        }
+
+        void plgItem_Click(object sender, EventArgs e)
+        {
+            ((sender as ToolStripMenuItem).Tag as ILuaDebuggerPlugin).ShowInState(activeState.LuaState, this);
         }
     }
 

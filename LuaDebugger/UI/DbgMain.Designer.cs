@@ -31,18 +31,20 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DbgMain));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-            this.PRtoolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.stepLineToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.stepInToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
-            this.stepOutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmLS = new System.Windows.Forms.ToolStripMenuItem();
             this.tcbState = new System.Windows.Forms.ToolStripComboBox();
+            this.pluginsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.s5CutsceneCreatorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tmUpdateView = new System.Windows.Forms.Timer(this.components);
             this.lblNoStates = new System.Windows.Forms.Label();
             this.pnlMain = new System.Windows.Forms.Panel();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.tmrAlive = new System.Windows.Forms.Timer(this.components);
+            this.PRtoolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.stepLineToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.stepInToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.stepOutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.pnlMain.SuspendLayout();
             this.SuspendLayout();
@@ -56,14 +58,85 @@
             this.toolStripMenuItem4,
             this.stepOutToolStripMenuItem,
             this.tsmLS,
-            this.tcbState});
+            this.tcbState,
+            this.pluginsToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Padding = new System.Windows.Forms.Padding(4, 2, 0, 2);
             this.menuStrip1.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
-            this.menuStrip1.Size = new System.Drawing.Size(624, 27);
+            this.menuStrip1.Size = new System.Drawing.Size(654, 27);
             this.menuStrip1.TabIndex = 2;
             this.menuStrip1.Text = "menuStrip1";
+            // 
+            // toolStripMenuItem4
+            // 
+            this.toolStripMenuItem4.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.toolStripMenuItem4.Name = "toolStripMenuItem4";
+            this.toolStripMenuItem4.Size = new System.Drawing.Size(80, 23);
+            this.toolStripMenuItem4.Text = "© yoq 2014";
+            // 
+            // tsmLS
+            // 
+            this.tsmLS.Name = "tsmLS";
+            this.tsmLS.ShowShortcutKeys = false;
+            this.tsmLS.Size = new System.Drawing.Size(76, 23);
+            this.tsmLS.Text = "  Lua State:";
+            // 
+            // tcbState
+            // 
+            this.tcbState.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.tcbState.FlatStyle = System.Windows.Forms.FlatStyle.Standard;
+            this.tcbState.Items.AddRange(new object[] {
+            "Lol",
+            "Foo"});
+            this.tcbState.Name = "tcbState";
+            this.tcbState.Size = new System.Drawing.Size(121, 23);
+            this.tcbState.Tag = "ok";
+            // 
+            // pluginsToolStripMenuItem
+            // 
+            this.pluginsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.s5CutsceneCreatorToolStripMenuItem});
+            this.pluginsToolStripMenuItem.Name = "pluginsToolStripMenuItem";
+            this.pluginsToolStripMenuItem.Size = new System.Drawing.Size(58, 23);
+            this.pluginsToolStripMenuItem.Text = "Plugins";
+            this.pluginsToolStripMenuItem.DropDownOpening += new System.EventHandler(this.pluginsToolStripMenuItem_DropDownOpening);
+            // 
+            // s5CutsceneCreatorToolStripMenuItem
+            // 
+            this.s5CutsceneCreatorToolStripMenuItem.Name = "s5CutsceneCreatorToolStripMenuItem";
+            this.s5CutsceneCreatorToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.s5CutsceneCreatorToolStripMenuItem.Text = "S5 Cutscene Creator";
+            // 
+            // tmUpdateView
+            // 
+            this.tmUpdateView.Enabled = true;
+            this.tmUpdateView.Tick += new System.EventHandler(this.tmUpdateView_Tick);
+            // 
+            // lblNoStates
+            // 
+            this.lblNoStates.AutoSize = true;
+            this.lblNoStates.Location = new System.Drawing.Point(52, 47);
+            this.lblNoStates.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.lblNoStates.Name = "lblNoStates";
+            this.lblNoStates.Size = new System.Drawing.Size(127, 13);
+            this.lblNoStates.TabIndex = 5;
+            this.lblNoStates.Text = "No Lua states available...";
+            // 
+            // pnlMain
+            // 
+            this.pnlMain.Controls.Add(this.lblNoStates);
+            this.pnlMain.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pnlMain.Location = new System.Drawing.Point(0, 27);
+            this.pnlMain.Name = "pnlMain";
+            this.pnlMain.Size = new System.Drawing.Size(654, 585);
+            this.pnlMain.TabIndex = 6;
+            // 
+            // tmrAlive
+            // 
+            this.tmrAlive.Enabled = true;
+            this.tmrAlive.Interval = 1000;
+            this.tmrAlive.Tick += new System.EventHandler(this.tmrAlive_Tick);
             // 
             // PRtoolStripMenuItem
             // 
@@ -104,13 +177,6 @@
             this.stepInToolStripMenuItem.MouseLeave += new System.EventHandler(this.toolStripMenuItem_MouseLeave);
             this.stepInToolStripMenuItem.MouseHover += new System.EventHandler(this.toolStripMenuItem_MouseHover);
             // 
-            // toolStripMenuItem4
-            // 
-            this.toolStripMenuItem4.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.toolStripMenuItem4.Name = "toolStripMenuItem4";
-            this.toolStripMenuItem4.Size = new System.Drawing.Size(80, 23);
-            this.toolStripMenuItem4.Text = "© yoq 2014";
-            // 
             // stepOutToolStripMenuItem
             // 
             this.stepOutToolStripMenuItem.Enabled = false;
@@ -124,59 +190,11 @@
             this.stepOutToolStripMenuItem.MouseLeave += new System.EventHandler(this.toolStripMenuItem_MouseLeave);
             this.stepOutToolStripMenuItem.MouseHover += new System.EventHandler(this.toolStripMenuItem_MouseHover);
             // 
-            // tsmLS
-            // 
-            this.tsmLS.Name = "tsmLS";
-            this.tsmLS.ShowShortcutKeys = false;
-            this.tsmLS.Size = new System.Drawing.Size(76, 23);
-            this.tsmLS.Text = "  Lua State:";
-            // 
-            // tcbState
-            // 
-            this.tcbState.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.tcbState.FlatStyle = System.Windows.Forms.FlatStyle.Standard;
-            this.tcbState.Items.AddRange(new object[] {
-            "Lol",
-            "Foo"});
-            this.tcbState.Name = "tcbState";
-            this.tcbState.Size = new System.Drawing.Size(121, 23);
-            this.tcbState.Tag = "ok";
-            // 
-            // tmUpdateView
-            // 
-            this.tmUpdateView.Enabled = true;
-            this.tmUpdateView.Tick += new System.EventHandler(this.tmUpdateView_Tick);
-            // 
-            // lblNoStates
-            // 
-            this.lblNoStates.AutoSize = true;
-            this.lblNoStates.Location = new System.Drawing.Point(52, 47);
-            this.lblNoStates.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.lblNoStates.Name = "lblNoStates";
-            this.lblNoStates.Size = new System.Drawing.Size(127, 13);
-            this.lblNoStates.TabIndex = 5;
-            this.lblNoStates.Text = "No Lua states available...";
-            // 
-            // pnlMain
-            // 
-            this.pnlMain.Controls.Add(this.lblNoStates);
-            this.pnlMain.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnlMain.Location = new System.Drawing.Point(0, 27);
-            this.pnlMain.Name = "pnlMain";
-            this.pnlMain.Size = new System.Drawing.Size(624, 585);
-            this.pnlMain.TabIndex = 6;
-            // 
-            // tmrAlive
-            // 
-            this.tmrAlive.Enabled = true;
-            this.tmrAlive.Interval = 1000;
-            this.tmrAlive.Tick += new System.EventHandler(this.tmrAlive_Tick);
-            // 
             // DbgMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(624, 612);
+            this.ClientSize = new System.Drawing.Size(654, 612);
             this.Controls.Add(this.pnlMain);
             this.Controls.Add(this.menuStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -211,5 +229,7 @@
         private System.Windows.Forms.Panel pnlMain;
         private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.Timer tmrAlive;
+        private System.Windows.Forms.ToolStripMenuItem pluginsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem s5CutsceneCreatorToolStripMenuItem;
     }
 }

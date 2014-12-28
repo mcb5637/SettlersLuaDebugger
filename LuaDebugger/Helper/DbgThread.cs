@@ -14,14 +14,20 @@ namespace LuaDebugger
         [STAThread] //attribute doesnt work, needs to be done explicitly on the thread object
         public static void RunMessageLoop()
         {
-            string editorDll = "LuaDebugger.Resources.ICSharpCode.TextEditor.dll";
-            Assembly assembly = Assembly.GetExecutingAssembly();
-            using (Stream stm = assembly.GetManifestResourceStream(editorDll))
+            string[] dllsToLoad = new string[] 
             {
-                byte[] ba = new byte[stm.Length];
-                stm.Read(ba, 0, (int)stm.Length);
-                Assembly a = Assembly.Load(ba);
-                LoadedAssemblies.Add(a.FullName, a);
+                "LuaDebugger.Resources.ICSharpCode.TextEditor.dll"
+            };
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            foreach (string dll in dllsToLoad)
+            {
+                using (Stream stm = assembly.GetManifestResourceStream(dll))
+                {
+                    byte[] ba = new byte[stm.Length];
+                    stm.Read(ba, 0, (int)stm.Length);
+                    Assembly a = Assembly.Load(ba);
+                    LoadedAssemblies.Add(a.FullName, a);
+                }
             }
 
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;

@@ -9,9 +9,11 @@ namespace LuaDebugger
     public static class GlobalState
     {
 #if S5
+        public const int SettlersNr = 5;
         public const string LuaDll = "S5Lua5.dll";
         public const string SettlersExe = "settlershok";
 #elif S6
+        public const int SettlersNr = 6;
         public const string LuaDll = "BBLua51.dll";
         public const string SettlersExe = "settlers6";
 #endif

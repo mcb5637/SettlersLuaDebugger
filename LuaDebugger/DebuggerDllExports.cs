@@ -82,6 +82,7 @@ namespace LuaDebugger
             lock (GlobalState.GuiUpdateLock)
             {
                 LuaState ls = GlobalState.L2State[L];
+                ls.RemovedByGame();
                 GlobalState.L2State.Remove(L);
                 GlobalState.LuaStates.Remove(ls);
                 ErrorHook.RemoveErrorHandler(L); // todo: refactor into luastate?

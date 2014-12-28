@@ -78,7 +78,7 @@ namespace DebugDummy
 
 #pragma warning disable 0162
             if (LuaDebugger.GlobalState.SettlersExe == "settlershok")
-                si = new ProcessStartInfo("D:/Program Files (x86)/DEdK/extra2/bin/settlershok.exe", "-debugscript");
+                si = new ProcessStartInfo("C:/Program Files (x86)/Ubisoft/Blue Byte/DIE SIEDLER - Das Erbe der Könige - Gold Edition/extra2/bin/settlershok.exe", "-debugscript");
             else
                 si = new ProcessStartInfo("D:/Program Files (x86)/S6/extra1/bin/Settlers6_.exe", "-DISPLAYSCRIPTERRORS -DevM");
 #pragma warning restore 0162
