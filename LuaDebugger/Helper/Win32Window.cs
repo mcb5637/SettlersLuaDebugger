@@ -133,8 +133,35 @@ namespace LuaDebugger
 
     }
 
+    [Flags]
+    public enum SendMessageTimeoutFlags : uint
+    {
+        SMTO_NORMAL = 0x0,
+        SMTO_BLOCK = 0x1,
+        SMTO_ABORTIFHUNG = 0x2,
+        SMTO_NOTIMEOUTIFNOTHUNG = 0x8,
+        SMTO_ERRORONEXIT = 0x20
+    }
+
     public static class WinAPI
     {
+        [DllImport("user32.dll")]
+        public static extern IntPtr CallWindowProc(uint lpPrevWndFunc, IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+
+        public delegate IntPtr WndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+
+        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        public static extern int SendMessageTimeout(
+            IntPtr windowHandle,
+            uint Msg,
+            uint wParam,
+            uint lParam,
+            SendMessageTimeoutFlags flags,
+            uint timeout,
+            uint resPtr);
+            //out IntPtr result);
+
+
         [DllImport("user32.dll", SetLastError = true)]
         public static extern uint GetWindowLong(IntPtr hWnd, int nIndex);
 

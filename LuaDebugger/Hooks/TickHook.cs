@@ -14,7 +14,7 @@ namespace LuaDebugger
     static class TickHook
     {
         private static bool pauseGame = false;
-        public static bool GameIsPaused = false;
+        private static bool gameIsPaused = false;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate UIntPtr DispatchMessageDelegate(UIntPtr msg);
@@ -50,12 +50,12 @@ namespace LuaDebugger
         {
             if (pauseGame)
             {
-                GameIsPaused = true;
+                gameIsPaused = true;
 
                 while (pauseGame)
                     Thread.Sleep(10);
 
-                GameIsPaused = false;
+                gameIsPaused = false;
             }
             return DispatchMessage(msg);
         }
@@ -69,7 +69,7 @@ namespace LuaDebugger
             
             pauseGame = true;
 
-            for (int timeOut = 0; !GameIsPaused; timeOut++)
+            for (int timeOut = 0; !gameIsPaused; timeOut++)
             {
                 if (timeOut == 10)
                 {

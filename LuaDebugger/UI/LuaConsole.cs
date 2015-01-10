@@ -267,5 +267,15 @@ namespace LuaDebugger
 
             DisableCompositeDrawing();
         }
+
+        private void rtbOutput_VScroll(object sender, EventArgs e)
+        {
+            DisableCompositeDrawing();
+        }
+
+        private void rtbOutput_MouseLeave(object sender, EventArgs e)
+        {
+            EnableCompositeDrawing();
+        }
     }
 }

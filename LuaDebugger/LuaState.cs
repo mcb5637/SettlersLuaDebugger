@@ -47,7 +47,7 @@ namespace LuaDebugger
             if (this.CurrentState == DebugState.Running)
             {
                 unfreeze = true;
-                if (!TickHook.PauseGame())
+                if (!GameLoopHook.PauseGame())
                     return "Error: Game is busy!";
             }
             this.DebugEngine.RemoveHook();
@@ -91,7 +91,7 @@ namespace LuaDebugger
 
             this.DebugEngine.SetHook();
             if (unfreeze)
-                TickHook.ResumeGame();
+                GameLoopHook.ResumeGame();
 
             return result;
         }
@@ -102,7 +102,7 @@ namespace LuaDebugger
             if (this.CurrentState == DebugState.Running)
             {
                 unfreeze = true;
-                if (!TickHook.PauseGame())
+                if (!GameLoopHook.PauseGame())
                     return false;
             }
             this.DebugEngine.RemoveHook();
@@ -111,7 +111,7 @@ namespace LuaDebugger
 
             this.DebugEngine.SetHook();
             if (unfreeze)
-                TickHook.ResumeGame();
+                GameLoopHook.ResumeGame();
             return true;
         }
 
@@ -285,7 +285,7 @@ namespace LuaDebugger
             bool wasRunning = this.DebugEngine.CurrentState == DebugState.Running;
             if (wasRunning)
             {
-                if (!TickHook.PauseGame())
+                if (!GameLoopHook.PauseGame())
                     return false;
             }
 
@@ -302,7 +302,7 @@ namespace LuaDebugger
             BBLua.lua_setglobal(this.L, "_LuaDebugger_FileData");
 
             if (wasRunning)
-                TickHook.ResumeGame();
+                GameLoopHook.ResumeGame();
 
             return true;
         }
@@ -313,7 +313,7 @@ namespace LuaDebugger
             bool wasRunning = this.DebugEngine.CurrentState == DebugState.Running;
             if (wasRunning)
             {
-                if (!TickHook.PauseGame())
+                if (!GameLoopHook.PauseGame())
                     return false;
             }
 
@@ -321,7 +321,7 @@ namespace LuaDebugger
             if (BBLua.lua_type(this.L, -1) != LuaType.Table)
             {
                 if (wasRunning)
-                    TickHook.ResumeGame();
+                    GameLoopHook.ResumeGame();
                 return true;
             }
 
@@ -340,7 +340,7 @@ namespace LuaDebugger
             }
 
             if (wasRunning)
-                TickHook.ResumeGame();
+                GameLoopHook.ResumeGame();
 
             this.LoadedFiles.Clear();
 

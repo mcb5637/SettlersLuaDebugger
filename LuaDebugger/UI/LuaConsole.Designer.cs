@@ -34,9 +34,9 @@
             this.tbSpinner = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
             this.tbPrompt = new System.Windows.Forms.TextBox();
+            this.rtbOutput = new LuaDebugger.RichTextBoxLink();
             this.tmrSpinner = new System.Windows.Forms.Timer(this.components);
             this.tmrWaitForSpinner = new System.Windows.Forms.Timer(this.components);
-            this.rtbOutput = new LuaDebugger.RichTextBoxLink();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -117,15 +117,6 @@
             this.tbPrompt.Text = ">";
             this.tbPrompt.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // tmrSpinner
-            // 
-            this.tmrSpinner.Interval = 50;
-            this.tmrSpinner.Tick += new System.EventHandler(this.tmrSpinner_Tick);
-            // 
-            // tmrWaitForSpinner
-            // 
-            this.tmrWaitForSpinner.Tick += new System.EventHandler(this.tmrWaitForSpinner_Tick);
-            // 
             // rtbOutput
             // 
             this.rtbOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -143,10 +134,21 @@
             this.rtbOutput.Text = "> a = 6\n> b = 7\n> a+b\n13\n> foo = function(x, y) return x + y * 2; end\n> a + foo(b" +
     ", a)\n26";
             this.rtbOutput.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.rtbOutput_LinkClicked);
+            this.rtbOutput.VScroll += new System.EventHandler(this.rtbOutput_VScroll);
             this.rtbOutput.Enter += new System.EventHandler(this.rtbOutput_Enter);
             this.rtbOutput.KeyDown += new System.Windows.Forms.KeyEventHandler(this.rtbOutput_KeyDown);
             this.rtbOutput.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.rtbOutput_KeyPress);
             this.rtbOutput.Leave += new System.EventHandler(this.rtbOutput_Leave);
+            this.rtbOutput.MouseLeave += new System.EventHandler(this.rtbOutput_MouseLeave);
+            // 
+            // tmrSpinner
+            // 
+            this.tmrSpinner.Interval = 50;
+            this.tmrSpinner.Tick += new System.EventHandler(this.tmrSpinner_Tick);
+            // 
+            // tmrWaitForSpinner
+            // 
+            this.tmrWaitForSpinner.Tick += new System.EventHandler(this.tmrWaitForSpinner_Tick);
             // 
             // LuaConsole
             // 

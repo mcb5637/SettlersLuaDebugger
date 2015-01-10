@@ -37,7 +37,8 @@ namespace LuaDebugger
             //settlersWndStyle |= WindowStyle.WS_MINIMIZEBOX | WindowStyle.WS_SIZEBOX | WindowStyle.WS_MAXIMIZEBOX;
             //WinAPI.SetWindowLong(GlobalState.SettlersWindowHandle, WinAPI.GWL_STYLE, (uint)settlersWndStyle);
 
-            TickHook.InstallHook();
+            //TickHook.InstallHook();
+            GameLoopHook.InstallHook();
             ErrorHook.InstallHook();
             Thread uiThread = new Thread(new ThreadStart(DbgThread.RunMessageLoop));
             uiThread.SetApartmentState(ApartmentState.STA);
