@@ -46,7 +46,13 @@ namespace LuaDebugger
 
         static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
-            return LoadedAssemblies[args.Name];
+            Assembly asm;
+            if (!LoadedAssemblies.TryGetValue(args.Name, out asm))
+            {
+                MessageBox.Show("The following Assembly was not found:\n" + args.Name + "\nPlease verify that .NET Framework 3.5 is installed correctly.");
+                Environment.Exit(-1);
+            }
+            return asm;
         }
 
         static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)

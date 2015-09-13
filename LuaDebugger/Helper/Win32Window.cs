@@ -172,6 +172,12 @@ namespace LuaDebugger
         public const int GWL_EXSTYLE = -20;
 
         [DllImport("user32.dll")]
+        public static extern uint SetClassLong(IntPtr hWnd, int nIndex, uint dwNewLong);
+
+        [DllImport("user32.dll")]
+        public static extern IntPtr LoadIconA(IntPtr hInstance, uint lpStr);
+
+        [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool IsWindow(IntPtr hWnd);
 

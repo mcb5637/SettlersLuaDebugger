@@ -23,16 +23,6 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
         string tmpPath;
         Properties propertyWindow = new Properties();
 
-        public string PluginName
-        {
-            get { return "S5 Cutscene Editor"; }
-        }
-
-        public bool IsOpenable(LuaState luaState)
-        {
-            return (GlobalState.SettlersNr == 5) && luaState.Name.Contains("Game");
-        }
-
         public S5CutsceneEditorMain()
         {
             InitializeComponent();

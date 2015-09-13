@@ -108,6 +108,7 @@ namespace LuaDebugger
         protected unsafe void DebugHook(UIntPtr L, IntPtr ptr) //unsafe for speed
         {
             LuaStackRecord* sr = (LuaStackRecord*)ptr;
+            BBLua.lua_getstack(L, 0, ptr);
             if (sr->debugEvent == LuaEvent.Call)
                 this.callStack++;
             else if (sr->debugEvent == LuaEvent.Return || sr->debugEvent == LuaEvent.TailReturn)

@@ -262,13 +262,16 @@ namespace LuaDebugger
         private void pluginsToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
         {
             pluginsToolStripMenuItem.DropDownItems.Clear();
-            foreach(ILuaDebuggerPlugin plugin in PluginSystem.Plugins)
+            foreach(IPluginDescriptor pluginProps in PluginSystem.Plugins)
             {
-                ToolStripMenuItem plgItem = new ToolStripMenuItem(plugin.PluginName);
-                plgItem.Tag = plugin;
+                if (!pluginProps.CheckSettlersVersion(GlobalState.SettlersNr))
+                    continue;
+
+                ToolStripMenuItem plgItem = new ToolStripMenuItem(pluginProps.Name);
+                plgItem.Tag = pluginProps;
                 pluginsToolStripMenuItem.DropDownItems.Add(plgItem);
 
-                if (plugin.IsOpenable(activeState.LuaState))
+                if (pluginProps.IsOpenableForState(activeState.LuaState))
                     plgItem.Click += plgItem_Click;
                 else
                     plgItem.Enabled = false;
@@ -277,7 +280,10 @@ namespace LuaDebugger
 
         void plgItem_Click(object sender, EventArgs e)
         {
-            ((sender as ToolStripMenuItem).Tag as ILuaDebuggerPlugin).ShowInState(activeState.LuaState, this);
+            ToolStripMenuItem tmi = sender as ToolStripMenuItem;
+            IPluginDescriptor pluginProps = tmi.Tag as IPluginDescriptor;
+            ILuaDebuggerPlugin plugin = pluginProps.CreateInstance(activeState.LuaState);
+            plugin.ShowInState(activeState.LuaState, this);
         }
     }
 

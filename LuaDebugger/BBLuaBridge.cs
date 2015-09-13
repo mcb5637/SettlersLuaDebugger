@@ -70,6 +70,8 @@ namespace LuaDebugger
         public LuaEvent debugEvent;
         [FieldOffset(20)]
         public int currentline;
+        [FieldOffset(82)]
+        public int privateInt;  /* active function */
     }
 
     [StructLayout(LayoutKind.Explicit)]

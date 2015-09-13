@@ -6,18 +6,24 @@ using System.Windows.Forms;
 
 namespace LuaDebugger.Plugins
 {
-    interface ILuaDebuggerPlugin
+    public interface IPluginDescriptor
     {
-        string PluginName { get; }
-        bool IsOpenable(LuaState luaState);
+        string Name { get; }
+        bool CheckSettlersVersion(int version);
+        bool IsOpenableForState(LuaState luaState);
+        ILuaDebuggerPlugin CreateInstance(LuaState luaState);
+    }
+
+    public interface ILuaDebuggerPlugin
+    {
         void ShowInState(LuaState luaState, Control parent);
     }
 
-    static class PluginSystem
+    public static class PluginSystem
     {
-        public static List<ILuaDebuggerPlugin> Plugins = new List<ILuaDebuggerPlugin>()
+        public static List<IPluginDescriptor> Plugins = new List<IPluginDescriptor>()
         {
-            new S5CutsceneEditor.S5CutsceneEditorMain()
+            new S5CutsceneEditor.S5CutsceneEditorProps()
         };
     }
 }

@@ -15,6 +15,7 @@ namespace LuaDebuggerStarter
         [STAThread]
         static void Main()
         {
+            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
             Application.ThreadException += Application_ThreadException;
@@ -28,6 +29,13 @@ namespace LuaDebuggerStarter
                 Application.SetCompatibleTextRenderingDefault(false);
                 Application.Run(new frmLDStarter());
             }
+        }
+
+        static System.Reflection.Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            MessageBox.Show("The following Assembly was not found:\n" + args.Name + "\nPlease verify that .NET Framework 3.5 is installed correctly.");
+            Environment.Exit(-1);
+            return null;
         }
 
         public static void ToggleS6DevM()
@@ -134,10 +142,4 @@ namespace LuaDebuggerStarter
             }
         }
     }
-}
-
-// .net3 wtf!
-namespace System.Runtime.CompilerServices
-{
-    public class ExtensionAttribute : Attribute { }
 }

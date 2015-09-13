@@ -78,6 +78,7 @@
     <Compile Include="Plugins\S5CutsceneEditor\JoyStick.designer.cs">
       <DependentUpon>JoyStick.cs</DependentUpon>
     </Compile>
+    <Compile Include="Plugins\S5CutsceneEditor\PluginProps.cs" />
     <Compile Include="Plugins\S5CutsceneEditor\Point3D.cs" />
     <Compile Include="Plugins\S5CutsceneEditor\Properties.cs">
       <SubType>Form</SubType>
