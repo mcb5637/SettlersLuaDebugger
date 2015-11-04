@@ -106,12 +106,14 @@ namespace DebugDummy
                     return; //process exited, etc..
 
                 foreach (EnvDTE.Program p in dbgProc.Programs)
+                {
                     if (p.Name.Contains("Managed"))
                     {
                         dbgProc.Attach();
                         dllNotYetLoaded = false;
                         break;
                     }
+                }
             } while (dllNotYetLoaded);
             proc.WaitForExit();
 
@@ -129,7 +131,9 @@ namespace DebugDummy
             { 
                 "VisualStudio.DTE.11.0",        //VS2012
                 "VisualStudio.DTE.10.0",        //VS2010
-                "VisualStudio.DTE.12.0"         //VS2013
+                "VisualStudio.DTE.12.0",        //VS2013
+                "VisualStudio.DTE.13.0",        //VS2014
+                "VisualStudio.DTE.14.0"         //VS2015
             };
 
             foreach (string dteKey in vsDTEs)

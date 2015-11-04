@@ -31,7 +31,11 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DbgMain));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.PRtoolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.stepLineToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.stepInToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
+            this.stepOutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmLS = new System.Windows.Forms.ToolStripMenuItem();
             this.tcbState = new System.Windows.Forms.ToolStripComboBox();
             this.pluginsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -41,10 +45,6 @@
             this.pnlMain = new System.Windows.Forms.Panel();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.tmrAlive = new System.Windows.Forms.Timer(this.components);
-            this.PRtoolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.stepLineToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.stepInToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.stepOutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.pnlMain.SuspendLayout();
             this.SuspendLayout();
@@ -68,12 +68,64 @@
             this.menuStrip1.TabIndex = 2;
             this.menuStrip1.Text = "menuStrip1";
             // 
+            // PRtoolStripMenuItem
+            // 
+            this.PRtoolStripMenuItem.Enabled = false;
+            this.PRtoolStripMenuItem.Image = global::LuaDebugger.Properties.Resources.Pause;
+            this.PRtoolStripMenuItem.Name = "PRtoolStripMenuItem";
+            this.PRtoolStripMenuItem.Size = new System.Drawing.Size(66, 23);
+            this.PRtoolStripMenuItem.Tag = "ok";
+            this.PRtoolStripMenuItem.Text = "Pause";
+            this.PRtoolStripMenuItem.ToolTipText = "F5";
+            this.PRtoolStripMenuItem.Click += new System.EventHandler(this.PRtoolStripMenuItem_Click);
+            this.PRtoolStripMenuItem.MouseLeave += new System.EventHandler(this.toolStripMenuItem_MouseLeave);
+            this.PRtoolStripMenuItem.MouseHover += new System.EventHandler(this.toolStripMenuItem_MouseHover);
+            // 
+            // stepLineToolStripMenuItem
+            // 
+            this.stepLineToolStripMenuItem.Enabled = false;
+            this.stepLineToolStripMenuItem.Image = global::LuaDebugger.Properties.Resources.StepOver;
+            this.stepLineToolStripMenuItem.Name = "stepLineToolStripMenuItem";
+            this.stepLineToolStripMenuItem.Size = new System.Drawing.Size(83, 23);
+            this.stepLineToolStripMenuItem.Tag = "ok";
+            this.stepLineToolStripMenuItem.Text = "Step Line";
+            this.stepLineToolStripMenuItem.ToolTipText = "F10";
+            this.stepLineToolStripMenuItem.Click += new System.EventHandler(this.stepLineToolStripMenuItem_Click);
+            this.stepLineToolStripMenuItem.MouseLeave += new System.EventHandler(this.toolStripMenuItem_MouseLeave);
+            this.stepLineToolStripMenuItem.MouseHover += new System.EventHandler(this.toolStripMenuItem_MouseHover);
+            // 
+            // stepInToolStripMenuItem
+            // 
+            this.stepInToolStripMenuItem.Enabled = false;
+            this.stepInToolStripMenuItem.Image = global::LuaDebugger.Properties.Resources.StepIn;
+            this.stepInToolStripMenuItem.Name = "stepInToolStripMenuItem";
+            this.stepInToolStripMenuItem.Size = new System.Drawing.Size(71, 23);
+            this.stepInToolStripMenuItem.Tag = "ok";
+            this.stepInToolStripMenuItem.Text = "Step In";
+            this.stepInToolStripMenuItem.ToolTipText = "F11";
+            this.stepInToolStripMenuItem.Click += new System.EventHandler(this.stepInToolStripMenuItem_Click);
+            this.stepInToolStripMenuItem.MouseLeave += new System.EventHandler(this.toolStripMenuItem_MouseLeave);
+            this.stepInToolStripMenuItem.MouseHover += new System.EventHandler(this.toolStripMenuItem_MouseHover);
+            // 
             // toolStripMenuItem4
             // 
             this.toolStripMenuItem4.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
             this.toolStripMenuItem4.Name = "toolStripMenuItem4";
             this.toolStripMenuItem4.Size = new System.Drawing.Size(80, 23);
-            this.toolStripMenuItem4.Text = "© yoq 2014";
+            this.toolStripMenuItem4.Text = "© yoq 2015";
+            // 
+            // stepOutToolStripMenuItem
+            // 
+            this.stepOutToolStripMenuItem.Enabled = false;
+            this.stepOutToolStripMenuItem.Image = global::LuaDebugger.Properties.Resources.StepOut;
+            this.stepOutToolStripMenuItem.Name = "stepOutToolStripMenuItem";
+            this.stepOutToolStripMenuItem.Size = new System.Drawing.Size(81, 23);
+            this.stepOutToolStripMenuItem.Tag = "ok";
+            this.stepOutToolStripMenuItem.Text = "Step Out";
+            this.stepOutToolStripMenuItem.ToolTipText = "Shift+F11";
+            this.stepOutToolStripMenuItem.Click += new System.EventHandler(this.stepOutToolStripMenuItem_Click);
+            this.stepOutToolStripMenuItem.MouseLeave += new System.EventHandler(this.toolStripMenuItem_MouseLeave);
+            this.stepOutToolStripMenuItem.MouseHover += new System.EventHandler(this.toolStripMenuItem_MouseHover);
             // 
             // tsmLS
             // 
@@ -137,58 +189,6 @@
             this.tmrAlive.Enabled = true;
             this.tmrAlive.Interval = 1000;
             this.tmrAlive.Tick += new System.EventHandler(this.tmrAlive_Tick);
-            // 
-            // PRtoolStripMenuItem
-            // 
-            this.PRtoolStripMenuItem.Enabled = false;
-            this.PRtoolStripMenuItem.Image = global::LuaDebugger.Properties.Resources.Pause;
-            this.PRtoolStripMenuItem.Name = "PRtoolStripMenuItem";
-            this.PRtoolStripMenuItem.Size = new System.Drawing.Size(66, 23);
-            this.PRtoolStripMenuItem.Tag = "ok";
-            this.PRtoolStripMenuItem.Text = "Pause";
-            this.PRtoolStripMenuItem.ToolTipText = "F5";
-            this.PRtoolStripMenuItem.Click += new System.EventHandler(this.PRtoolStripMenuItem_Click);
-            this.PRtoolStripMenuItem.MouseLeave += new System.EventHandler(this.toolStripMenuItem_MouseLeave);
-            this.PRtoolStripMenuItem.MouseHover += new System.EventHandler(this.toolStripMenuItem_MouseHover);
-            // 
-            // stepLineToolStripMenuItem
-            // 
-            this.stepLineToolStripMenuItem.Enabled = false;
-            this.stepLineToolStripMenuItem.Image = global::LuaDebugger.Properties.Resources.StepOver;
-            this.stepLineToolStripMenuItem.Name = "stepLineToolStripMenuItem";
-            this.stepLineToolStripMenuItem.Size = new System.Drawing.Size(83, 23);
-            this.stepLineToolStripMenuItem.Tag = "ok";
-            this.stepLineToolStripMenuItem.Text = "Step Line";
-            this.stepLineToolStripMenuItem.ToolTipText = "F10";
-            this.stepLineToolStripMenuItem.Click += new System.EventHandler(this.stepLineToolStripMenuItem_Click);
-            this.stepLineToolStripMenuItem.MouseLeave += new System.EventHandler(this.toolStripMenuItem_MouseLeave);
-            this.stepLineToolStripMenuItem.MouseHover += new System.EventHandler(this.toolStripMenuItem_MouseHover);
-            // 
-            // stepInToolStripMenuItem
-            // 
-            this.stepInToolStripMenuItem.Enabled = false;
-            this.stepInToolStripMenuItem.Image = global::LuaDebugger.Properties.Resources.StepIn;
-            this.stepInToolStripMenuItem.Name = "stepInToolStripMenuItem";
-            this.stepInToolStripMenuItem.Size = new System.Drawing.Size(71, 23);
-            this.stepInToolStripMenuItem.Tag = "ok";
-            this.stepInToolStripMenuItem.Text = "Step In";
-            this.stepInToolStripMenuItem.ToolTipText = "F11";
-            this.stepInToolStripMenuItem.Click += new System.EventHandler(this.stepInToolStripMenuItem_Click);
-            this.stepInToolStripMenuItem.MouseLeave += new System.EventHandler(this.toolStripMenuItem_MouseLeave);
-            this.stepInToolStripMenuItem.MouseHover += new System.EventHandler(this.toolStripMenuItem_MouseHover);
-            // 
-            // stepOutToolStripMenuItem
-            // 
-            this.stepOutToolStripMenuItem.Enabled = false;
-            this.stepOutToolStripMenuItem.Image = global::LuaDebugger.Properties.Resources.StepOut;
-            this.stepOutToolStripMenuItem.Name = "stepOutToolStripMenuItem";
-            this.stepOutToolStripMenuItem.Size = new System.Drawing.Size(81, 23);
-            this.stepOutToolStripMenuItem.Tag = "ok";
-            this.stepOutToolStripMenuItem.Text = "Step Out";
-            this.stepOutToolStripMenuItem.ToolTipText = "Shift+F11";
-            this.stepOutToolStripMenuItem.Click += new System.EventHandler(this.stepOutToolStripMenuItem_Click);
-            this.stepOutToolStripMenuItem.MouseLeave += new System.EventHandler(this.toolStripMenuItem_MouseLeave);
-            this.stepOutToolStripMenuItem.MouseHover += new System.EventHandler(this.toolStripMenuItem_MouseHover);
             // 
             // DbgMain
             // 

@@ -70,7 +70,7 @@
             // 
             // panel1
             // 
-            this.panel1.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.panel1.BackColor = System.Drawing.SystemColors.Control;
             this.panel1.Controls.Add(this.lblInstS5);
             this.panel1.Controls.Add(this.btnS5AO2);
             this.panel1.Controls.Add(this.btnS5AO1);
@@ -125,7 +125,7 @@
             // 
             // panel2
             // 
-            this.panel2.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.panel2.BackColor = System.Drawing.SystemColors.Control;
             this.panel2.Controls.Add(this.lblDevMS6);
             this.panel2.Controls.Add(this.label6);
             this.panel2.Controls.Add(this.btnS6DevM);
@@ -221,6 +221,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(415, 182);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
