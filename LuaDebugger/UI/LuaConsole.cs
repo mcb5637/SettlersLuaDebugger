@@ -29,6 +29,14 @@ namespace LuaDebugger
         public LuaConsole()
         {
             InitializeComponent();
+            tbPrompt.Cursor = Cursors.Default;
+            tbPrompt.GotFocus += TbPrompt_GotFocus;
+        }
+
+        private void TbPrompt_GotFocus(object sender, EventArgs e)
+        {
+            JumpToInput();
+            tbInput.Select(0, 0);
         }
 
         public void InitState(LuaState ls)
