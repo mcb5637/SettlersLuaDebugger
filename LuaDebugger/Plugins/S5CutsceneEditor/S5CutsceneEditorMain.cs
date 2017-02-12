@@ -7,6 +7,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO;
 using Microsoft.VisualBasic;
+using System.Xml.Linq;
 
 namespace LuaDebugger.Plugins.S5CutsceneEditor
 {
@@ -390,12 +391,38 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
             SaveFileDialog sfd = new SaveFileDialog();
             sfd.Filter = "XML files (*.xml)|*.xml|All files (*.*)|*.*";
             if (sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
                 myCutscene.SaveCutscene(sfd.FileName);
+                XElement cs = myCutscene.serialize();
+                XDocument d = new XDocument(new XElement("root", cs));
+                d.Save(sfd.FileName + ".save");
+            }
         }
 
         private void btnLoad_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Not implemented");
+            OpenFileDialog od = new OpenFileDialog();
+            od.Filter = "Cutscene save (*.xml.save)|*.xml.save|All files (*.*)|*.*";
+            if (od.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                //IFormatter fo = new BinaryFormatter();
+                XDocument d = XDocument.Load(od.FileName);
+                Cutscene cs = Cutscene.deserialize(d.Element("root"));
+                if (cs==null)
+                {
+                    MessageBox.Show("Error reading file!");
+                    return;
+                }
+                myCutscene = cs;
+                cbFlights.Items.Clear();
+                foreach (Flight f in cs.Flights)
+                {
+                    cbFlights.Items.Add(f);
+                }
+                selectedFlight = null;
+                selectedFlightPoint = null;
+                lvCut.Items.Clear();
+            }
         }
 
         private void S5CutsceneEditorMain_FormClosing(object sender, FormClosingEventArgs e)
