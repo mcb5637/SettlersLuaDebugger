@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using System.IO;
 using Microsoft.VisualBasic;
 using System.Xml.Linq;
+using LuaDebugger.UI;
 
 namespace LuaDebugger.Plugins.S5CutsceneEditor
 {
@@ -48,7 +49,7 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
         public void ShowInState(LuaState luaState, Control parent)
         {
             this.Location = new Point(parent.Location.X + parent.Width / 2 - Width / 2, parent.Location.Y + parent.Height / 2 - Height / 2);
-            
+
             this.Show();
 
             if (this.LS != luaState)
@@ -166,8 +167,9 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
                 btnAddPointAbove.Enabled = true;
                 btnAddPointBelow.Enabled = true;
                 btnRemoveFlight.Enabled = true;
+                btnRenameFlight.Enabled = true;
                 btnSaveCutscene.Enabled = true;
-
+                btnExportCutscene.Enabled = true;
                 gbPreviewCutscene.Enabled = true;
             }
             else
@@ -177,7 +179,9 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
                 btnAddPointAbove.Enabled = false;
                 btnAddPointBelow.Enabled = false;
                 btnRemoveFlight.Enabled = false;
+                btnRenameFlight.Enabled = false;
                 btnSaveCutscene.Enabled = false;
+                btnExportCutscene.Enabled = false;
                 gbPreviewCutscene.Enabled = false;
             }
 
@@ -190,9 +194,9 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
             lvCut.Items.Clear();
             foreach (FlightPoint fp in selectedFlight.FlightPoints)
             {
-                ListViewItem point = new ListViewItem(new string[] 
-                { 
-                    fp.ID.ToString(), 
+                ListViewItem point = new ListViewItem(new string[]
+                {
+                    fp.ID.ToString(),
                     "Edit",
                     fp.LuaCallback
                 });
@@ -203,7 +207,7 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
 
         private void btnAddFlight_Click(object sender, EventArgs e)
         {
-            if (tbFlightName.Text == "")
+            if (tbFlightName.WaterMarkActive || tbFlightName.Text == "")
             {
                 MessageBox.Show("Flight name needs at least 1 character!");
                 return;
@@ -222,9 +226,25 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
                 myCutscene.Flights.Remove(selectedFlight);
                 cbFlights.Items.Remove(selectedFlight);
                 selectedFlight = null;
-                cbFlights_SelectedIndexChanged(cbFlights, e);
+
+                if (cbFlights.Items.Count > 0)
+                    cbFlights.SelectedItem = cbFlights.Items[0];
+                else
+                    cbFlights_SelectedIndexChanged(cbFlights, e);
             }
 
+        }
+
+        private void btnRename_Click(object sender, EventArgs e)
+        {
+            string newName = Prompt.ShowDialog(selectedFlight.Name, "New Name:");
+            if (!string.IsNullOrEmpty(newName))
+            {
+                var flight = selectedFlight;
+                flight.Name = newName;
+                var idx = cbFlights.SelectedIndex;
+                cbFlights.Items[idx] = flight;
+            }
         }
 
         private void MoveFlightOrder(object sender, EventArgs e)
@@ -285,9 +305,9 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
             }
             FlightPoint newFlightPoint = new FlightPoint(Camera, selectedFlight.GetNextPointID());
 
-            ListViewItem point = new ListViewItem(new string[] 
-            { 
-                newFlightPoint.ID.ToString(), 
+            ListViewItem point = new ListViewItem(new string[]
+            {
+                newFlightPoint.ID.ToString(),
                 "Edit",
                 newFlightPoint.LuaCallback
             });
@@ -386,16 +406,23 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
             speed = tbSpeed.Value;
         }
 
-        private void btnSaveCutscene_Click(object sender, EventArgs e)
+        private void btnExportCutscene_Click(object sender, EventArgs e)
         {
             SaveFileDialog sfd = new SaveFileDialog();
             sfd.Filter = "XML files (*.xml)|*.xml|All files (*.*)|*.*";
             if (sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
                 myCutscene.SaveCutscene(sfd.FileName);
-                XElement cs = myCutscene.serialize();
+        }
+
+        private void btnSaveCutscene_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.Filter = "Cutscene save (*.xml.save)|*.xml.save|All files (*.*)|*.*";
+            if (sfd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                XElement cs = myCutscene.Serialize();
                 XDocument d = new XDocument(new XElement("root", cs));
-                d.Save(sfd.FileName + ".save");
+                d.Save(sfd.FileName);
             }
         }
 
@@ -405,10 +432,9 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
             od.Filter = "Cutscene save (*.xml.save)|*.xml.save|All files (*.*)|*.*";
             if (od.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                //IFormatter fo = new BinaryFormatter();
                 XDocument d = XDocument.Load(od.FileName);
-                Cutscene cs = Cutscene.deserialize(d.Element("root"));
-                if (cs==null)
+                Cutscene cs = Cutscene.Deserialize(d.Element("root"));
+                if (cs == null)
                 {
                     MessageBox.Show("Error reading file!");
                     return;
@@ -422,6 +448,7 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
                 selectedFlight = null;
                 selectedFlightPoint = null;
                 lvCut.Items.Clear();
+                cbFlights.SelectedItem = cbFlights.Items[0];
             }
         }
 

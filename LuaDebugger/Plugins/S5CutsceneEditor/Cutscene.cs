@@ -58,23 +58,23 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
             this.SaveCutscene(filename, 0, 0);
         }
 
-        public XElement serialize()
+        public XElement Serialize()
         {
             XElement cs = new XElement("Cutscene");
             foreach (Flight fl in Flights)
             {
-                cs.Add(new XElement("Flight", fl.serialize()));
+                cs.Add(new XElement("Flight", fl.Serialize()));
             }
             return cs;
         }
 
-        public static Cutscene deserialize(XElement el)
+        public static Cutscene Deserialize(XElement el)
         {
             el = el.Element("Cutscene");
             Cutscene cs = new Cutscene();
             foreach (XElement e in el.Elements("Flight"))
             {
-                cs.Flights.Add(Flight.deserialize(e));
+                cs.Flights.Add(Flight.Deserialize(e));
             }
             return cs;
         }
@@ -104,24 +104,24 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
             return pointIdCounter;
         }
 
-        public XElement serialize()
+        public XElement Serialize()
         {
             XElement f = new XElement("FlightPoints");
             XElement r = new XElement("Flight", new XElement("name", Name), f);
             for (int i=0; i<FlightPoints.Count; i++)
             {
-                f.Add(new XElement("FlightPoint", FlightPoints[i].serialize()));
+                f.Add(new XElement("FlightPoint", FlightPoints[i].Serialize()));
             }
             return r;
         }
 
-        public static Flight deserialize(XElement el)
+        public static Flight Deserialize(XElement el)
         {
             el = el.Element("Flight");
             Flight r = new Flight(el.Element("name").Value);
             foreach (XElement e in el.Element("FlightPoints").Elements("FlightPoint"))
             {
-                r.FlightPoints.Add(FlightPoint.deserialize(e, r.GetNextPointID()));
+                r.FlightPoints.Add(FlightPoint.Deserialize(e, r.GetNextPointID()));
             }
             return r;
         }
@@ -309,12 +309,12 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
                 new XElement("z", point.Z.ToString("e", CultureInfo.InvariantCulture)));
         }
 
-        public XElement serialize()
+        public XElement Serialize()
         {
             return new XElement("Waypoint", PointToXML(Position), new XElement("Active", Active.ToString()));
         }
 
-        public static Waypoint deserialize(XElement el)
+        public static Waypoint Deserialize(XElement el)
         {
             el = el.Element("Waypoint");
             Waypoint r = new Waypoint(new Point3D(
@@ -359,20 +359,20 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
 
         }
 
-        public XElement serialize()
+        public XElement Serialize()
         {
-            return new XElement("FlightPoint", new XElement("CamPos", CamPos.serialize()), new XElement("LookAt", LookAtPos.serialize()),
+            return new XElement("FlightPoint", new XElement("CamPos", CamPos.Serialize()), new XElement("LookAt", LookAtPos.Serialize()),
                 new XElement("callback", LuaCallback), new XElement("pitch", CamPitch.ToString(CultureInfo.InvariantCulture)),
                 new XElement("yaw", CamYaw.ToString(CultureInfo.InvariantCulture)), new XElement("speed", Speed.ToString(CultureInfo.InvariantCulture))
                 );
         }
 
-        public static FlightPoint deserialize(XElement el, int id)
+        public static FlightPoint Deserialize(XElement el, int id)
         {
             el = el.Element("FlightPoint");
             FlightPoint r = new FlightPoint();
-            r.CamPos = Waypoint.deserialize(el.Element("CamPos"));
-            r.LookAtPos = Waypoint.deserialize(el.Element("LookAt"));
+            r.CamPos = Waypoint.Deserialize(el.Element("CamPos"));
+            r.LookAtPos = Waypoint.Deserialize(el.Element("LookAt"));
             r.LuaCallback = el.Element("callback").Value;
             r.CamPitch = float.Parse(el.Element("pitch").Value, CultureInfo.InvariantCulture);
             r.CamYaw = float.Parse(el.Element("yaw").Value, CultureInfo.InvariantCulture);

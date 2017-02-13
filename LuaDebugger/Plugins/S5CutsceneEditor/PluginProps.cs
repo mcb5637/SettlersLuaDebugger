@@ -21,7 +21,7 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
 
         public bool IsOpenableForState(LuaState luaState)
         {
-            return luaState.Name.Contains("Game");
+            return luaState.Name.Contains("Game") || GlobalState.IsInVisualStudio;
         }
 
         public ILuaDebuggerPlugin CreateInstance(LuaState luaState)
