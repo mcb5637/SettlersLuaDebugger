@@ -139,6 +139,7 @@
     <Compile Include="UI\StateView.Designer.cs">
       <DependentUpon>StateView.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\Utils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

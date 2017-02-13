@@ -57,8 +57,29 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
         {
             this.SaveCutscene(filename, 0, 0);
         }
-    }
 
+        public XElement Serialize()
+        {
+            XElement cs = new XElement("Cutscene");
+            foreach (Flight fl in Flights)
+            {
+                cs.Add(new XElement("Flight", fl.Serialize()));
+            }
+            return cs;
+        }
+
+        public static Cutscene Deserialize(XElement el)
+        {
+            el = el.Element("Cutscene");
+            Cutscene cs = new Cutscene();
+            foreach (XElement e in el.Elements("Flight"))
+            {
+                cs.Flights.Add(Flight.Deserialize(e));
+            }
+            return cs;
+        }
+    }
+    
     class Flight
     {
         public List<FlightPoint> FlightPoints;
@@ -81,6 +102,28 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
         {
             pointIdCounter++;
             return pointIdCounter;
+        }
+
+        public XElement Serialize()
+        {
+            XElement f = new XElement("FlightPoints");
+            XElement r = new XElement("Flight", new XElement("name", Name), f);
+            for (int i=0; i<FlightPoints.Count; i++)
+            {
+                f.Add(new XElement("FlightPoint", FlightPoints[i].Serialize()));
+            }
+            return r;
+        }
+
+        public static Flight Deserialize(XElement el)
+        {
+            el = el.Element("Flight");
+            Flight r = new Flight(el.Element("name").Value);
+            foreach (XElement e in el.Element("FlightPoints").Elements("FlightPoint"))
+            {
+                r.FlightPoints.Add(FlightPoint.Deserialize(e, r.GetNextPointID()));
+            }
+            return r;
         }
 
         public void SmoothPaths()
@@ -231,7 +274,7 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
             this.LuaCallbackFlight = lc;
         }
     }
-
+    
     public class Waypoint
     {
         public Point3D Position, InTangent, OutTangent;
@@ -265,8 +308,25 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
                 new XElement("y", point.Y.ToString("e", CultureInfo.InvariantCulture)),
                 new XElement("z", point.Z.ToString("e", CultureInfo.InvariantCulture)));
         }
-    }
 
+        public XElement Serialize()
+        {
+            return new XElement("Waypoint", PointToXML(Position), new XElement("Active", Active.ToString()));
+        }
+
+        public static Waypoint Deserialize(XElement el)
+        {
+            el = el.Element("Waypoint");
+            Waypoint r = new Waypoint(new Point3D(
+                    float.Parse(el.Element("Position").Element("x").Value, CultureInfo.InvariantCulture),
+                    float.Parse(el.Element("Position").Element("y").Value, CultureInfo.InvariantCulture),
+                    float.Parse(el.Element("Position").Element("z").Value, CultureInfo.InvariantCulture)
+            ));
+            r.Active = el.Element("Active").Value == "True";
+            return r;
+        }
+    }
+    
     public class FlightPoint
     {
         public int ID;
@@ -293,6 +353,32 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
 
             CamPitch = camera.PitchAngle;
             CamYaw = camera.YawAngle;
+        }
+        private FlightPoint()
+        {
+
+        }
+
+        public XElement Serialize()
+        {
+            return new XElement("FlightPoint", new XElement("CamPos", CamPos.Serialize()), new XElement("LookAt", LookAtPos.Serialize()),
+                new XElement("callback", LuaCallback), new XElement("pitch", CamPitch.ToString(CultureInfo.InvariantCulture)),
+                new XElement("yaw", CamYaw.ToString(CultureInfo.InvariantCulture)), new XElement("speed", Speed.ToString(CultureInfo.InvariantCulture))
+                );
+        }
+
+        public static FlightPoint Deserialize(XElement el, int id)
+        {
+            el = el.Element("FlightPoint");
+            FlightPoint r = new FlightPoint();
+            r.CamPos = Waypoint.Deserialize(el.Element("CamPos"));
+            r.LookAtPos = Waypoint.Deserialize(el.Element("LookAt"));
+            r.LuaCallback = el.Element("callback").Value;
+            r.CamPitch = float.Parse(el.Element("pitch").Value, CultureInfo.InvariantCulture);
+            r.CamYaw = float.Parse(el.Element("yaw").Value, CultureInfo.InvariantCulture);
+            r.Speed = float.Parse(el.Element("speed").Value, CultureInfo.InvariantCulture);
+            r.ID = id;
+            return r;
         }
     }
 }

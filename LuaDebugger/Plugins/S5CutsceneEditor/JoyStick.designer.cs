@@ -44,6 +44,7 @@
             this.pbJoyStick.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pbJoyStick_MouseDown);
             this.pbJoyStick.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pbJoyStick_MouseMove);
             this.pbJoyStick.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pbJoyStick_MouseUp);
+            this.pbJoyStick.Resize += new System.EventHandler(this.pbJoyStick_Resize);
             // 
             // JoyStick
             // 

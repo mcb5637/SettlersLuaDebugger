@@ -183,5 +183,10 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
             }
             return result;
         }
+
+        private void pbJoyStick_Resize(object sender, EventArgs e)
+        {
+            pbJoyStick.Invalidate();
+        }
     }
 }

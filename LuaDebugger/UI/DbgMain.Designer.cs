@@ -111,8 +111,8 @@
             // 
             this.toolStripMenuItem4.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
             this.toolStripMenuItem4.Name = "toolStripMenuItem4";
-            this.toolStripMenuItem4.Size = new System.Drawing.Size(80, 23);
-            this.toolStripMenuItem4.Text = "© yoq 2015";
+            this.toolStripMenuItem4.Size = new System.Drawing.Size(57, 23);
+            this.toolStripMenuItem4.Text = "© 2017";
             // 
             // stepOutToolStripMenuItem
             // 
