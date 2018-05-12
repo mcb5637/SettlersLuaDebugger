@@ -375,6 +375,11 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
                 return;
             if (e.Location.X < chJumpTo.Width)
             {
+                if (!freeFlightActive)
+                {
+                    MessageBox.Show("Please activate free flight mode!");
+                    return;
+                }
                 Camera.Point3D = selectedFlightPoint.CamPos.Position;
                 Camera.PitchAngle = selectedFlightPoint.CamPitch;
                 Camera.YawAngle = selectedFlightPoint.CamYaw;
@@ -382,7 +387,13 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
             }
             else if (e.Location.X < (chJumpTo.Width + chProperties.Width))
             {
-                propertyWindow.ShowProperties(selectedFlightPoint);
+                int ind = selectedFlight.FlightPoints.IndexOf(selectedFlightPoint) - 1;
+                FlightPoint prev = null;
+                if (ind >= 0 && ind < selectedFlight.FlightPoints.Count)
+                {
+                    prev = selectedFlight.FlightPoints[ind];
+                }
+                propertyWindow.ShowProperties(selectedFlightPoint, prev);
             }
             else if (e.Location.X < (chLuaCall.Width + chJumpTo.Width + chProperties.Width))
             {
@@ -394,6 +405,9 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
         private void btnReplace_Click(object sender, EventArgs e)
         {
             FlightPoint newPoint = new FlightPoint(Camera, selectedFlight.GetNextPointID());
+            newPoint.LuaCallback = selectedFlightPoint.LuaCallback;
+            newPoint.Speed = selectedFlightPoint.Speed;
+            newPoint.SpeedUseOnlyXY = selectedFlightPoint.SpeedUseOnlyXY;
             int oldIndex = selectedFlight.FlightPoints.IndexOf(selectedFlightPoint);
             selectedFlight.FlightPoints[oldIndex] = newPoint;
             lvCut.SelectedItems[0].Tag = newPoint;

@@ -32,6 +32,9 @@
             this.cbLookAtActive = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
             this.nudSpeed = new System.Windows.Forms.NumericUpDown();
+            this.cbUseOnlyXY = new System.Windows.Forms.CheckBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.lDist = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.nudSpeed)).BeginInit();
             this.SuspendLayout();
             // 
@@ -40,7 +43,7 @@
             this.cbCamPosActive.AutoSize = true;
             this.cbCamPosActive.Checked = true;
             this.cbCamPosActive.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbCamPosActive.Location = new System.Drawing.Point(24, 23);
+            this.cbCamPosActive.Location = new System.Drawing.Point(24, 27);
             this.cbCamPosActive.Name = "cbCamPosActive";
             this.cbCamPosActive.Size = new System.Drawing.Size(135, 17);
             this.cbCamPosActive.TabIndex = 0;
@@ -64,7 +67,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(171, 24);
+            this.label1.Location = new System.Drawing.Point(235, 27);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(41, 13);
             this.label1.TabIndex = 3;
@@ -72,7 +75,7 @@
             // 
             // nudSpeed
             // 
-            this.nudSpeed.Location = new System.Drawing.Point(174, 40);
+            this.nudSpeed.Location = new System.Drawing.Point(238, 43);
             this.nudSpeed.Maximum = new decimal(new int[] {
             10000,
             0,
@@ -93,11 +96,45 @@
             0});
             this.nudSpeed.ValueChanged += new System.EventHandler(this.nudSpeed_ValueChanged);
             // 
+            // cbUseOnlyXY
+            // 
+            this.cbUseOnlyXY.AutoSize = true;
+            this.cbUseOnlyXY.Checked = true;
+            this.cbUseOnlyXY.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cbUseOnlyXY.Location = new System.Drawing.Point(24, 73);
+            this.cbUseOnlyXY.Name = "cbUseOnlyXY";
+            this.cbUseOnlyXY.Size = new System.Drawing.Size(178, 17);
+            this.cbUseOnlyXY.TabIndex = 5;
+            this.cbUseOnlyXY.Text = "Use only XY Distance for Speed";
+            this.cbUseOnlyXY.UseVisualStyleBackColor = true;
+            this.cbUseOnlyXY.CheckedChanged += new System.EventHandler(this.cbUseOnlyXY_CheckedChanged);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(235, 66);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(52, 13);
+            this.label2.TabIndex = 6;
+            this.label2.Text = "Distance:";
+            // 
+            // lDist
+            // 
+            this.lDist.AutoSize = true;
+            this.lDist.Location = new System.Drawing.Point(241, 79);
+            this.lDist.Name = "lDist";
+            this.lDist.Size = new System.Drawing.Size(35, 13);
+            this.lDist.TabIndex = 7;
+            this.lDist.Text = "label3";
+            // 
             // Properties
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(253, 90);
+            this.ClientSize = new System.Drawing.Size(331, 112);
+            this.Controls.Add(this.lDist);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.cbUseOnlyXY);
             this.Controls.Add(this.nudSpeed);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.cbLookAtActive);
@@ -121,5 +158,8 @@
         private System.Windows.Forms.CheckBox cbLookAtActive;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.NumericUpDown nudSpeed;
+        private System.Windows.Forms.CheckBox cbUseOnlyXY;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label lDist;
     }
 }

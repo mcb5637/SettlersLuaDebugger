@@ -250,11 +250,8 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
             float internOffset = 0;
             for (int i = startFromPoint + 1; i < this.FlightPoints.Count; i++)
             {
-                float dx = fps[i - 1].CamPos.Position.X - fps[i].CamPos.Position.X;
-                float dy = fps[i - 1].CamPos.Position.Y - fps[i].CamPos.Position.Y;
-                float dz = fps[i - 1].CamPos.Position.Z - fps[i].CamPos.Position.Z;
-                float dxyz = (float)Math.Sqrt(dx * dx + dy * dy + dz * dz);
-                internOffset += dxyz / fps[i].Speed;
+                float fullDistance = fps[i].getDistanceRelativeTo(fps[i - 1]);
+                internOffset += fullDistance / fps[i].Speed;
                 fps[i].CamPos.Time = internOffset;
                 fps[i].LookAtPos.Time = internOffset;
             }
@@ -335,6 +332,7 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
         public float Speed;
         public float CamPitch;
         public float CamYaw;
+        public bool SpeedUseOnlyXY;
 
         public XElement GetLuaXML()
         {
@@ -350,6 +348,7 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
             CamPos = new Waypoint(camera.Point3D);
             LuaCallback = "";
             Speed = 800;
+            SpeedUseOnlyXY = false;
 
             CamPitch = camera.PitchAngle;
             CamYaw = camera.YawAngle;
@@ -363,7 +362,8 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
         {
             return new XElement("FlightPoint", new XElement("CamPos", CamPos.Serialize()), new XElement("LookAt", LookAtPos.Serialize()),
                 new XElement("callback", LuaCallback), new XElement("pitch", CamPitch.ToString(CultureInfo.InvariantCulture)),
-                new XElement("yaw", CamYaw.ToString(CultureInfo.InvariantCulture)), new XElement("speed", Speed.ToString(CultureInfo.InvariantCulture))
+                new XElement("yaw", CamYaw.ToString(CultureInfo.InvariantCulture)), new XElement("speed", Speed.ToString(CultureInfo.InvariantCulture)),
+                new XElement("speedOnlyXY", SpeedUseOnlyXY.ToString())
                 );
         }
 
@@ -377,8 +377,29 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
             r.CamPitch = float.Parse(el.Element("pitch").Value, CultureInfo.InvariantCulture);
             r.CamYaw = float.Parse(el.Element("yaw").Value, CultureInfo.InvariantCulture);
             r.Speed = float.Parse(el.Element("speed").Value, CultureInfo.InvariantCulture);
+            if (el.Element("speedOnlyXY") != null)
+            {
+                r.SpeedUseOnlyXY = el.Element("speedOnlyXY").Value == "True";
+            }
             r.ID = id;
             return r;
+        }
+
+        public float getDistanceRelativeTo(FlightPoint p)
+        {
+            float dx = p.CamPos.Position.X - this.CamPos.Position.X;
+            float dy = p.CamPos.Position.Y - this.CamPos.Position.Y;
+            float dz = p.CamPos.Position.Z - this.CamPos.Position.Z;
+            float fullDistance = 0;
+            if (this.SpeedUseOnlyXY)
+            {
+                fullDistance = (float)Math.Sqrt(dx * dx + dy * dy);
+            }
+            else
+            {
+                fullDistance = (float)Math.Sqrt(dx * dx + dy * dy + dz * dz);
+            }
+            return fullDistance;
         }
     }
 }
