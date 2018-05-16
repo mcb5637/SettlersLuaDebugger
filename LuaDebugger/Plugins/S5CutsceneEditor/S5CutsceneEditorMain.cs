@@ -24,6 +24,7 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
         FlightPoint selectedFlightPoint = null;
         string tmpPath;
         Properties propertyWindow = new Properties();
+        NumericCameraControl numCamContr = new NumericCameraControl();
 
         public S5CutsceneEditorMain()
         {
@@ -111,6 +112,10 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
                     }
                 Camera.Point3D = newPos;
                 Camera.WriteToMemory();
+                if (numCamContr.Visible)
+                {
+                    numCamContr.updateGUI();
+                }
             }
         }
 
@@ -480,6 +485,19 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
                 selectedFlight.FlightPoints.RemoveAt(selectedIndex);
                 lvCut.Items.RemoveAt(selectedIndex);
             }
+        }
+
+        private void btnNumbers_Click(object sender, EventArgs e)
+        {
+            if (!freeFlightActive)
+            {
+                MessageBox.Show("Please activate free flight mode!");
+                return;
+            }
+            numCamContr.cam = Camera;
+            numCamContr.ls = LS;
+            numCamContr.updateGUI();
+            numCamContr.ShowDialog();
         }
     }
 }

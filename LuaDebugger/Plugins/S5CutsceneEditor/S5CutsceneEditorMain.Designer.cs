@@ -61,6 +61,7 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
             this.label4 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.joyStickCutsceneEditor = new LuaDebugger.Plugins.S5CutsceneEditor.JoyStick();
+            this.btnNumbers = new System.Windows.Forms.Button();
             this.gbPreviewCutscene.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tbSpeed)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -383,11 +384,22 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
             this.joyStickCutsceneEditor.Size = new System.Drawing.Size(545, 263);
             this.joyStickCutsceneEditor.TabIndex = 0;
             // 
+            // btnNumbers
+            // 
+            this.btnNumbers.Location = new System.Drawing.Point(463, 344);
+            this.btnNumbers.Name = "btnNumbers";
+            this.btnNumbers.Size = new System.Drawing.Size(88, 23);
+            this.btnNumbers.TabIndex = 31;
+            this.btnNumbers.Text = "Show Numbers";
+            this.btnNumbers.UseVisualStyleBackColor = true;
+            this.btnNumbers.Click += new System.EventHandler(this.btnNumbers_Click);
+            // 
             // S5CutsceneEditorMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(569, 616);
+            this.Controls.Add(this.btnNumbers);
             this.Controls.Add(this.tbSpeed);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.groupBox1);
@@ -447,5 +459,6 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button btnRenameFlight;
+        private System.Windows.Forms.Button btnNumbers;
     }
 }

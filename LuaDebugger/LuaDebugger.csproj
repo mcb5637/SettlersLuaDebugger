@@ -78,6 +78,12 @@
     <Compile Include="Plugins\S5CutsceneEditor\JoyStick.designer.cs">
       <DependentUpon>JoyStick.cs</DependentUpon>
     </Compile>
+    <Compile Include="Plugins\S5CutsceneEditor\NumericCameraControl.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Plugins\S5CutsceneEditor\NumericCameraControl.Designer.cs">
+      <DependentUpon>NumericCameraControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Plugins\S5CutsceneEditor\PluginProps.cs" />
     <Compile Include="Plugins\S5CutsceneEditor\Point3D.cs" />
     <Compile Include="Plugins\S5CutsceneEditor\Properties.cs">
@@ -145,6 +151,9 @@
     <None Include="packages.config" />
     <EmbeddedResource Include="Plugins\S5CutsceneEditor\JoyStick.resx">
       <DependentUpon>JoyStick.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Plugins\S5CutsceneEditor\NumericCameraControl.resx">
+      <DependentUpon>NumericCameraControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Plugins\S5CutsceneEditor\Properties.resx">
       <DependentUpon>Properties.cs</DependentUpon>
