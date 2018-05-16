@@ -6,7 +6,7 @@ using System.Text;
 namespace LuaDebugger.Plugins.S5CutsceneEditor
 {
     [StructLayout(LayoutKind.Sequential)]
-    public struct S5CameraInfo
+    public class S5CameraInfo
     {
         public float PosX;
         public float PosY;
