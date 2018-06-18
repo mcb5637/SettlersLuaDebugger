@@ -114,6 +114,7 @@ namespace DebugDummy
                         break;
                     }
                 }
+                if (dllNotYetLoaded) System.Threading.Thread.Sleep(10);
             } while (dllNotYetLoaded);
             proc.WaitForExit();
 
@@ -127,27 +128,13 @@ namespace DebugDummy
                 return currentDTE;
 
             EnvDTE.DTE dte = null;
-            string[] vsDTEs = new string[] 
-            { 
-                "VisualStudio.DTE.11.0",        //VS2012
-                "VisualStudio.DTE.10.0",        //VS2010
-                "VisualStudio.DTE.12.0",        //VS2013
-                "VisualStudio.DTE.13.0",        //VS2014
-                "VisualStudio.DTE.14.0"         //VS2015
-            };
-
-            foreach (string dteKey in vsDTEs)
+            try
             {
-                try
-                {
-                    dte = Marshal.GetActiveObject(dteKey) as EnvDTE.DTE;
-                }
-                catch { }
+                dte = Marshal.GetActiveObject("VisualStudio.DTE") as EnvDTE.DTE;
             }
-            if (dte == null)
-                throw new Exception("Failed to aquire DTE");
+            catch { }
 
-            currentDTE = dte;
+            currentDTE = dte ?? throw new Exception("Failed to aquire DTE");
             return dte;
         }
 
