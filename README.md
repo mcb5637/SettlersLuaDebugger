@@ -12,6 +12,9 @@ Settlers 6 uses Lua 5.1.1
 
 ## Project Overview ##
 
+### Building ###
+First, build LuaDebugger in both build-configurations (DbgS5 & DbgS6) to build the debugger DLLs. Otherwise, LuaDebuggerStarter will not build successfully. 
+
 ### LuaDebugger ###
 The main project which compiles to the DLL. Differences between the two versions are handled by compile-time conditionals `#if` etc...
 The Editor used is [ICSharpCode.TextEditor](https://www.nuget.org/packages/ICSharpCode.TextEditor/), and the native DLL exports are created with [UnmanagedExports](https://www.nuget.org/packages/UnmanagedExports)
