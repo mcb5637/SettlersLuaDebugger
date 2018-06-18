@@ -444,8 +444,25 @@ public static extern int luaL_findstring (string st, string const lst[]);*/
         public static extern int luaL_loadfile(UIntPtr L, string filename);
 
         [DllImport(GlobalState.LuaDll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern LuaResult luaL_loadbuffer(UIntPtr L, string buff, int sz,
-                                        string name);
+        private static extern LuaResult luaL_loadbuffer(UIntPtr L, IntPtr buff, int sz,
+            string name);
+
+        public static LuaResult luaL_loadbuffer(UIntPtr L, string buff, int sz, string name)
+        {
+            var byteBuffer = Encoding.UTF8.GetBytes(buff);
+            Array.Resize(ref byteBuffer, byteBuffer.Length + 1);
+            byteBuffer[byteBuffer.Length - 1] = 0; // 0 termination
+            var utf8Buffer = Marshal.AllocHGlobal(byteBuffer.Length);
+            try
+            {
+                Marshal.Copy(byteBuffer, 0, utf8Buffer, byteBuffer.Length);
+                return luaL_loadbuffer(L, utf8Buffer, byteBuffer.Length - 1, name);
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(utf8Buffer);
+            }
+        }
 
         /*
         ** Compatibility macros and functions
