@@ -97,11 +97,11 @@ namespace LuaDebugger
         protected int LogCallback(UIntPtr L)
         {
             string text = this.ls.TosToString();
-            string[] lines = text.Split('\n');
-            for (int i = 0; i < lines.Length; i++)
-                lines[i] = "Log: " + lines[i];
-
-            this.ls.StateView.LuaConsole.AppendText(string.Join("\n", lines));
+            if (text.Contains("\n"))
+                this.ls.StateView.LuaConsole.AppendText("Log:");
+            else
+                text = "Log: " + text;
+            this.ls.StateView.LuaConsole.AppendText(text);
             return 0;
         }
 
