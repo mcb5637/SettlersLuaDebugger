@@ -21,6 +21,8 @@ namespace LuaDebugger
 
         private static DispatchMessageDelegate dmDelegate;
 
+        private static EasyHook.LocalHook hook;
+
         [DllImport("user32.dll")]
         private static extern UIntPtr DispatchMessage(UIntPtr msg);
 
@@ -29,21 +31,15 @@ namespace LuaDebugger
             dmDelegate = new DispatchMessageDelegate(DispatchMessageHook);
             IntPtr hookPtr = Marshal.GetFunctionPointerForDelegate(dmDelegate);
 
-            try
-            {
-                return ImportPatcher.ReplaceIATEntry("user32.dll",
+            hook = EasyHook.LocalHook.Create(EasyHook.LocalHook.GetProcAddress("user32.dll",
 #if S5
-                    "DispatchMessageA", 
+                                    "DispatchMessageA")
 #elif S6
- "DispatchMessageW",
+                                    "DispatchMessageW")
 #endif
- hookPtr);
-            }
-            catch (Exception)
-            {
-                MessageBox.Show("Couldn't patch DispatchMessage!");
-                return false;
-            }
+                , dmDelegate, null);
+            hook.ThreadACL.SetInclusiveACL(new int[] { 0 }); // only hook current thread, so main settlers is intercepted but our debugger not
+            return true;
         }
 
         private static UIntPtr DispatchMessageHook(UIntPtr msg)

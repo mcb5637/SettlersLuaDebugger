@@ -156,3 +156,9 @@ Desktop.ini
 dbgenv/
 .vs/
 LuaDebuggerStarter/Unpack/
+LuaDebugger/EasyHook32.dll
+LuaDebugger/EasyHook32Svc.exe
+LuaDebugger/EasyHook64.dll
+LuaDebugger/EasyHook64Svc.exe
+LuaDebugger/EasyLoad32.dll
+LuaDebugger/EasyLoad64.dll

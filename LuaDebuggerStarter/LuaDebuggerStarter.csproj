@@ -81,6 +81,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="bug.ico" />
+    <EmbeddedResource Include="Unpack\EasyHook.dll" />
+    <EmbeddedResource Include="Unpack\EasyHook32.dll" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
