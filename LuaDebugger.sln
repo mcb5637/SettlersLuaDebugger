@@ -1,11 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29509.3
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LuaDebugger", "LuaDebugger\LuaDebugger.csproj", "{707CEB10-EA0D-4A8A-AB18-BA41800DB0BF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DebugSettlers", "DebugDummy\DebugSettlers.csproj", "{9C66C249-83DA-4DD5-AB47-1372248AD9D3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LuaDebuggerStarter", "LuaDebuggerStarter\LuaDebuggerStarter.csproj", "{16B211B2-5232-4DF1-94F2-BE76C28E1302}"
+	ProjectSection(ProjectDependencies) = postProject
+		{707CEB10-EA0D-4A8A-AB18-BA41800DB0BF} = {707CEB10-EA0D-4A8A-AB18-BA41800DB0BF}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{5E3A4AFE-CDC7-4CB1-8E4D-E33944F44284}"
 	ProjectSection(SolutionItems) = preProject
@@ -55,5 +60,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D34F8AF3-14D0-4F59-B504-EE4A93D023B0}
 	EndGlobalSection
 EndGlobal

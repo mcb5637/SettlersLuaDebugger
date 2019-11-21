@@ -10,13 +10,44 @@ using System.ComponentModel;
 using System.Reflection;
 using System.IO;
 using System.Globalization;
+using System.Linq;
 
 namespace LuaDebugger
 {
     public static class DebuggerDllExports
     {
+
+        private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            // Ignore missing resources
+            if (args.Name.Contains(".resources"))
+                return null;
+
+            // check for assemblies already loaded
+            Assembly assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.FullName == args.Name);
+            if (assembly != null)
+                return assembly;
+
+            // Try to load by filename - split out the filename of the full assembly name
+            // and append the base path of the original assembly (ie. look in the same dir)
+            string filename = args.Name.Split(',')[0] + ".dll".ToLower();
+
+            string asmFile = Path.GetTempPath() + "luaDebugger-yoq/" + filename;
+
+            try
+            {
+                return System.Reflection.Assembly.LoadFrom(asmFile);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
         static DebuggerDllExports()
         {
+            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve; // set own function to load dlls windows cant find on its own
+
             if (Environment.GetEnvironmentVariable("ldbWaitForDebugger") == "yes")
             {
                 while (!Debugger.IsAttached)

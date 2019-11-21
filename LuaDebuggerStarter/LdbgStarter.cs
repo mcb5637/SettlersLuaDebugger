@@ -151,6 +151,11 @@ namespace LuaDebuggerStarter
                 using (FileStream fs = new FileStream(s6DllPath + "BBLuaDebugger.dll", FileMode.Create))
                     s6Stream.CopyTo(fs);
 
+                using (FileStream fs = new FileStream(tmpPath + "EasyHook.dll", FileMode.Create))
+                    localAssembly.GetManifestResourceStream(res + "EasyHook.dll").CopyTo(fs);
+
+                using (FileStream fs = new FileStream(tmpPath + "EasyHook32.dll", FileMode.Create))
+                    localAssembly.GetManifestResourceStream(res + "EasyHook32.dll").CopyTo(fs);
             }
             catch
             {
