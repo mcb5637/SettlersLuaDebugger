@@ -41,6 +41,9 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EasyHook, Version=2.7.7097.0, Culture=neutral, PublicKeyToken=4b580fca19d0b0c5, processorArchitecture=MSIL">
+      <HintPath>..\packages\EasyHook.2.7.7097\lib\net35\EasyHook.dll</HintPath>
+    </Reference>
     <Reference Include="ICSharpCode.TextEditor">
       <HintPath>..\packages\ICSharpCode.TextEditor.3.2.1.6466\lib\Net20\ICSharpCode.TextEditor.dll</HintPath>
     </Reference>
@@ -51,6 +54,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -59,6 +63,9 @@
   <ItemGroup>
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="CopyChangedTextBox.cs">
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="Helper\IVCThreadPool.cs" />
     <Compile Include="Hooks\GameLoopHook.cs" />
@@ -109,7 +116,6 @@
     <Compile Include="Helper\DbgThread.cs" />
     <Compile Include="DebuggerDllExports.cs" />
     <Compile Include="Helper\GlobalState.cs" />
-    <Compile Include="Helper\ImportPatcher.cs" />
     <Compile Include="UI\ErrorView.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -223,7 +229,26 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\ICSharpCode.TextEditor.dll" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="EasyHook32.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="EasyHook32Svc.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="EasyHook64.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="EasyHook64Svc.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="EasyLoad32.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="EasyLoad64.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if "$(ConfigurationName)" == "DebugS5" (
@@ -233,7 +258,11 @@
    copy /y "$(TargetPath)" "$(TargetDir)BBLuaDebugger.dll"
    xcopy /y /i "$(TargetDir)BBLuaDebugger.dll" "$(SolutionDir)dbgenv\base\_dbg\bin\release\"
    xcopy /y /i "$(TargetDir)BBLuaDebugger.dll" "$(SolutionDir)LuaDebuggerStarter\Unpack\"
-)</PostBuildEvent>
+)
+xcopy /y /i "$(TargetDir)EasyHook.dll" "$(SolutionDir)dbgenv\"
+xcopy /y /i "$(TargetDir)EasyHook.dll" "$(SolutionDir)LuaDebuggerStarter\Unpack\"
+xcopy /y /i "$(TargetDir)EasyHook32.dll" "$(SolutionDir)dbgenv\"
+xcopy /y /i "$(TargetDir)EasyHook32.dll" "$(SolutionDir)LuaDebuggerStarter\Unpack\"</PostBuildEvent>
   </PropertyGroup>
   <Import Project="../packages/UnmanagedExports.1.2.7/tools/RGiesecke.DllExport.targets" Condition="Exists('../packages/UnmanagedExports.1.2.7/tools/RGiesecke.DllExport.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

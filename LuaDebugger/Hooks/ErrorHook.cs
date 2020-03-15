@@ -19,6 +19,8 @@ namespace LuaDebugger
 
         static IntPtr errorHandlerPtr;
 
+        static EasyHook.LocalHook hook;
+
         static Dictionary<UIntPtr, LuaErrorCaught> stateErrHandler = new Dictionary<UIntPtr, LuaErrorCaught>();
 
         public static bool InstallHook()
@@ -29,19 +31,9 @@ namespace LuaDebugger
             ErrorHook.pcallHook = new LuaPcallHook(ErrorHook.FakePcall);
             IntPtr pcallHookPtr = Marshal.GetFunctionPointerForDelegate(ErrorHook.pcallHook);
 
-            try
-            {
-                return ImportPatcher.ReplaceIATEntry(GlobalState.LuaDll, "lua_pcall", pcallHookPtr);
-            }
-            catch (Exception e)
-            {
-                Process p = Process.GetCurrentProcess();
-                string modules = "";
-                foreach (ProcessModule pm in p.Modules)
-                    modules += pm.ModuleName + " (@ 0x" + pm.BaseAddress.ToString("X") + ") " + pm.FileName + "\n";
-                MessageBox.Show("Patching the Import Table for lua_pcall failed!\nLua Errors won't be caught by the Debugger.\nProblem: " + e.Message + "\n\n" + modules.TrimEnd(), "Press Ctrl+C and send to yoq!");
-                return false;
-            }
+            hook = EasyHook.LocalHook.Create(EasyHook.LocalHook.GetProcAddress(GlobalState.LuaDll, "lua_pcall"), pcallHook, null);
+            hook.ThreadACL.SetExclusiveACL(new int[] { }); // hook all threads
+            return true;
         }
 
         public static void SetErrorHandler(UIntPtr L, LuaErrorCaught callback)

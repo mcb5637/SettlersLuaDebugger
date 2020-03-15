@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.tbInput = new System.Windows.Forms.TextBox();
+            this.tbInput = new CopyChangedTextBox();
             this.panel1 = new System.Windows.Forms.Panel();
             this.tbSpinner = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
@@ -168,7 +168,7 @@
         #endregion
 
         private RichTextBoxLink rtbOutput;
-        private System.Windows.Forms.TextBox tbInput;
+        private CopyChangedTextBox tbInput;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.TextBox tbPrompt;
         private System.Windows.Forms.Button button1;
