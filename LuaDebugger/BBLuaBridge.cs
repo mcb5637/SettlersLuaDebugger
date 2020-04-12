@@ -108,6 +108,11 @@ namespace LuaDebugger
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate int LuaCFunc(UIntPtr L);
 
+    /*
+     * BIG WARNING!
+     * do not use return string from imported c functions, c# tries to free the returned memory.
+     * marshall the string as IntPtr and convert it manually (see lua_tostring)
+     */
     public static class BBLua
     {
 
@@ -183,16 +188,21 @@ namespace LuaDebugger
 
 #if S5
         [DllImport(GlobalState.LuaDll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string lua_tostring(UIntPtr L, int idx);
+        public static extern IntPtr lua_tostring(UIntPtr L, int idx);
 #elif S6
         [DllImport(GlobalState.LuaDll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string lua_tolstring(UIntPtr L, int idx, int setNull);
+        public static extern IntPtr lua_tolstring(UIntPtr L, int idx, int setNull);
 
-        public static string lua_tostring(UIntPtr L, int idx)
+        public static IntPtr lua_tostring(UIntPtr L, int idx)
         {
                 return lua_tolstring(L, idx, 0);
         }
 #endif
+        public static string toStringMarshal(UIntPtr L, int idx)
+        {
+            return Marshal.PtrToStringAnsi(lua_tostring(L, idx));
+        }
+
         [DllImport(GlobalState.LuaDll, CallingConvention = CallingConvention.Cdecl)]
         public static extern int lua_strlen(UIntPtr L, int idx);
 
@@ -493,16 +503,36 @@ public static extern int luaL_findstring (string st, string const lst[]);*/
         public static extern int lua_getinfo(UIntPtr L, string what, IntPtr sr);
 
         [DllImport(GlobalState.LuaDll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string lua_getlocal(UIntPtr L, IntPtr ar, int n);
+        public static extern IntPtr lua_getlocal(UIntPtr L, IntPtr ar, int n);
+
+        [DllImport(GlobalState.LuaDll, CallingConvention = CallingConvention.Cdecl)] 
+        public static extern IntPtr lua_setlocal(UIntPtr L, IntPtr ar, int n);
 
         [DllImport(GlobalState.LuaDll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string lua_setlocal(UIntPtr L, IntPtr ar, int n);
+        public static extern IntPtr lua_getupvalue(UIntPtr L, int funcindex, int n);
 
         [DllImport(GlobalState.LuaDll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string lua_getupvalue(UIntPtr L, int funcindex, int n);
+        public static extern IntPtr lua_setupvalue(UIntPtr L, int funcindex, int n);
 
-        [DllImport(GlobalState.LuaDll, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string lua_setupvalue(UIntPtr L, int funcindex, int n);
+        public static string getlocalMarshal(UIntPtr L, IntPtr ar, int n)
+        {
+            return Marshal.PtrToStringAnsi(lua_getlocal(L, ar, n));
+        }
+
+        public static string setlocalMarshal(UIntPtr L, IntPtr ar, int n)
+        {
+            return Marshal.PtrToStringAnsi(lua_setlocal(L, ar, n));
+        }
+
+        public static string getupvalueMarshal(UIntPtr L, int funcindex, int n)
+        {
+            return Marshal.PtrToStringAnsi(lua_getupvalue(L, funcindex, n));
+        }
+
+        public static string setupvalueMarshal(UIntPtr L, int funcindex, int n)
+        {
+            return Marshal.PtrToStringAnsi(lua_setupvalue(L, funcindex, n));
+        }
 
 
         [DllImport(GlobalState.LuaDll, CallingConvention = CallingConvention.Cdecl)]

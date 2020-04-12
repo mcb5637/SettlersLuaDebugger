@@ -91,7 +91,7 @@ namespace LuaDebugger
 
             for (int i = 1; ; i++)
             {
-                varName = BBLua.lua_getupvalue(ls.L, -1, i);
+                varName = BBLua.getupvalueMarshal(ls.L, -1, i);
                 if (varName == null) break;
                 TryFakeVar(varName, i, this.fakedUpvalues);
             }
@@ -100,7 +100,7 @@ namespace LuaDebugger
 
             for (int i = 1; ; i++)
             {
-                varName = BBLua.lua_getlocal(ls.L, this.funcInfo, i);
+                varName = BBLua.getlocalMarshal(ls.L, this.funcInfo, i);
                 if (varName == null) break;
                 if (varName.Length > 0 && varName[0] != '(')
                     TryFakeVar(varName, i, this.fakedLocals);
@@ -135,7 +135,7 @@ namespace LuaDebugger
             foreach (FakeVar fv in this.fakedUpvalues)
             {
                 GetVarAndCleanG(fv.VarName);
-                string vn = BBLua.lua_setupvalue(ls.L, -2, fv.Number);
+                string vn = BBLua.setupvalueMarshal(ls.L, -2, fv.Number);
             }
 
             BBLua.lua_settop(ls.L, -2); //remove func
@@ -143,7 +143,7 @@ namespace LuaDebugger
             foreach (FakeVar fv in this.fakedLocals)
             {
                 GetVarAndCleanG(fv.VarName);
-                string vn = BBLua.lua_setlocal(ls.L, this.funcInfo, fv.Number);
+                string vn = BBLua.setlocalMarshal(ls.L, this.funcInfo, fv.Number);
             }
         }
 

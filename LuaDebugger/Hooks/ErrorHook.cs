@@ -84,7 +84,7 @@ namespace LuaDebugger
 
         static int ErrorCatcher(UIntPtr L) //could be moved into DebugEngine, but this would cost perfomance to fetch the correct delegate for each pcall
         {
-            string errMsg = BBLua.lua_tostring(L, -1);
+            string errMsg = BBLua.toStringMarshal(L, -1);
             BBLua.lua_settop(L, -2);
 
             LuaErrorCaught callback;

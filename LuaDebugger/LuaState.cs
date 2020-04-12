@@ -144,7 +144,7 @@ namespace LuaDebugger
                     result = BBLua.lua_tonumber(this.L, -1).ToString();
                     break;
                 case LuaType.String:
-                    result = "\"" + BBLua.lua_tostring(this.L, -1) + "\"";
+                    result = "\"" + BBLua.toStringMarshal(this.L, -1) + "\"";
                     break;
                 case LuaType.Function:
                     result = GetTosFunctionInfo();
@@ -335,7 +335,7 @@ namespace LuaDebugger
                     BBLua.lua_settop(this.L, -2);
                     break;
                 }
-                sb.Append(BBLua.lua_tostring(this.L, -1));
+                sb.Append(BBLua.toStringMarshal(this.L, -1));
                 BBLua.lua_settop(this.L, -2);
             }
 
