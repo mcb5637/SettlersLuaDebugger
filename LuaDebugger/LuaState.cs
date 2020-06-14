@@ -144,7 +144,7 @@ namespace LuaDebugger
                     result = BBLua.lua_tonumber(this.L, -1).ToString();
                     break;
                 case LuaType.String:
-                    result = "\"" + BBLua.toStringMarshal(this.L, -1) + "\"";
+                    result = "\"" + BBLua.toStringMarshal(this.L, -1).Replace("\n", "\\n").Replace("\r", "\\r").Replace("\"", "\\\"") + "\"";
                     break;
                 case LuaType.Function:
                     result = GetTosFunctionInfo();

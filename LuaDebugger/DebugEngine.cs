@@ -1,6 +1,7 @@
 ﻿using ICSharpCode.TextEditor.Document;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -57,6 +58,7 @@ namespace LuaDebugger
         //prevent the gc from deleting the delegates
         protected LuaDebugHook debugHook;
         protected LuaCFunc logCallback;
+        protected LuaCFunc writeTableToFileCallback;
 
         protected int callStack = 0;
         protected int targetCallStackLevel = 0;
@@ -78,6 +80,7 @@ namespace LuaDebugger
             this.ls = ls;
             this.debugHook = new LuaDebugHook(this.DebugHook);
             this.logCallback = new LuaCFunc(this.LogCallback);
+            this.writeTableToFileCallback = new LuaCFunc(this.WriteTableToFile);
             RegisterLogFunction();
             ErrorHook.SetErrorHandler(ls.L, new ErrorHook.LuaErrorCaught(this.ErrorCaughtHook));
             this.fireStateChangedEvent = new Action(FireStateChangedEvent);
@@ -91,6 +94,9 @@ namespace LuaDebugger
             BBLua.lua_pushstring(this.ls.L, "Log");
             BBLua.lua_pushcclosure(this.ls.L, Marshal.GetFunctionPointerForDelegate(this.logCallback), 0);
             BBLua.lua_rawset(this.ls.L, -3);
+            BBLua.lua_pushstring(this.ls.L, "WriteTableToFile");
+            BBLua.lua_pushcclosure(this.ls.L, Marshal.GetFunctionPointerForDelegate(this.writeTableToFileCallback), 0);
+            BBLua.lua_rawset(this.ls.L, -3);
             BBLua.lua_rawset(this.ls.L, (int)LuaPseudoIndices.GLOBALSINDEX);
         }
 
@@ -102,6 +108,15 @@ namespace LuaDebugger
             else
                 text = "Log: " + text;
             this.ls.StateView.LuaConsole.AppendText(text);
+            return 0;
+        }
+
+        protected int WriteTableToFile(UIntPtr L)
+        {
+            string name = BBLua.toStringMarshal(L, -2);
+            string file = BBLua.toStringMarshal(L, -3);
+            string txt = this.ls.TosToString();
+            File.WriteAllText(file, name + " = " + txt);
             return 0;
         }
 
