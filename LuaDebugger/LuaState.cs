@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using System.Linq;
 
 namespace LuaDebugger
 {
@@ -160,6 +161,7 @@ namespace LuaDebugger
                         break;
                     }
 
+                    Dictionary<string, string> tcontents = new Dictionary<string, string>();
                     result = "{";
                     BBLua.lua_pushnil(this.L);
                     while (BBLua.lua_next(this.L, -2) != 0)
@@ -167,8 +169,24 @@ namespace LuaDebugger
                         printedTables.Add(tblPtr, true);
                         string val = IndentMultiLine(TosToString(true, false, printedTables));
                         string key = TosToString(false, true, printedTables);
+                        tcontents.Add(key, val);
                         printedTables.Remove(tblPtr);
-
+                        /*
+                        if (key[0] == '\"')
+                        {
+                            string rawString = key.Substring(1, key.Length - 2);
+                            if (alphaNumeric.IsMatch(rawString))
+                                result += "\n    " + rawString + " = " + val + ",";
+                            else
+                                result += "\n    [" + key + "] = " + val + ",";
+                        }
+                        else
+                            result += "\n    [" + key + "] = " + val + ",";
+                        */
+                    }
+                    foreach (string key in tcontents.Keys.OrderBy((x) => x))
+                    {
+                        string val = tcontents[key];
                         if (key[0] == '\"')
                         {
                             string rawString = key.Substring(1, key.Length - 2);
