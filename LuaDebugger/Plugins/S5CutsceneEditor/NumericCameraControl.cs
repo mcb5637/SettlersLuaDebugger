@@ -35,7 +35,7 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
         private void updateHeight()
         {
             // TODO need better way to get this info, not this ugly hack
-            String res = ls.EvaluateLua("(S5Hook.GetTerrainInfo(" + numX.Value + ", " + numY.Value + @"))");
+            String res = ls.EvaluateLua("S5Hook and (S5Hook.GetTerrainInfo(" + numX.Value + ", " + numY.Value + @"))");
             float terrainHeight = 0;
             if (float.TryParse(res, out terrainHeight)) {
                 lblTerrain.Text = res;

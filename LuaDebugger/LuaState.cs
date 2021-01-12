@@ -53,48 +53,55 @@ namespace LuaDebugger
             }
             this.DebugEngine.RemoveHook();
 
+            int top = BBLua.lua_gettop(L);
+
             string asStatement = expression;
             expression = "return " + expression;
 
-            string result = "";
-            LuaResult err = BBLua.luaL_loadbuffer(this.L, expression, expression.Length, "from console");
+            LuaResult err = BBLua.luaL_loadbuffer(L, expression, expression.Length, "from console");
+            if (err != LuaResult.OK)
+            {
+                BBLua.lua_settop(L, -2); // remove loadbuffer err msg
+                err = BBLua.luaL_loadbuffer(L, asStatement, asStatement.Length, "from console");
+            }
+            string result;
+
             if (err == LuaResult.OK)
             {
-                int stackTop = BBLua.lua_gettop(this.L);
-                err = BBLua.lua_pcall(this.L, 0, -1, 0);
-                int nResults = 1 + BBLua.lua_gettop(this.L) - stackTop;
+                int stackTop = BBLua.lua_gettop(L);
+                err = BBLua.lua_pcall(L, 0, -1, 0);
+                int nResults = 1 + BBLua.lua_gettop(L) - stackTop;
 
-                if(nResults == 1)
-                    result = TosToString();
-                else if (nResults > 1)
-                {
-                    string[] results = new string[nResults];
-                    do
-                    {
-                        nResults--;
-                        results[nResults] = TosToString(true);
-                    } while (nResults != 0);
-
-                    result = "(" + string.Join(", ", results) + ")";
-                }
+                result = EvalCreateResult(nResults);
             }
             else
             {
-                string parseErrExpr = TosToString();
-
-                err = BBLua.luaL_loadbuffer(this.L, asStatement, asStatement.Length, "from console");
-                if (err == LuaResult.OK)
-                    err = BBLua.lua_pcall(this.L, 0, 0, 0); //statement -> no return values
-
-                if (err != LuaResult.OK)
-                    result = TosToString();
+                result = TosToString();
             }
+
+            BBLua.lua_settop(L, top);
 
             this.DebugEngine.SetHook();
             if (unfreeze)
                 GameLoopHook.ResumeGame();
 
             return result;
+        }
+
+        private string EvalCreateResult(int nResults)
+        {
+            if (nResults <= 0)
+                return "";
+            if (nResults == 1)
+                return TosToString();
+            string[] results = new string[nResults];
+            do
+            {
+                nResults--;
+                results[nResults] = TosToString(true);
+            } while (nResults != 0);
+
+            return "(" + string.Join(", ", results) + ")";
         }
 
         public bool RunDelegateSafely(MethodInvoker dlg)
