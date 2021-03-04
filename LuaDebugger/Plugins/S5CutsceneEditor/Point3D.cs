@@ -32,5 +32,36 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
             res.Z = scale * (this.Z - subWhat.Z);
             return res;
         }
+
+        public static Point3D operator +(Point3D a, Point3D b)
+        {
+            return new Point3D(a.X + b.X, a.Y + b.Y, a.Z + b.Y);
+        }
+
+        public static Point3D operator -(Point3D a, Point3D b)
+        {
+            return new Point3D(a.X - b.X, a.Y - b.Y, a.Z - b.Y);
+        }
+
+
+        public static Point3D operator -(Point3D a)
+        {
+            return new Point3D(-a.X, -a.Y, -a.Z);
+        }
+
+        public static Point3D operator /(Point3D a, float b)
+        {
+            return new Point3D(a.X / b, a.Y / b, a.Z / b);
+        }
+
+        public static Point3D operator *(Point3D a, float b)
+        {
+            return new Point3D(a.X * b, a.Y * b, a.Z * b);
+        }
+
+        public float Length()
+        {
+            return (float)Math.Sqrt(X * X + Y * Y + Z * Z);
+        }
     }
 }

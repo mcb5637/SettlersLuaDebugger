@@ -138,72 +138,46 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
                     validLP.Add(fp.LookAtPos);
             }
 
-            foreach (List<Waypoint> validList in new List<List<Waypoint>> { validCP, validLP })
-            {
-                for (int i = 0; i < validList.Count - 1; i++)
-                {
-                    Waypoint[] wps = new Waypoint[] 
-                        {
-                            i == 0 ? validList[0] : validList[i-1],
-                            validList[i],
-                            validList[i+1],
-                            i+2 == validList.Count ? validList[i+1] : validList[i+2]
-                        };
-                    CreateControlPoints(wps, 3);
-                }
-            }
+            CalcCamTangents(validCP);
+
+            CalcLookAtTangents(validLP);
         }
 
-        private void CreateControlPoints(Waypoint[] wp, float smooth_value)
+        // get_tangents_camera
+        private static void CalcCamTangents(List<Waypoint> pos)
         {
-            bool notFirst = !(wp[0].Equals(wp[1]));
-            bool notLast = !(wp[2].Equals(wp[3]));
-
-            float xc1 = (wp[0].Position.X + wp[1].Position.X) / 2.0f;
-            float yc1 = (wp[0].Position.Y + wp[1].Position.Y) / 2.0f;
-            float zc1 = (wp[0].Position.Z + wp[1].Position.Z) / 2.0f;
-            float xc2 = (wp[1].Position.X + wp[2].Position.X) / 2.0f;
-            float yc2 = (wp[1].Position.Y + wp[2].Position.Y) / 2.0f;
-            float zc2 = (wp[1].Position.Z + wp[2].Position.Z) / 2.0f;
-            float xc3 = (wp[2].Position.X + wp[3].Position.X) / 2.0f;
-            float yc3 = (wp[2].Position.Y + wp[3].Position.Y) / 2.0f;
-            float zc3 = (wp[2].Position.Z + wp[3].Position.Z) / 2.0f;
-            //zc1-zc3
-
-            float len1 = (float)Math.Sqrt((wp[1].Position.X - wp[0].Position.X) * (wp[1].Position.X - wp[0].Position.X) + (wp[1].Position.Y - wp[0].Position.Y) * (wp[1].Position.Y - wp[0].Position.Y) + (wp[1].Position.Z - wp[0].Position.Z) * (wp[1].Position.Z - wp[0].Position.Z));
-            float len2 = (float)Math.Sqrt((wp[2].Position.X - wp[1].Position.X) * (wp[2].Position.X - wp[1].Position.X) + (wp[2].Position.Y - wp[1].Position.Y) * (wp[2].Position.Y - wp[1].Position.Y) + (wp[2].Position.Z - wp[1].Position.Z) * (wp[2].Position.Z - wp[1].Position.Z));
-            float len3 = (float)Math.Sqrt((wp[3].Position.X - wp[2].Position.X) * (wp[3].Position.X - wp[2].Position.X) + (wp[3].Position.Y - wp[2].Position.Y) * (wp[3].Position.Y - wp[2].Position.Y) + (wp[3].Position.Z - wp[2].Position.Z) * (wp[3].Position.Z - wp[2].Position.Z));
-            //plus z²
-
-            float k1 = len1 / (len1 + len2);
-            float k2 = len2 / (len2 + len3);
-
-            float xm1 = xc1 + (xc2 - xc1) * k1;
-            float ym1 = yc1 + (yc2 - yc1) * k1;
-            float zm1 = zc1 + (zc2 - zc1) * k1;
-            //zm1
-
-            float xm2 = xc2 + (xc3 - xc2) * k2;
-            float ym2 = yc2 + (yc3 - yc2) * k2;
-            float zm2 = zc2 + (zc3 - zc2) * k2;
-            //zm2
-
-            // Resulting control points. Here smooth_value is mentioned
-            // above coefficient K whose value should be in range [0...1].
-            if (notFirst)
+            for (int i = 0; i < pos.Count; i++)
             {
-                wp[1].OutTangent.X = xm1 + (xc2 - xm1) * smooth_value + wp[1].Position.X - xm1;
-                wp[1].OutTangent.Y = ym1 + (yc2 - ym1) * smooth_value + wp[1].Position.Y - ym1;
-                wp[1].OutTangent.Z = zm1 + (zc2 - zm1) * smooth_value + wp[1].Position.Z - zm1;
-            }
+                Waypoint c = pos[i];
+                Waypoint nex = i < pos.Count - 1 ? pos[i + 1] : pos[pos.Count - 1];
+                Waypoint prev = i > 0 ? pos[i - 1] : pos[0];
 
-            if (notLast)
-            {
-                wp[2].InTangent.X = xm2 + (xc2 - xm2) * smooth_value + wp[2].Position.X - xm2;
-                wp[2].InTangent.Y = ym2 + (yc2 - ym2) * smooth_value + wp[2].Position.Y - ym2;
-                wp[2].InTangent.Z = zm2 + (zc2 - zm2) * smooth_value + wp[2].Position.Z - zm2;
+                Point3D middle_c_nex = (c.Position + nex.Position) / 2;
+                Point3D middle_c_prev = (c.Position + prev.Position) / 2;
+
+                c.OutTangent = (middle_c_nex - middle_c_prev);
+                c.InTangent = c.OutTangent;
             }
+            pos[0].InTangent = new Point3D(0, 0, 0);
+            pos[pos.Count - 1].OutTangent = new Point3D(0, 0, 0);
         }
+
+        // get_tangents_lookAt
+        private static void CalcLookAtTangents(List<Waypoint> pos)
+        {
+            for (int i = 0; i < pos.Count - 1; i++)
+            {
+                Waypoint c = pos[i];
+                Waypoint nex = pos[i + 1];
+
+                c.OutTangent = nex.Position - c.Position;
+                c.OutTangent = c.OutTangent / c.OutTangent.Length() * 100;
+                nex.InTangent = -c.OutTangent;
+            }
+            pos[0].InTangent = new Point3D(0, 0, 0);
+            pos[pos.Count - 1].OutTangent = new Point3D(0, 0, 0);
+        }
+
         public FlightXML GetXML(int startFromPoint)
         {
             string startTime = this.StartTime.ToString("e", CultureInfo.InvariantCulture);

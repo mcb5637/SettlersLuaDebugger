@@ -1,0 +1,27 @@
+﻿def get_tangents_camera(points):
+    tangents_out      = np.zeros_like(points)
+    tangents_in       = np.zeros_like(points)
+    points            = np.array([points[0]] + list(points) + [points[-1]])
+    
+    # get mid-point of positions
+    mid_points        = (points[:-1] + points[1:])/2.0
+    
+    # compute tangents (I know it's the same thing - readability!)
+    tangents_out[:-1] = (mid_points[1:-1] - mid_points[:-2])
+    tangents_in[1:]   = (mid_points[2:] - mid_points[1:-1])
+    
+    return tangents_in, tangents_out
+
+def get_tangents_lookAt(points, norm_size=100):
+    tangents_out      = np.zeros_like(points)
+    tangents_in       = np.zeros_like(points)
+    
+    # compute tangents
+    tangents_out[:-1] = points[1:] - points[:-1]
+    # normalize to fixed length
+    norms = np.sqrt(np.sum(tangents_out[:-1]**2, axis=1))
+    tangents_out[:-1] = tangents_out[:-1]/norms[:,None]*norm_size
+    
+    tangents_in[1:] = -tangents_out[:-1]
+    
+    return tangents_in, tangents_out
