@@ -146,7 +146,7 @@ namespace LuaDebugger
                     result = "nil";
                     break;
                 case LuaType.Boolean:
-                    result = BBLua.lua_toboolean(this.L, -1).ToString();
+                    result = BBLua.lua_toboolean(this.L, -1).ToString().ToLower();
                     break;
                 case LuaType.Number:
                     result = BBLua.lua_tonumber(this.L, -1).ToString();
