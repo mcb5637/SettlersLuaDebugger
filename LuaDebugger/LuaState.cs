@@ -29,6 +29,7 @@ namespace LuaDebugger
         public Dictionary<string, LuaFile> LoadedFiles = new Dictionary<string, LuaFile>();
         public bool UpdateFileList = false;
         public bool UpdateAfterFileListRestore = false;
+        public bool ReloadedLuaFiles = false;
         public DebugEngine DebugEngine { get; protected set; }
         public DebugState CurrentState { get { return this.DebugEngine.CurrentState; } }
         public event EventHandler<StateRemovedEventArgs> OnStateRemoved;
@@ -296,7 +297,8 @@ namespace LuaDebugger
                     {
                         string filename = br.ReadString();
                         string fileContents = br.ReadString();
-                        this.LoadedFiles.Add(filename, new LuaFile(filename, fileContents));
+                        if (!LoadedFiles.ContainsKey(filename))
+                            this.LoadedFiles.Add(filename, new LuaFile(filename, fileContents));
                     }
                 }
             }
@@ -367,7 +369,7 @@ namespace LuaDebugger
             if (wasRunning)
                 GameLoopHook.ResumeGame();
 
-            this.LoadedFiles.Clear();
+            //this.LoadedFiles.Clear();
 
             RestoreFromFileString(sb.ToString());
 

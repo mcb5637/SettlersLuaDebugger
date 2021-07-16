@@ -171,7 +171,7 @@ namespace LuaDebugger
 
                 if (this.fileSaveTimeout == 0)
                 {
-                    if (this.ls.LoadedFiles.Count > 0)
+                    if (this.ls.ReloadedLuaFiles)
                     {
                         if (!this.ls.SaveLoadedFiles())
                             fileSaveTimeout = fileSaveTimeoutInitial;
@@ -180,6 +180,11 @@ namespace LuaDebugger
                     {
                         if (!this.ls.RestoreLoadedFiles())
                             fileSaveTimeout = fileSaveTimeoutInitial;
+                        else
+                        {
+                            ls.ReloadedLuaFiles = true;
+                            ls.UpdateFileList = true;
+                        }
                     }
                 }
             }

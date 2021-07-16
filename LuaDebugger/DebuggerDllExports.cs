@@ -130,11 +130,11 @@ namespace LuaDebugger
 
             LuaState ls = GlobalState.L2State[L];
 
-            if (ls.LoadedFiles.ContainsKey(filename))
-                return;
 
             lock (GlobalState.GuiUpdateLock)
             {
+                if (ls.LoadedFiles.ContainsKey(filename))
+                    ls.LoadedFiles.Remove(filename);
                 string fileContents = Marshal.PtrToStringAnsi(content, contentLen);
                 ls.LoadedFiles.Add(filename, new LuaFile(filename, fileContents));
                 ls.UpdateFileList = true;
