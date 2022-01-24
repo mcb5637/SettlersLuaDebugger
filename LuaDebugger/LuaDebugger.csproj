@@ -255,6 +255,7 @@
     <PostBuildEvent>if "$(ConfigurationName)" == "DebugS5" (
    xcopy /y /i "$(TargetDir)LuaDebugger.dll" "$(SolutionDir)dbgenv\"
    xcopy /y /i "$(TargetDir)LuaDebugger.dll" "$(SolutionDir)LuaDebuggerStarter\Unpack\"
+   xcopy /y /i "$(TargetDir)LuaDebugger.dll" "C:\games\dedk\dedk_mp\bin\LuaDebuggerOrig.dll"
 ) ELSE (
    copy /y "$(TargetPath)" "$(TargetDir)BBLuaDebugger.dll"
    xcopy /y /i "$(TargetDir)BBLuaDebugger.dll" "$(SolutionDir)dbgenv\base\_dbg\bin\release\"
