@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>LuaDebugger</RootNamespace>
     <AssemblyName>LuaDebugger</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -25,6 +25,7 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'DebugS6|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -35,23 +36,21 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug S5|x86'">
     <DefineConstants>TRACE;DEBUG</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EasyHook, Version=2.7.7097.0, Culture=neutral, PublicKeyToken=4b580fca19d0b0c5, processorArchitecture=MSIL">
-      <HintPath>..\packages\EasyHook.2.7.7097\lib\net35\EasyHook.dll</HintPath>
+      <HintPath>..\packages\EasyHook.2.7.7097\lib\net40\EasyHook.dll</HintPath>
     </Reference>
-    <Reference Include="ICSharpCode.TextEditor">
+    <Reference Include="ICSharpCode.TextEditor, Version=3.2.1.6466, Culture=neutral, PublicKeyToken=4d61825e8dd49f1a, processorArchitecture=MSIL">
       <HintPath>..\packages\ICSharpCode.TextEditor.3.2.1.6466\lib\Net20\ICSharpCode.TextEditor.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualBasic" />
-    <Reference Include="RGiesecke.DllExport.Metadata, Version=1.0.0.0, Culture=neutral, PublicKeyToken=8f52d83c1a22df51, processorArchitecture=MSIL">
-      <HintPath>..\packages\UnmanagedExports.1.2.7\lib\net\RGiesecke.DllExport.Metadata.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Remoting" />
@@ -76,6 +75,8 @@
     <Compile Include="DebugEngine.cs" />
     <Compile Include="Helper\MySyntaxModeProvider.cs" />
     <Compile Include="Helper\Win32Window.cs" />
+    <Compile Include="LuaSharp\LuaState.cs" />
+    <Compile Include="LuaSharp\LuaState50.cs" />
     <Compile Include="LuaStackTrace.cs" />
     <Compile Include="Plugins\PluginSystem.cs" />
     <Compile Include="Plugins\S5CutsceneEditor\Cutscene.cs" />
@@ -227,9 +228,6 @@
     <EmbeddedResource Include="Resources\SyntaxModes.xml" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\ICSharpCode.TextEditor.dll" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="EasyHook32.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -266,7 +264,43 @@ xcopy /y /i "$(TargetDir)EasyHook.dll" "$(SolutionDir)LuaDebuggerStarter\Unpack\
 xcopy /y /i "$(TargetDir)EasyHook32.dll" "$(SolutionDir)dbgenv\"
 xcopy /y /i "$(TargetDir)EasyHook32.dll" "$(SolutionDir)LuaDebuggerStarter\Unpack\"</PostBuildEvent>
   </PropertyGroup>
-  <Import Project="../packages/UnmanagedExports.1.2.7/tools/RGiesecke.DllExport.targets" Condition="Exists('../packages/UnmanagedExports.1.2.7/tools/RGiesecke.DllExport.targets')" />
+  <PropertyGroup>
+    <DllExportIdent>8FF0D3BF-79BA-479A-AF5E-1C0E3C5605C6</DllExportIdent>
+    <DllExportMetaLibName>DllExport.dll</DllExportMetaLibName>
+    <DllExportNamespace>LuaDebugger</DllExportNamespace>
+    <DllExportDDNSCecil>false</DllExportDDNSCecil>
+    <PlatformTarget>x86</PlatformTarget>
+    <DllExportOrdinalsBase>1</DllExportOrdinalsBase>
+    <DllExportGenExpLib>false</DllExportGenExpLib>
+    <DllExportOurILAsm>false</DllExportOurILAsm>
+    <DllExportSysObjRebase>false</DllExportSysObjRebase>
+    <DllExportLeaveIntermediateFiles>false</DllExportLeaveIntermediateFiles>
+    <DllExportTimeout>30000</DllExportTimeout>
+    <DllExportPeCheck>2</DllExportPeCheck>
+    <DllExportPatches>0</DllExportPatches>
+    <DllExportPreProcType>0</DllExportPreProcType>
+    <DllExportPostProcType>0</DllExportPostProcType>
+  </PropertyGroup>
+  <ImportGroup Label=".NET DllExport">
+    <Import Project="$(SolutionDir)packages\DllExport.1.7.4\tools\net.r_eg.DllExport.targets" Condition="Exists($([MSBuild]::Escape('$(SolutionDir)packages\DllExport.1.7.4\tools\net.r_eg.DllExport.targets')))" Label="8337224c9ad9e356" />
+  </ImportGroup>
+  <Target Name="DllExportRestorePkg" BeforeTargets="PrepareForBuild">
+    <Error Condition="!Exists('$(SolutionDir)DllExport.bat')" Text="DllExport.bat is not found. Path: '$(SolutionDir)' - https://github.com/3F/DllExport" />
+    <Exec Condition="('$(DllExportModImported)' != 'true' Or !Exists('$(SolutionDir)packages\DllExport.1.7.4\tools\net.r_eg.DllExport.targets')) And Exists('$(SolutionDir)DllExport.bat')" Command=".\DllExport.bat  -action Restore" WorkingDirectory="$(SolutionDir)" />
+    <MSBuild Condition="'$(DllExportModImported)' != 'true'" Projects="$(SolutionDir)packages\DllExport.1.7.4\tools\net.r_eg.DllExport.targets" Targets="DllExportMetaXBaseTarget" Properties="TargetFramework=$(TargetFramework)">
+      <Output TaskParameter="TargetOutputs" PropertyName="DllExportMetaXBase" />
+    </MSBuild>
+    <ItemGroup>
+      <Reference Include="DllExport, PublicKeyToken=8337224c9ad9e356">
+        <HintPath>$(SolutionDir)packages\DllExport.1.7.4\gcache\$(DllExportMetaXBase)\$(DllExportNamespace)\$(DllExportMetaLibName)</HintPath>
+        <Private>False</Private>
+        <SpecificVersion>False</SpecificVersion>
+      </Reference>
+    </ItemGroup>
+  </Target>
+  <Target Name="DllExportRPkgDynamicImport" BeforeTargets="PostBuildEvent" DependsOnTargets="GetFrameworkPaths" Condition="'$(DllExportModImported)' != 'true' And '$(DllExportRPkgDyn)' != 'false'">
+    <MSBuild BuildInParallel="true" UseResultsCache="true" Projects="$(MSBuildProjectFullPath)" Properties="DllExportRPkgDyn=true" Targets="Build" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
