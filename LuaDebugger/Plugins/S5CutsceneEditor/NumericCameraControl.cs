@@ -13,7 +13,7 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
     {
         public S5CameraInfo cam;
         private bool setup = false;
-        public LuaState ls;
+        public LuaStateWrapper ls;
 
         public NumericCameraControl()
         {

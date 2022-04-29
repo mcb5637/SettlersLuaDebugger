@@ -17,7 +17,7 @@ namespace LuaDebugger
     public partial class DbgMain : Form
     {
         protected StateView activeState;
-        protected Dictionary<LuaState, StateView> state2View = new Dictionary<LuaState, StateView>();
+        protected Dictionary<LuaStateWrapper, StateView> state2View = new Dictionary<LuaStateWrapper, StateView>();
 
         public DbgMain()
         {
@@ -84,7 +84,7 @@ namespace LuaDebugger
 
         void ComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            SwitchToState(this.tcbState.SelectedItem as LuaState);
+            SwitchToState(this.tcbState.SelectedItem as LuaStateWrapper);
         }
 
         bool IsSettlersFullscreen()
@@ -128,7 +128,7 @@ namespace LuaDebugger
                 {
                     tcbState.ComboBox.Items.Clear();
 
-                    foreach (LuaState ls in GlobalState.L2State.Values)
+                    foreach (LuaStateWrapper ls in GlobalState.L2State.Values)
                     {
                         tcbState.ComboBox.Items.Add(ls);
                         if (ls.StateView == null)
@@ -146,14 +146,14 @@ namespace LuaDebugger
                     GlobalState.UpdateStatesView = false;
                 }
 
-                foreach (LuaState ls in GlobalState.L2State.Values)
+                foreach (LuaStateWrapper ls in GlobalState.L2State.Values)
                     ls.StateView.UpdateView();
 
                 tmUpdateView.Enabled = true;
             }
         }
 
-        private void SwitchToState(LuaState ls)
+        private void SwitchToState(LuaStateWrapper ls)
         {
             if (ls == null)
             {

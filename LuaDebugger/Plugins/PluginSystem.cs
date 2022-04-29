@@ -10,13 +10,13 @@ namespace LuaDebugger.Plugins
     {
         string Name { get; }
         bool CheckSettlersVersion(int version);
-        bool IsOpenableForState(LuaState luaState);
-        ILuaDebuggerPlugin CreateInstance(LuaState luaState);
+        bool IsOpenableForState(LuaStateWrapper luaState);
+        ILuaDebuggerPlugin CreateInstance(LuaStateWrapper luaState);
     }
 
     public interface ILuaDebuggerPlugin
     {
-        void ShowInState(LuaState luaState, Control parent);
+        void ShowInState(LuaStateWrapper luaState, Control parent);
     }
 
     public static class PluginSystem

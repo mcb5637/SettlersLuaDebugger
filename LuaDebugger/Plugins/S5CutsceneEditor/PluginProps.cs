@@ -19,12 +19,12 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
             return version == 5;
         }
 
-        public bool IsOpenableForState(LuaState luaState)
+        public bool IsOpenableForState(LuaStateWrapper luaState)
         {
             return luaState.Name.Contains("Game") || GlobalState.IsInVisualStudio;
         }
 
-        public ILuaDebuggerPlugin CreateInstance(LuaState luaState)
+        public ILuaDebuggerPlugin CreateInstance(LuaStateWrapper luaState)
         {
             if (_instance == null)
                 _instance = new S5CutsceneEditorMain();

@@ -11,7 +11,7 @@ namespace LuaDebugger
 {
     public partial class LuaConsole : UserControl
     {
-        protected LuaState ls;
+        protected LuaStateWrapper ls;
         protected List<string> History = new List<string>() { "" };
         protected int historyPos = 0;
 
@@ -39,7 +39,7 @@ namespace LuaDebugger
             tbInput.Select(0, 0);
         }
 
-        public void InitState(LuaState ls)
+        public void InitState(LuaStateWrapper ls)
         {
             this.ls = ls;
         }
@@ -64,22 +64,23 @@ namespace LuaDebugger
             rtbOutput.BackColor = bgCol;
         }
 
-        public void RunCommand(string cmd)
+        public void RunCommand(string cmd, bool uivarname = false)
         {
-            int nextHistory = this.History.Count - 1;
-            this.History[nextHistory] = cmd;
-            this.History.Add("");
-            this.historyPos = nextHistory + 1;
 
-            this.AppendText("> " + cmd);
             tbInput.ReadOnly = true;
             StartWait();
 
             IVCThreadPool.RunAsync(delegate
             {
-                string answer = ls.EvaluateLua(cmd);
+                string answer = ls.EvaluateLua(ref cmd, uivarname);
                 rtbOutput.Invoke((MethodInvoker)delegate
                 {
+                    int nextHistory = this.History.Count - 1;
+                    this.History[nextHistory] = cmd;
+                    this.History.Add("");
+                    this.historyPos = nextHistory + 1;
+
+                    this.AppendText("> " + cmd);
                     if (answer != "")
                         this.AppendText(answer);
                     rtbOutput.ScrollToCaret();

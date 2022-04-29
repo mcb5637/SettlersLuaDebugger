@@ -19,12 +19,12 @@ namespace LuaDebugger
             get { return this.debugEngine.CurrentState; }
         }
 
-        public LuaState LuaState
+        public LuaStateWrapper LuaState
         {
             get { return this.ls;  }
         }
 
-        protected LuaState ls;
+        protected LuaStateWrapper ls;
         protected DebugEngine debugEngine = null;
         protected LuaFile currentFile;
         protected TreeNode mapScripts, internalScripts;
@@ -40,7 +40,7 @@ namespace LuaDebugger
             luaConsole_LocationChanged(this, new EventArgs());
         }
 
-        public void InitState(LuaState state)
+        public void InitState(LuaStateWrapper state)
         {
             if (this.debugEngine != null)
                 this.debugEngine.OnDebugStateChange -= debugEngine_OnDebugStateChange;
@@ -103,7 +103,7 @@ namespace LuaDebugger
                 file.Arrow.NormalLineNr = lfi.Line;
                 file.Arrow.IsEnabled = true;
                 SwitchToFile(file, lfi.Line);
-                this.ls.DebugEngine.FakeEnvironment(lfi);
+                this.ls.DebugEngine.FakeEnvironment(lfi, n);
             }
             else
                 ShowSourceUnavailable();
@@ -251,7 +251,7 @@ namespace LuaDebugger
         {
             string selected = this.currentFile.Editor.ActiveTextAreaControl.SelectionManager.SelectedText;
             if (selected != "" && !selected.Contains("(") && !selected.Contains("\n"))
-                this.LuaConsole.RunCommand(selected);
+                this.LuaConsole.RunCommand(selected, true);
         }
 
 

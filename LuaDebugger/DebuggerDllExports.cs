@@ -10,6 +10,7 @@ using System.Reflection;
 using System.IO;
 using System.Globalization;
 using System.Linq;
+using LuaSharp;
 
 namespace LuaDebugger
 {
@@ -67,7 +68,6 @@ namespace LuaDebugger
             //settlersWndStyle |= WindowStyle.WS_MINIMIZEBOX | WindowStyle.WS_SIZEBOX | WindowStyle.WS_MAXIMIZEBOX;
             //WinAPI.SetWindowLong(GlobalState.SettlersWindowHandle, WinAPI.GWL_STYLE, (uint)settlersWndStyle);
 
-            //TickHook.InstallHook();
             GameLoopHook.InstallHook();
             ErrorHook.InstallHook();
             Thread uiThread = new Thread(new ThreadStart(DbgThread.RunMessageLoop));
@@ -79,14 +79,14 @@ namespace LuaDebugger
         static int s5StateCount = 0;
         //S5
         [DllExport("_AddLuaState@4", CallingConvention = CallingConvention.StdCall)]
-        public static void AddLuaState(UIntPtr L)
+        public static void AddLuaState(IntPtr L)
         {
             s5StateCount++;
             string name = s5StateCount == 1 ? "Main Menu" : "Game";
 
             lock (GlobalState.GuiUpdateLock)
             {
-                LuaState ls = new LuaState(L, name);
+                LuaStateWrapper ls = new LuaStateWrapper(new LuaState50(L), name);
                 GlobalState.L2State.Add(L, ls);
                 GlobalState.LuaStates.Add(ls);
                 GlobalState.UpdateStatesView = true;
@@ -95,12 +95,13 @@ namespace LuaDebugger
 
         //S6
         [DllExport("_AddLuaState@8", CallingConvention = CallingConvention.StdCall)]
-        public static void AddLuaStateS6(UIntPtr L, string name)
+        public static void AddLuaStateS6(IntPtr L, IntPtr n)
         {
+            string name = Marshal.PtrToStringAnsi(n);
             lock (GlobalState.GuiUpdateLock)
             {
                 TextInfo ti = Thread.CurrentThread.CurrentCulture.TextInfo;
-                LuaState ls = new LuaState(L, ti.ToTitleCase(name));
+                LuaStateWrapper ls = new LuaStateWrapper(null, ti.ToTitleCase(name));
                 GlobalState.L2State.Add(L, ls);
                 GlobalState.LuaStates.Add(ls);
                 GlobalState.UpdateStatesView = true;
@@ -108,27 +109,27 @@ namespace LuaDebugger
         }
 
         [DllExport("_RemoveLuaState@4", CallingConvention = CallingConvention.StdCall)]
-        public static void RemoveLuaState(UIntPtr L)
+        public static void RemoveLuaState(IntPtr L)
         {
             lock (GlobalState.GuiUpdateLock)
             {
-                LuaState ls = GlobalState.L2State[L];
+                LuaStateWrapper ls = GlobalState.L2State[L];
                 ls.RemovedByGame();
                 GlobalState.L2State.Remove(L);
                 GlobalState.LuaStates.Remove(ls);
-                ErrorHook.RemoveErrorHandler(L); // todo: refactor into luastate?
+                ErrorHook.RemoveErrorHandler(ls.L); // todo: refactor into luastate?
                 GlobalState.UpdateStatesView = true;
             }
         }
 
         [DllExport("_NewFile@16", CallingConvention = CallingConvention.StdCall)]
-        public static void NewFile(UIntPtr L, string filename, IntPtr content, int contentLen)
+        public static void NewFile(IntPtr L, IntPtr filenamep, IntPtr content, int contentLen)
         {
-            if (filename == null)
+            if (filenamep == IntPtr.Zero)
                 return;//Immediate Action
 
-            LuaState ls = GlobalState.L2State[L];
-
+            LuaStateWrapper ls = GlobalState.L2State[L];
+            string filename = Marshal.PtrToStringAnsi(filenamep);
 
             lock (GlobalState.GuiUpdateLock)
             {
@@ -154,7 +155,7 @@ namespace LuaDebugger
         }
 
         [DllExport("_Break@4", CallingConvention = CallingConvention.StdCall)]
-        public static void Break(UIntPtr L)
+        public static void Break(IntPtr L)
         {
             GlobalState.L2State[L].DebugEngine.BreakFromGameEngine();
         }

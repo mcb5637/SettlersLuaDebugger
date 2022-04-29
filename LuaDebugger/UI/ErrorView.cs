@@ -10,14 +10,14 @@ namespace LuaDebugger
 {
     public partial class ErrorView : UserControl
     {
-        protected LuaState ls = null;
+        protected LuaStateWrapper ls = null;
 
         public ErrorView()
         {
             InitializeComponent();
         }
 
-        public void InitState(LuaState ls)
+        public void InitState(LuaStateWrapper ls)
         {
             this.ls = ls;
         }

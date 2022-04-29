@@ -22,8 +22,8 @@ namespace LuaDebugger
         public static Thread UIThread;
         public static Thread SettlersThread;
         public static DbgMain DebuggerWindow;
-        public static List<LuaState> LuaStates = new List<LuaState>();
-        public static Dictionary<UIntPtr, LuaState> L2State = new Dictionary<UIntPtr, LuaState>();
+        public static List<LuaStateWrapper> LuaStates = new List<LuaStateWrapper>();
+        public static Dictionary<IntPtr, LuaStateWrapper> L2State = new Dictionary<IntPtr, LuaStateWrapper>();
         public static int FreezeCount = 0;
         public static bool UpdateStatesView = false;
         public static object GuiUpdateLock = new object();

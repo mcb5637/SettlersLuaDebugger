@@ -14,7 +14,7 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
 {
     public partial class S5CutsceneEditorMain : Form, ILuaDebuggerPlugin
     {
-        protected LuaState LS;
+        protected LuaStateWrapper LS;
         bool freeFlightActive = false;
         int cameraControl = 1;
         float speed = 20;
@@ -47,7 +47,7 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
 
 
 
-        public void ShowInState(LuaState luaState, Control parent)
+        public void ShowInState(LuaStateWrapper luaState, Control parent)
         {
             this.Location = new Point(parent.Location.X + parent.Width / 2 - Width / 2, parent.Location.Y + parent.Height / 2 - Height / 2);
 

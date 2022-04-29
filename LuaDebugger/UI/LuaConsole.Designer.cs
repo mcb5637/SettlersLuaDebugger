@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.tbInput = new CopyChangedTextBox();
+            this.tbInput = new LuaDebugger.CopyChangedTextBox();
             this.panel1 = new System.Windows.Forms.Panel();
             this.tbSpinner = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
@@ -167,8 +167,8 @@
 
         #endregion
 
-        private RichTextBoxLink rtbOutput;
-        private CopyChangedTextBox tbInput;
+        private LuaDebugger.RichTextBoxLink rtbOutput;
+        private LuaDebugger.CopyChangedTextBox tbInput;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.TextBox tbPrompt;
         private System.Windows.Forms.Button button1;

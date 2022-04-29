@@ -1,4 +1,5 @@
 ﻿using ICSharpCode.TextEditor.Document;
+using LuaSharp;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -40,10 +41,10 @@ namespace LuaDebugger
 
     public class DebugStateChangedEventArgs : EventArgs
     {
-        public LuaState LuaState { get; protected set; }
+        public LuaStateWrapper LuaState { get; protected set; }
         public DebugState State { get; protected set; }
 
-        public DebugStateChangedEventArgs(DebugState newState, LuaState ls)
+        public DebugStateChangedEventArgs(DebugState newState, LuaStateWrapper ls)
         {
             this.State = newState;
             this.LuaState = ls;
@@ -52,13 +53,8 @@ namespace LuaDebugger
 
     public class DebugEngine
     {
-        protected LuaState ls;
+        protected LuaStateWrapper ls;
         protected Dictionary<int, List<Breakpoint>> lineToBP = new Dictionary<int, List<Breakpoint>>();
-
-        //prevent the gc from deleting the delegates
-        protected LuaDebugHook debugHook;
-        protected LuaCFunc logCallback;
-        protected LuaCFunc writeTableToFileCallback;
 
         protected int callStack = 0;
         protected int targetCallStackLevel = 0;
@@ -74,93 +70,158 @@ namespace LuaDebugger
         protected delegate void Action(); //.net3 WHY?!?!
         protected Action fireStateChangedEvent;
         protected Action unfakeCallback = null;
+        public int CurrentActiveFunction { get; private set; } = -1;
 
-        public DebugEngine(LuaState ls)
+        public DebugEngine(LuaStateWrapper ls)
         {
             this.ls = ls;
-            this.debugHook = new LuaDebugHook(this.DebugHook);
-            this.logCallback = new LuaCFunc(this.LogCallback);
-            this.writeTableToFileCallback = new LuaCFunc(this.WriteTableToFile);
-            RegisterLogFunction();
+            RegisterLibFunctions();
             ErrorHook.SetErrorHandler(ls.L, new ErrorHook.LuaErrorCaught(this.ErrorCaughtHook));
             this.fireStateChangedEvent = new Action(FireStateChangedEvent);
             SetHook();
         }
 
-        protected void RegisterLogFunction()
+        protected void RegisterLibFunctions()
         {
-            BBLua.lua_pushstring(this.ls.L, "LuaDebugger");
-            BBLua.lua_newtable(this.ls.L);
-            BBLua.lua_pushstring(this.ls.L, "Log");
-            BBLua.lua_pushcclosure(this.ls.L, Marshal.GetFunctionPointerForDelegate(this.logCallback), 0);
-            BBLua.lua_rawset(this.ls.L, -3);
-            BBLua.lua_pushstring(this.ls.L, "WriteTableToFile");
-            BBLua.lua_pushcclosure(this.ls.L, Marshal.GetFunctionPointerForDelegate(this.writeTableToFileCallback), 0);
-            BBLua.lua_rawset(this.ls.L, -3);
-            BBLua.lua_rawset(this.ls.L, (int)LuaPseudoIndices.GLOBALSINDEX);
+            ls.L.Push("LuaDebugger");
+            ls.L.NewTable();
+            ls.L.RegisterFuncLib<DebugEngine>(-3);
+            ls.L.SetTableRaw(ls.L.GLOBALSINDEX);
         }
 
-        protected int LogCallback(UIntPtr L)
+        [LuaLibFunction("Log")]
+        public static int LogCallback(LuaState L)
         {
-            string text = this.ls.TosToString();
+            LuaStateWrapper w = GlobalState.L2State[L.State];
+            L.PushValue(1);
+            string text = w.TosToString();
             if (text.Contains("\n"))
-                this.ls.StateView.LuaConsole.AppendText("Log:");
+                w.StateView.LuaConsole.AppendText("Log:");
             else
                 text = "Log: " + text;
-            this.ls.StateView.LuaConsole.AppendText(text);
+            w.StateView.LuaConsole.AppendText(text);
             return 0;
         }
 
-        protected int WriteTableToFile(UIntPtr L)
+        [LuaLibFunction("WriteTableToFile")]
+        public static int WriteTableToFile(LuaState L)
         {
-            string name = BBLua.toStringMarshal(L, -2);
-            string file = BBLua.toStringMarshal(L, -3);
-            string txt = this.ls.TosToString();
+            string name = L.ToString(2);
+            string file = L.ToString(1);
+            L.PushValue(3);
+            string txt = GlobalState.L2State[L.State].TosToString();
             File.WriteAllText(file, name + " = " + txt);
             return 0;
         }
 
-        protected unsafe void DebugHook(UIntPtr L, IntPtr ptr) //unsafe for speed
+        [LuaLibFunction("GetLocal")]
+        public static int GetLocal(LuaState L)
         {
-            LuaStackRecord* sr = (LuaStackRecord*)ptr;
-            BBLua.lua_getstack(L, 0, ptr);
-            if (sr->debugEvent == LuaEvent.Call)
-                this.callStack++;
-            else if (sr->debugEvent == LuaEvent.Return || sr->debugEvent == LuaEvent.TailReturn)
+            int lvl = L.CheckInt(1);
+            DebugInfo i = L.GetStackInfo(lvl, false);
+            string name = L.CheckString(2);
+            int l = 1;
+            while (true)
             {
-                this.callStack--;
-
-                if ((this.callStack == 0) && //stepping into engine code is not possible -> resume
-                    (this.CurrentRequest == DebugRequest.StepIn || this.CurrentRequest == DebugRequest.StepToLevel))
+                string ln = L.GetLocalName(i, l);
+                if (ln == null)
+                    break;
+                if (ln.Equals(name))
                 {
-                    this.CurrentRequest = DebugRequest.Resume;
-                    this.CurrentState = DebugState.Running;
-                    FireStateChangedEvent();
+                    L.GetLocal(i, l);
+                    return 1;
+                }
+                l++;
+            }
+            L.PushDebugInfoFunc(i);
+            l = 1;
+            while (true)
+            {
+                string up = L.GetUpvalueName(-1, l);
+                if (up == null)
+                    break;
+                if (up.Equals(name))
+                {
+                    L.GetUpvalue(-1, l);
+                    return 1;
                 }
             }
-            // event == line
-            else if (this.CurrentRequest == DebugRequest.Pause || this.CurrentRequest == DebugRequest.StepIn)
-                NormalBreak();
-            else if (this.CurrentRequest == DebugRequest.StepToLevel && (this.callStack <= this.targetCallStackLevel))
-                NormalBreak();            
-            // request == resume
+            return 0;
+        }
+        [LuaLibFunction("SetLocal")]
+        public static int SetLocal(LuaState L)
+        {
+            int lvl = L.CheckInt(1);
+            DebugInfo i = L.GetStackInfo(lvl, false);
+            string name = L.CheckString(2);
+            L.CheckAny(3);
+            int l = 1;
+            while (true)
+            {
+                string ln = L.GetLocalName(i, l);
+                if (ln == null)
+                    break;
+                if (ln.Equals(name))
+                {
+                    L.PushValue(3);
+                    L.SetLocal(i, l);
+                    return 0;
+                }
+                l++;
+            }
+            L.PushDebugInfoFunc(i);
+            l = 1;
+            while (true)
+            {
+                string up = L.GetUpvalueName(-1, l);
+                if (up == null)
+                    break;
+                if (up.Equals(name))
+                {
+                    L.PushValue(3);
+                    L.SetUpvalue(-2, l);
+                    return 0;
+                }
+            }
+            return 0;
+        }
+        [LuaLibFunction("HandleXPCallErrorMessage")]
+        public static int HandleXPCallErrorMessage(LuaState L)
+        {
+            return ErrorHook.ErrorCatcher(L);
+        }
+
+        protected static void DebugHook(LuaState L, DebugInfo i)
+        {
+            DebugEngine th = GlobalState.L2State[L.State].DebugEngine;
+            if (i.Event == LuaHook.Call)
+                th.callStack++;
+            else if (i.Event == LuaHook.Ret || i.Event == LuaHook.TailRet)
+            {
+                th.callStack--;
+                if (th.callStack == 0 && (th.CurrentRequest == DebugRequest.StepIn || th.CurrentRequest == DebugRequest.StepToLevel))
+                {
+                    th.CurrentRequest = DebugRequest.Resume;
+                    th.CurrentState = DebugState.Running;
+                    th.FireStateChangedEvent();
+                }
+            }
+            else if (th.CurrentRequest == DebugRequest.Pause || th.CurrentRequest == DebugRequest.StepIn)
+                th.NormalBreak();
+            else if (th.CurrentRequest == DebugRequest.StepToLevel && th.callStack <= th.targetCallStackLevel)
+                th.NormalBreak();
             else
             {
                 List<Breakpoint> bpsAtLine;
-                if (!this.lineToBP.TryGetValue(sr->currentline, out bpsAtLine))
-                    return; //no breakpoints on this line
-
-                BBLua.lua_getinfo(L, "S", ptr);
-                LuaDebugSourceRecord dr = (LuaDebugSourceRecord)Marshal.PtrToStructure(ptr, typeof(LuaDebugSourceRecord));
-
+                if (!th.lineToBP.TryGetValue(i.CurrentLine, out bpsAtLine))
+                    return;
                 foreach (Breakpoint bp in bpsAtLine)
                 {
-                    if (bp.File.Filename == dr.source)
+                    if (bp.File.Filename == i.Source)
                     {
-                        NormalBreak();
+                        th.NormalBreak();
                         break;
                     }
-
                 }
             }
         }
@@ -351,12 +412,12 @@ namespace LuaDebugger
 
         public void SetHook()
         {
-            BBLua.lua_sethook(this.ls.L, this.debugHook, LuaHookType.Line | LuaHookType.Call | LuaHookType.Return, 0);
+            ls.L.SetHook(DebugHook, LuaHookMask.Line | LuaHookMask.Call | LuaHookMask.Ret, 0);
         }
 
         public void RemoveHook()
         {
-            BBLua.lua_sethook(this.ls.L, this.debugHook, LuaHookType.Nothing, 0);
+            ls.L.SetHook(null, LuaHookMask.None, 0);
         }
 
         protected void UnfakeIfNeccessary()
@@ -368,11 +429,46 @@ namespace LuaDebugger
             }
         }
 
-        public void FakeEnvironment(LuaFunctionInfo lfi)
+        public void FakeEnvironment(LuaFunctionInfo lfi, int lvl)
         {
             UnfakeIfNeccessary();
-            lfi.FakeG();
-            this.unfakeCallback = new Action(lfi.UnFakeG);
+            CurrentActiveFunction = lvl;
+            this.unfakeCallback = () => CurrentActiveFunction = -1;
+        }
+
+        public bool IsLocalOrUpvalueInActiveStack(string name)
+        {
+            int lvl = CurrentActiveFunction;
+            if (lvl < 0)
+                return false;
+            DebugInfo i = ls.L.GetStackInfo(lvl, false);
+            int l = 1;
+            while (true)
+            {
+                string ln = ls.L.GetLocalName(i, l);
+                if (ln == null)
+                    break;
+                if (ln.Equals(name))
+                {
+                    return true;
+                }
+                l++;
+            }
+            l = 1;
+            ls.L.PushDebugInfoFunc(i);
+            while (true)
+            {
+                string up = ls.L.GetUpvalueName(-1, l);
+                if (up == null)
+                    break;
+                if (up.Equals(name))
+                {
+                    ls.L.Pop(1);
+                    return true;
+                }
+            }
+            ls.L.Pop(1);
+            return false;
         }
     }
 }
