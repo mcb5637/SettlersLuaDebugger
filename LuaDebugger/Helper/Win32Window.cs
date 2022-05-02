@@ -186,6 +186,8 @@ namespace LuaDebugger
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern IntPtr SendMessage(IntPtr hWnd, UInt32 Msg, UInt32 wParam, UInt32 lParam);
+        [DllImport("User32.dll")]
+        public static extern int PostMessage(IntPtr hWnd, UInt32 Msg, UInt32 wParam, UInt32 lParam);
 
         [DllImport("user32.dll")]
         public static extern bool PeekMessage(out MSG lpMsg, IntPtr hWnd, uint wMsgFilterMin, uint wMsgFilterMax, PeekMessageType pmt);

@@ -1,0 +1,3 @@
+[submodule "LuaDebugger/LuaSharp"]
+	path = LuaDebugger/LuaSharp
+	url = https://github.com/mcb5637/LuaSharp.git

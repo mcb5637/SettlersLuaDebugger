@@ -118,6 +118,7 @@ namespace LuaDebugger
                 GlobalState.L2State.Remove(L);
                 GlobalState.LuaStates.Remove(ls);
                 ErrorHook.RemoveErrorHandler(ls.L); // todo: refactor into luastate?
+                ls.DebugEngine.RemoveHook();
                 GlobalState.UpdateStatesView = true;
             }
         }

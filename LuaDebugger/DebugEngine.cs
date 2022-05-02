@@ -67,10 +67,11 @@ namespace LuaDebugger
         public string CurrentError { get; protected set; }
 
         protected bool surpressStateChangedEvent = false;
-        protected delegate void Action(); //.net3 WHY?!?!
         protected Action fireStateChangedEvent;
-        protected Action unfakeCallback = null;
+        protected Action ResetStackFunctionCB = null;
         public int CurrentActiveFunction { get; private set; } = -1;
+
+        private LinkedList<Action> ToExecuteInSHoKThread = new LinkedList<Action>();
 
         public DebugEngine(LuaStateWrapper ls)
         {
@@ -228,7 +229,7 @@ namespace LuaDebugger
 
         protected void ErrorCaughtHook(string errMessage)
         {
-            if (this.BreakOnError)
+            if (this.BreakOnError && CurrentState != DebugState.CaughtError)
             {
                 this.CurrentState = DebugState.CaughtError;
                 this.CurrentError = errMessage;
@@ -269,9 +270,11 @@ namespace LuaDebugger
                 //Application.DoEvents(); //can cause crashes
                 FreezeMsgLoop.ProcessBasicEvents();
 
+                CheckRunSafely();
+
                 Thread.Sleep(10);
             }
-            UnfakeIfNeccessary();
+            UnSetActiveStackFunctionIfNeccessary();
             GlobalState.FreezeCount--;
 
             this.CurrentState = DebugState.Running;
@@ -420,20 +423,20 @@ namespace LuaDebugger
             ls.L.SetHook(null, LuaHookMask.None, 0);
         }
 
-        protected void UnfakeIfNeccessary()
+        protected void UnSetActiveStackFunctionIfNeccessary()
         {
-            if (this.unfakeCallback != null)
+            if (this.ResetStackFunctionCB != null)
             {
-                this.unfakeCallback();
-                this.unfakeCallback = null;
+                this.ResetStackFunctionCB();
+                this.ResetStackFunctionCB = null;
             }
         }
 
-        public void FakeEnvironment(LuaFunctionInfo lfi, int lvl)
+        public void SetActiveStackFunction(LuaFunctionInfo lfi, int lvl)
         {
-            UnfakeIfNeccessary();
+            UnSetActiveStackFunctionIfNeccessary();
             CurrentActiveFunction = lvl;
-            this.unfakeCallback = () => CurrentActiveFunction = -1;
+            this.ResetStackFunctionCB = () => CurrentActiveFunction = -1;
         }
 
         public bool IsLocalOrUpvalueInActiveStack(string name)
@@ -469,6 +472,33 @@ namespace LuaDebugger
             }
             ls.L.Pop(1);
             return false;
+        }
+
+        public void RunSafely(Action toRun)
+        {
+            lock (ToExecuteInSHoKThread)
+            {
+                ToExecuteInSHoKThread.AddLast(toRun);
+            }
+            if (CurrentState == DebugState.Running)
+            {
+                GameLoopHook.RunInGameThread(CheckRunSafely);
+            }
+        }
+        internal void CheckRunSafely()
+        {
+            while (true)
+            {
+                Action r;
+                lock (ToExecuteInSHoKThread)
+                {
+                    if (ToExecuteInSHoKThread.Count == 0)
+                        break;
+                    r = ToExecuteInSHoKThread.First.Value;
+                    ToExecuteInSHoKThread.RemoveFirst();
+                }
+                r();
+            }
         }
     }
 }

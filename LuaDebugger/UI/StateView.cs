@@ -91,7 +91,7 @@ namespace LuaDebugger
             LuaFunctionInfo lfi = this.debugEngine.CurrentStackTrace[n];
 
             if (this.ls.LoadedFiles.Count == 0 && this.fileSaveTimeout > 0)
-                this.ls.RestoreLoadedFiles();
+                this.ls.RestoreLoadedFiles(() => { });
 
             if (this.ls.UpdateFileList)
                 UpdateView();
@@ -103,7 +103,7 @@ namespace LuaDebugger
                 file.Arrow.NormalLineNr = lfi.Line;
                 file.Arrow.IsEnabled = true;
                 SwitchToFile(file, lfi.Line);
-                this.ls.DebugEngine.FakeEnvironment(lfi, n);
+                this.ls.DebugEngine.SetActiveStackFunction(lfi, n);
             }
             else
                 ShowSourceUnavailable();
@@ -134,35 +134,38 @@ namespace LuaDebugger
         {
             if (this.ls.UpdateFileList)
             {
-                this.ls.UpdateFileList = false;
-
-                //only trigger writing filedata to the luastate if the last
-                //change wasn't the result of restoring the file list from the LS
-                if (this.ls.UpdateAfterFileListRestore)
-                    this.ls.UpdateAfterFileListRestore = false;
-                else
-                    this.fileSaveTimeout = fileSaveTimeoutInitial;
-
-                this.mapScripts.Nodes.Clear();
-                this.internalScripts.Nodes.Clear();
-                foreach (KeyValuePair<string, LuaFile> kvp in this.ls.LoadedFiles)
+                lock (GlobalState.GuiUpdateLock)
                 {
-                    string filename = kvp.Key;
-                    string shortName = Path.GetFileName(filename);
-                    TreeNode fileNode = new TreeNode(shortName);
-                    fileNode.ToolTipText = filename;
-                    fileNode.Tag = kvp.Value;
-                    kvp.Value.Node = fileNode;
-                    if (filename.StartsWith("Data\\Script\\", StringComparison.CurrentCultureIgnoreCase) || //S5
-                        filename.StartsWith("Script\\", StringComparison.CurrentCultureIgnoreCase))         //S6
-                        this.internalScripts.Nodes.Add(fileNode);
-                    else
-                        this.mapScripts.Nodes.Add(fileNode);
+                    this.ls.UpdateFileList = false;
 
-                    if (kvp.Value.Editor == null)
-                        CreateEditorForFile(kvp.Value);
+                    //only trigger writing filedata to the luastate if the last
+                    //change wasn't the result of restoring the file list from the LS
+                    if (this.ls.UpdateAfterFileListRestore)
+                        this.ls.UpdateAfterFileListRestore = false;
+                    else
+                        this.fileSaveTimeout = fileSaveTimeoutInitial;
+
+                    this.mapScripts.Nodes.Clear();
+                    this.internalScripts.Nodes.Clear();
+                    foreach (KeyValuePair<string, LuaFile> kvp in this.ls.LoadedFiles)
+                    {
+                        string filename = kvp.Key;
+                        string shortName = Path.GetFileName(filename);
+                        TreeNode fileNode = new TreeNode(shortName);
+                        fileNode.ToolTipText = filename;
+                        fileNode.Tag = kvp.Value;
+                        kvp.Value.Node = fileNode;
+                        if (filename.StartsWith("Data\\Script\\", StringComparison.CurrentCultureIgnoreCase) || //S5
+                            filename.StartsWith("Script\\", StringComparison.CurrentCultureIgnoreCase))         //S6
+                            this.internalScripts.Nodes.Add(fileNode);
+                        else
+                            this.mapScripts.Nodes.Add(fileNode);
+
+                        if (kvp.Value.Editor == null)
+                            CreateEditorForFile(kvp.Value);
+                    }
+                    //this.tvFiles.Sort(); 
                 }
-                //this.tvFiles.Sort();
             }
 
             if (this.fileSaveTimeout >= 0)
@@ -173,18 +176,17 @@ namespace LuaDebugger
                 {
                     if (this.ls.ReloadedLuaFiles)
                     {
-                        if (!this.ls.SaveLoadedFiles())
-                            fileSaveTimeout = fileSaveTimeoutInitial;
+                        fileSaveTimeout = -1;
+                        ls.SaveLoadedFiles(() => { fileSaveTimeout = -1; });
                     }
                     else
                     {
-                        if (!this.ls.RestoreLoadedFiles())
-                            fileSaveTimeout = fileSaveTimeoutInitial;
-                        else
+                        fileSaveTimeout = -1;
+                        ls.RestoreLoadedFiles(() =>
                         {
                             ls.ReloadedLuaFiles = true;
                             ls.UpdateFileList = true;
-                        }
+                        });
                     }
                 }
             }

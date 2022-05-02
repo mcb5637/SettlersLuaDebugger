@@ -70,24 +70,23 @@ namespace LuaDebugger
             tbInput.ReadOnly = true;
             StartWait();
 
-            IVCThreadPool.RunAsync(delegate
+            ls.EvaluateLua(cmd, (answer, cmdex) =>
             {
-                string answer = ls.EvaluateLua(ref cmd, uivarname);
                 rtbOutput.Invoke((MethodInvoker)delegate
                 {
                     int nextHistory = this.History.Count - 1;
-                    this.History[nextHistory] = cmd;
+                    this.History[nextHistory] = cmdex;
                     this.History.Add("");
                     this.historyPos = nextHistory + 1;
 
-                    this.AppendText("> " + cmd);
+                    this.AppendText("> " + cmdex);
                     if (answer != "")
                         this.AppendText(answer);
                     rtbOutput.ScrollToCaret();
                     tbInput.ReadOnly = false;
                     EndWait();
                 });
-            });
+            }, true);
         }
 
         public void AppendText(string text)

@@ -44,58 +44,47 @@ namespace LuaDebugger
             this.DebugEngine = new DebugEngine(this);
         }
 
-        public string EvaluateLua(string expression)
+        public void EvaluateLua(string expression, Action<string, string> onDone, bool uivarname = false)
         {
-            return EvaluateLua(ref expression, false);
-        }
-        public string EvaluateLua(ref string expression, bool uivarname)
-        {
-            bool unfreeze = false;
-            if (this.CurrentState == DebugState.Running)
+            DebugEngine.RunSafely(() =>
             {
-                unfreeze = true;
-                if (!GameLoopHook.PauseGame())
-                    return "Error: Game is busy!";
-            }
-            this.DebugEngine.RemoveHook();
+                DebugEngine.RemoveHook();
 
-            int top = L.Top;
+                int top = L.Top;
 
-            if (uivarname && DebugEngine.IsLocalOrUpvalueInActiveStack(expression))
-            {
-                expression = $"LuaDebugger.GetLocal({DebugEngine.CurrentActiveFunction + 2}, '{expression}')";
-            }
-            string asStatement = expression;
-            string asExpression = "return " + expression;
+                if (uivarname && DebugEngine.IsLocalOrUpvalueInActiveStack(expression))
+                {
+                    expression = $"LuaDebugger.GetLocal({DebugEngine.CurrentActiveFunction + 2}, '{expression}')";
+                }
+                string asStatement = expression;
+                string asExpression = "return " + expression;
 
-            string result;
-            try
-            {
+                string result;
                 try
                 {
-                    L.LoadBuffer(asExpression, "from console");
+                    try
+                    {
+                        L.LoadBuffer(asExpression, "from console");
+                    }
+                    catch (LuaException)
+                    {
+                        L.LoadBuffer(asStatement, "from console");
+                    }
+                    int stackTop = L.Top;
+                    L.PCall(0, L.MULTIRETURN);
+                    int nResults = 1 + L.Top - stackTop;
+
+                    result = EvalCreateResult(nResults);
                 }
-                catch (LuaException)
+                catch (LuaException e)
                 {
-                    L.LoadBuffer(asStatement, "from console");
+                    result = e.ToString();
                 }
-                int stackTop = L.Top;
-                L.PCall(0, L.MULTIRETURN);
-                int nResults = 1 + L.Top - stackTop;
+                L.Top = top;
 
-                result = EvalCreateResult(nResults);
-            }
-            catch (LuaException e)
-            {
-                result = e.ToString();
-            }
-            L.Top = top;
-
-            this.DebugEngine.SetHook();
-            if (unfreeze)
-                GameLoopHook.ResumeGame();
-
-            return result;
+                DebugEngine.SetHook();
+                onDone(result, expression);
+            });
         }
 
         private string EvalCreateResult(int nResults)
@@ -112,25 +101,6 @@ namespace LuaDebugger
             } while (nResults != 0);
 
             return "(" + string.Join(", ", results) + ")";
-        }
-
-        public bool RunDelegateSafely(MethodInvoker dlg)
-        {
-            bool unfreeze = false;
-            if (this.CurrentState == DebugState.Running)
-            {
-                unfreeze = true;
-                if (!GameLoopHook.PauseGame())
-                    return false;
-            }
-            this.DebugEngine.RemoveHook();
-
-            dlg();
-
-            this.DebugEngine.SetHook();
-            if (unfreeze)
-                GameLoopHook.ResumeGame();
-            return true;
         }
 
         protected static Regex alphaNumeric = new Regex("^[a-zA-Z0-9_]*$");
@@ -245,40 +215,36 @@ namespace LuaDebugger
 
         protected string CreateFileString()
         {
-            using (MemoryStream mem = new MemoryStream())
+            lock (GlobalState.GuiUpdateLock)
             {
-                using (var gZipStream = new GZipStream(mem, CompressionMode.Compress, true))
+                using (MemoryStream mem = new MemoryStream())
                 {
-                    BinaryWriter bw = new BinaryWriter(gZipStream);
-                    bw.Write(this.LoadedFiles.Count);
-
-                    foreach (KeyValuePair<string, LuaFile> kvp in this.LoadedFiles)
+                    using (GZipStream gZipStream = new GZipStream(mem, CompressionMode.Compress))
+                    using (BinaryWriter bw = new BinaryWriter(gZipStream))
                     {
-                        bw.Write(kvp.Key);
-                        bw.Write(kvp.Value.Contents);
+                        bw.Write(this.LoadedFiles.Count);
+                        foreach (KeyValuePair<string, LuaFile> kvp in this.LoadedFiles)
+                        {
+                            bw.Write(kvp.Key);
+                            bw.Write(kvp.Value.Contents);
+                        }
+                        bw.Write(0);
+                        bw.Flush();
                     }
-                    bw.Write(0);
-
-                    mem.Position = 0;
-
-                    var compressedData = new byte[mem.Length];
-                    mem.Read(compressedData, 0, compressedData.Length);
-                    return Convert.ToBase64String(compressedData);
+                    return Convert.ToBase64String(mem.ToArray());
                 }
             }
         }
 
         protected void RestoreFromFileString(string data)
         {
-            byte[] gZipBuffer = Convert.FromBase64String(data);
-            using (var memoryStream = new MemoryStream())
+            lock (GlobalState.GuiUpdateLock)
             {
-                memoryStream.Write(gZipBuffer, 0, gZipBuffer.Length);
-                memoryStream.Position = 0;
-
-                using (var gZipStream = new GZipStream(memoryStream, CompressionMode.Decompress))
+                byte[] gZipBuffer = Convert.FromBase64String(data);
+                using (MemoryStream memoryStream = new MemoryStream(gZipBuffer))
+                using (GZipStream gZipStream = new GZipStream(memoryStream, CompressionMode.Decompress))
+                using (BinaryReader br = new BinaryReader(gZipStream))
                 {
-                    BinaryReader br = new BinaryReader(gZipStream);
                     int fileCnt = br.ReadInt32();
                     for (int i = 0; i < fileCnt; i++)
                     {
@@ -288,82 +254,61 @@ namespace LuaDebugger
                             this.LoadedFiles.Add(filename, new LuaFile(filename, fileContents));
                     }
                 }
+                this.UpdateAfterFileListRestore = true;
+                this.UpdateFileList = true; 
             }
-            this.UpdateAfterFileListRestore = true;
-            this.UpdateFileList = true;
         }
 
-        //returns false if game was busy
-        public bool SaveLoadedFiles()
+        public void SaveLoadedFiles(Action done)
         {
-            bool wasRunning = this.DebugEngine.CurrentState == DebugState.Running;
-            if (wasRunning)
+            DebugEngine.RunSafely(() =>
             {
-                if (!GameLoopHook.PauseGame())
-                    return false;
-            }
+                string data = CreateFileString();
 
-            string data = CreateFileString();
-
-            L.Push("_LuaDebugger_FileData");
-            L.NewTable();
-            int i = 1;
-            foreach (string substr in data.SplitBy(15000)) //the limit in shok seems to be at ~ 2^14, otherwise crashes savegame loading
-            {
-                L.Push(substr);
-                L.SetTableRaw(-2, i);
-                i++;
-            }
-            L.SetTableRaw(L.GLOBALSINDEX);
-
-            if (wasRunning)
-                GameLoopHook.ResumeGame();
-
-            return true;
-        }
-
-        //returns false if game was busy
-        public bool RestoreLoadedFiles()
-        {
-            bool wasRunning = this.DebugEngine.CurrentState == DebugState.Running;
-            if (wasRunning)
-            {
-                if (!GameLoopHook.PauseGame())
-                    return false;
-            }
-
-            L.Push("_LuaDebugger_FileData");
-            L.GetTableRaw(L.GLOBALSINDEX);
-            if (L.Type(-1) != LuaType.Table)
-            {
-                L.Pop(1);
-                if (wasRunning)
-                    GameLoopHook.ResumeGame();
-                return true;
-            }
-
-            StringBuilder sb = new StringBuilder();
-
-            for (int i = 1; ; i++)
-            {
-                L.GetTableRaw(-1, i);
-                if (L.Type(-1) != LuaType.String)
+                L.Push("_LuaDebugger_FileData");
+                L.NewTable();
+                int i = 1;
+                foreach (string substr in data.SplitBy(15000)) //the limit in shok seems to be at ~ 2^14, otherwise crashes savegame loading
                 {
-                    L.Pop(2);
-                    break;
+                    L.Push(substr);
+                    L.SetTableRaw(-2, i);
+                    i++;
                 }
-                sb.Append(L.ToString(-1));
-                L.Pop(2);
-            }
+                L.SetTableRaw(L.GLOBALSINDEX);
+                done();
+            });
+        }
 
-            if (wasRunning)
-                GameLoopHook.ResumeGame();
+        public void RestoreLoadedFiles(Action done)
+        {
+            DebugEngine.RunSafely(() =>
+            {
+                L.Push("_LuaDebugger_FileData");
+                L.GetTableRaw(L.GLOBALSINDEX);
+                if (L.Type(-1) != LuaType.Table)
+                {
+                    L.Pop(1);
+                    done();
+                    return;
+                }
 
-            //this.LoadedFiles.Clear();
+                StringBuilder sb = new StringBuilder();
 
-            RestoreFromFileString(sb.ToString());
+                for (int i = 1; ; i++)
+                {
+                    L.GetTableRaw(-1, i);
+                    if (L.Type(-1) != LuaType.String)
+                    {
+                        L.Pop(2);
+                        break;
+                    }
+                    sb.Append(L.ToString(-1));
+                    L.Pop(1);
+                }
 
-            return true;
+                RestoreFromFileString(sb.ToString());
+                done();
+            });
         }
 
         public void RemovedByGame()

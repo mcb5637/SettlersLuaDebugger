@@ -63,7 +63,7 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
                 end
                 Cutscene_Preview_Cancel = function() 
                     Camera.SetControlMode(1); 
-                end");
+                end", (r, c) => { });
                 myCutscene = new Cutscene();
                 lvCut.Items.Clear();
                 cbFlights.Items.Clear();
@@ -132,7 +132,7 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
                     Camera.RotSetFlipBack(0);
                     Camera.SetControlMode(1);
                     Display.SetRenderSky(1);
-                ");
+                ", (r, c) => { });
                 Camera = S5CameraInfo.GetCurrentCamera();
                 Camera.PosZ += 4000;
                 Camera.WriteToMemory();
@@ -146,7 +146,7 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
                     Camera_InitParams();
                     Game.GUIActivate(1);
                     Camera.SetControlMode(0);
-                ");
+                ", (r, c) => { });
                 tmrUpdateCamera.Stop();
                 joyStickCutsceneEditor.Enabled = false;
             }
@@ -363,8 +363,11 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
 
         private void StartPreviewCutscene()
         {
-            LS.RunDelegateSafely((MethodInvoker)delegate { S5Direct.ReloadCutscenes(tmpPath); });
-            LS.EvaluateLua("Cutscene.Start(\"Preview\")");
+            LS.DebugEngine.RunSafely(() =>
+            {
+                S5Direct.ReloadCutscenes(tmpPath);
+            });
+            LS.EvaluateLua("Cutscene.Start(\"Preview\")", (r,c) => { });
         }
 
         private void lvCut_SelectedIndexChanged(object sender, EventArgs e)

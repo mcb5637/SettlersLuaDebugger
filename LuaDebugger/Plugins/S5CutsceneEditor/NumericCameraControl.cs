@@ -35,16 +35,22 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
         private void updateHeight()
         {
             // TODO need better way to get this info, not this ugly hack
-            String res = ls.EvaluateLua("S5Hook and (S5Hook.GetTerrainInfo(" + numX.Value + ", " + numY.Value + @"))");
-            float terrainHeight = 0;
-            if (float.TryParse(res, out terrainHeight)) {
-                lblTerrain.Text = res;
-                lblCamHeight.Text = (((float)numZ.Value) - terrainHeight).ToString();
-            } else
+            ls.EvaluateLua("S5Hook and (S5Hook.GetTerrainInfo(" + numX.Value + ", " + numY.Value + @"))", (res, _)=>
             {
-                lblTerrain.Text = "needs S5Hook";
-                lblCamHeight.Text = "needs S5Hook";
-            }
+                Invoke((MethodInvoker)delegate
+                {
+                    if (float.TryParse(res, out float terrainHeight))
+                    {
+                        lblTerrain.Text = res;
+                        lblCamHeight.Text = (((float)numZ.Value) - terrainHeight).ToString();
+                    }
+                    else
+                    {
+                        lblTerrain.Text = "needs S5Hook";
+                        lblCamHeight.Text = "needs S5Hook";
+                    }
+                });
+            });
         }
 
         public void updateCam()
