@@ -115,7 +115,8 @@
     <Compile Include="Helper\MySyntaxModeProvider.cs" />
     <Compile Include="Helper\Win32Window.cs" />
     <Compile Include="LuaSharp\LuaState.cs" />
-    <Compile Include="LuaSharp\LuaState50.cs" />
+    <Compile Include="LuaSharp\LuaState50.cs" Condition=" '$(Configuration)' == 'DebugS5' "/>
+    <Compile Include="LuaSharp\LuaState51.cs" Condition=" '$(Configuration)' == 'DebugS6' "/>
     <Compile Include="LuaStackTrace.cs" />
     <Compile Include="Plugins\PluginSystem.cs" />
     <Compile Include="Plugins\S5CutsceneEditor\Cutscene.cs" />

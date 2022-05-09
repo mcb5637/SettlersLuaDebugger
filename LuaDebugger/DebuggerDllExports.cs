@@ -76,8 +76,8 @@ namespace LuaDebugger
             GlobalState.UIThread = uiThread;
         }
 
+#if S5
         static int s5StateCount = 0;
-        //S5
         [DllExport("_AddLuaState@4", CallingConvention = CallingConvention.StdCall)]
         public static void AddLuaState(IntPtr L)
         {
@@ -92,8 +92,7 @@ namespace LuaDebugger
                 GlobalState.UpdateStatesView = true;
             }
         }
-
-        //S6
+#elif S6
         [DllExport("_AddLuaState@8", CallingConvention = CallingConvention.StdCall)]
         public static void AddLuaStateS6(IntPtr L, IntPtr n)
         {
@@ -101,12 +100,13 @@ namespace LuaDebugger
             lock (GlobalState.GuiUpdateLock)
             {
                 TextInfo ti = Thread.CurrentThread.CurrentCulture.TextInfo;
-                LuaStateWrapper ls = new LuaStateWrapper(null, ti.ToTitleCase(name));
+                LuaStateWrapper ls = new LuaStateWrapper(new LuaState51(L), ti.ToTitleCase(name));
                 GlobalState.L2State.Add(L, ls);
                 GlobalState.LuaStates.Add(ls);
                 GlobalState.UpdateStatesView = true;
             }
         }
+#endif
 
         [DllExport("_RemoveLuaState@4", CallingConvention = CallingConvention.StdCall)]
         public static void RemoveLuaState(IntPtr L)
@@ -130,17 +130,16 @@ namespace LuaDebugger
                 return;//Immediate Action
 
             LuaStateWrapper ls = GlobalState.L2State[L];
-            string filename = Marshal.PtrToStringAnsi(filenamep);
+            string filename = filenamep.MarshalToString();
 
             lock (GlobalState.GuiUpdateLock)
             {
                 if (ls.LoadedFiles.ContainsKey(filename))
                     ls.LoadedFiles.Remove(filename);
-                string fileContents = Marshal.PtrToStringAnsi(content, contentLen);
+                string fileContents = content.MarshalToString(contentLen);
                 ls.LoadedFiles.Add(filename, new LuaFile(filename, fileContents));
                 ls.UpdateFileList = true;
             }
-
         }
 
         [DllExport("_Show@0", CallingConvention = CallingConvention.StdCall)]
@@ -167,11 +166,18 @@ namespace LuaDebugger
             //MessageBox.Show("ShowExecuteLine");
         }
 
-        //S6
+#if S6
         [DllExport("_IsBreaked@0", CallingConvention = CallingConvention.StdCall)]
         public static int IsBreaked()
         {
             return GlobalState.FreezeCount;
+        }
+#endif
+
+        [DllExport("?HasRealDebugger@@YG_NXZ", CallingConvention = CallingConvention.StdCall)]
+        public static bool HasRealDebugger()
+        {
+            return true;
         }
     }
 }

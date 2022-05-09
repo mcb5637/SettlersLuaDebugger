@@ -58,7 +58,6 @@ Global
 		{16B211B2-5232-4DF1-94F2-BE76C28E1302}.Dbg S6|x64.ActiveCfg = Debug|x64
 		{16B211B2-5232-4DF1-94F2-BE76C28E1302}.Dbg S6|x64.Build.0 = Debug|x64
 		{16B211B2-5232-4DF1-94F2-BE76C28E1302}.Dbg S6|x86.ActiveCfg = Debug|x86
-		{16B211B2-5232-4DF1-94F2-BE76C28E1302}.Dbg S6|x86.Build.0 = Debug|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

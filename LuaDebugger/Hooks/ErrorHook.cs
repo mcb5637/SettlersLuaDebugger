@@ -11,7 +11,7 @@ namespace LuaDebugger
     static class ErrorHook
     {
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        delegate LuaResult LuaPcallHook(IntPtr L, int nargs, int nresults, int errfunc);
+        delegate int LuaPcallHook(IntPtr L, int nargs, int nresults, int errfunc);
 
         public delegate void LuaErrorCaught(string message);
 
@@ -38,7 +38,7 @@ namespace LuaDebugger
             stateErrHandler.Remove(L.State);
         }
 
-        static LuaResult FakePcall(IntPtr L, int nargs, int nresults, int errfunc)
+        static int FakePcall(IntPtr L, int nargs, int nresults, int errfunc)
         {
             LuaState s = GlobalState.L2State[L].L;
             if (!GlobalState.CatchErrors)
@@ -52,10 +52,10 @@ namespace LuaDebugger
             s.Insert(ecpos);
 
             t = s.Top;
-            LuaResult r = s.PCall_Debug(nargs, nresults, ecpos);
+            int r = s.PCall_Debug(nargs, nresults, ecpos);
             t = s.Top;
 
-            if (r != LuaResult.OK)
+            if (r != 0)
             {
                 s.Pop(1); // err msg
                 if (nresults != s.MULTIRETURN)
@@ -66,7 +66,7 @@ namespace LuaDebugger
             s.Remove(ecpos);
             t = s.Top;
 
-            return LuaResult.OK;
+            return 0;
         }
 
         internal static int ErrorCatcher(LuaState L)
