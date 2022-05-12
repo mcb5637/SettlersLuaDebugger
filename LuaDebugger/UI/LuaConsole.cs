@@ -265,10 +265,9 @@ namespace LuaDebugger
             int line = int.Parse(parts[parts.Length - 1]);
             string path = string.Join(":", parts, 0, parts.Length - 1);
 
-            LuaFile fileObj = null;
             EnableCompositeDrawing();
 
-            if (this.ls.LoadedFiles.TryGetValue(path, out fileObj))
+            if (this.ls.LoadedFiles.TryGetValue(path, out LuaFile fileObj))
                 this.ls.StateView.SwitchToFile(fileObj, line);
             else
                 this.ls.StateView.ShowSourceUnavailable();

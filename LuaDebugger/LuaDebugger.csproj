@@ -115,8 +115,8 @@
     <Compile Include="Helper\MySyntaxModeProvider.cs" />
     <Compile Include="Helper\Win32Window.cs" />
     <Compile Include="LuaSharp\LuaState.cs" />
-    <Compile Include="LuaSharp\LuaState50.cs" Condition=" '$(Configuration)' == 'DebugS5' "/>
-    <Compile Include="LuaSharp\LuaState51.cs" Condition=" '$(Configuration)' == 'DebugS6' "/>
+    <Compile Include="LuaSharp\LuaState50.cs" Condition=" '$(Configuration)' == 'DebugS5' " />
+    <Compile Include="LuaSharp\LuaState51.cs" Condition=" '$(Configuration)' == 'DebugS6' " />
     <Compile Include="LuaStackTrace.cs" />
     <Compile Include="Plugins\PluginSystem.cs" />
     <Compile Include="Plugins\S5CutsceneEditor\Cutscene.cs" />
@@ -301,7 +301,9 @@
 xcopy /y /i "$(TargetDir)EasyHook.dll" "$(SolutionDir)dbgenv\"
 xcopy /y /i "$(TargetDir)EasyHook.dll" "$(SolutionDir)LuaDebuggerStarter\Unpack\"
 xcopy /y /i "$(TargetDir)EasyHook32.dll" "$(SolutionDir)dbgenv\"
-xcopy /y /i "$(TargetDir)EasyHook32.dll" "$(SolutionDir)LuaDebuggerStarter\Unpack\"</PostBuildEvent>
+xcopy /y /i "$(TargetDir)EasyHook32.dll" "$(SolutionDir)LuaDebuggerStarter\Unpack\"
+xcopy /y /i "$(TargetDir)ICSharpCode.TextEditor.dll" "$(SolutionDir)dbgenv\"
+xcopy /y /i "$(TargetDir)ICSharpCode.TextEditor.dll" "$(SolutionDir)LuaDebuggerStarter\Unpack\"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <DllExportIdent>8FF0D3BF-79BA-479A-AF5E-1C0E3C5605C6</DllExportIdent>

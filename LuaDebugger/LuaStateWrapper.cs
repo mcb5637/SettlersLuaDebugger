@@ -48,8 +48,6 @@ namespace LuaDebugger
         {
             DebugEngine.RunSafely(() =>
             {
-                DebugEngine.RemoveHook();
-
                 int top = L.Top;
 
                 if (uivarname && DebugEngine.IsLocalOrUpvalueInActiveStack(expression))
@@ -82,7 +80,6 @@ namespace LuaDebugger
                 }
                 L.Top = top;
 
-                DebugEngine.SetHook();
                 onDone(result, expression);
             });
         }
@@ -105,107 +102,27 @@ namespace LuaDebugger
 
         protected static Regex alphaNumeric = new Regex("^[a-zA-Z0-9_]*$");
 
-        public string TosToString(bool noExpand = false)
+        private static string FormatString(LuaState L, int i)
         {
-            return TosToString(true, noExpand, new Dictionary<IntPtr, bool>());
+            return "\"" + L.ToString(i).Replace("\n", "\\n").Replace("\r", "\\r").Replace("\"", "\\\"") + "\"";
         }
-
-        public string TosToString(bool popStack, bool noExpand, Dictionary<IntPtr, bool> printedTables)
+        private static string FormatFunc(LuaState L, int i)
         {
-            LuaType type = L.Type(-1);
-            string result;
-
-            switch (type)
+            if (L.IsCFunction(i))
             {
-                case LuaType.Nil:
-                    result = "nil";
-                    break;
-                case LuaType.Boolean:
-                    result = L.ToBoolean(-1).ToString().ToLower();
-                    break;
-                case LuaType.Number:
-                    result = L.ToNumber(-1).ToString();
-                    break;
-                case LuaType.String:
-                    result = "\"" + L.ToString(-1).Replace("\n", "\\n").Replace("\r", "\\r").Replace("\"", "\\\"") + "\"";
-                    break;
-                case LuaType.Function:
-                    result = GetTosFunctionInfo();
-                    break;
-                case LuaType.Table:
-                    if (noExpand)
-                        goto default;
-
-                    IntPtr tblPtr = L.ToPointer(-1);
-                    if (printedTables.ContainsKey(tblPtr))
-                    {
-                        result = "<Table, recursion>";
-                        break;
-                    }
-
-                    Dictionary<string, string> tcontents = new Dictionary<string, string>();
-                    result = "{";
-                    printedTables.Add(tblPtr, true);
-                    foreach (LuaType _ in L.Pairs(-1))
-                    {
-                        string val = IndentMultiLine(TosToString(false, false, printedTables));
-                        string key = L.ToDebugString(-2);
-                        tcontents.Add(key, val);
-                    }
-                    foreach (string key in tcontents.Keys.OrderBy((x) => x))
-                    {
-                        string val = tcontents[key];
-                        if (key[0] == '\"')
-                        {
-                            string rawString = key.Substring(1, key.Length - 2);
-                            if (alphaNumeric.IsMatch(rawString))
-                                result += "\n    " + rawString + " = " + val + ",";
-                            else
-                                result += "\n    [" + key + "] = " + val + ",";
-                        }
-                        else
-                            result += "\n    [" + key + "] = " + val + ",";
-                    }
-                    result += "\n}";
-                    break;
-                case LuaType.UserData:
-                case LuaType.LightUserData:
-                    IntPtr ptr = L.ToUserdata(-1);
-                    result = $"<{type}, at 0x{(uint)ptr:X}>";
-                    break;
-                default:
-                    result = $"<{type}>";
-                    break;
-            }
-
-            if (popStack)
-                L.Pop(1);
-            return result;
-        }
-
-        protected string GetTosFunctionInfo()
-        {
-            if (L.IsCFunction(-1))
-            {
-                return $"<function, defined in C: 0x{(uint)L.ToCFunction(-1):X}>";
+                return $"<function, defined in C: 0x{(uint)L.ToCFunction(i):X}>";
             }
             int t = L.Top;
-            L.PushValue(-1);
+            L.PushValue(i);
             DebugInfo d = L.GetFuncInfo();
             L.Top = t;
             return $"<function \b{d.Source}:{d.LineDefined}\b>";
         }
-
-        protected string IndentMultiLine(string input)
+        public string TosToString(bool noExpand = false)
         {
-            string[] lines = input.Split('\n');
-            if (lines.Length < 2)
-                return input;
-
-            for (int i = 1; i < lines.Length; i++)
-                lines[i] = "    " + lines[i];
-
-            return string.Join("\n", lines);
+            string r = L.ToDebugString(-1, noExpand ? 0 : 10, FormatString, FormatFunc, 0, null);
+            L.Pop(1);
+            return r;
         }
 
         public override string ToString()

@@ -59,38 +59,33 @@ namespace LuaDebugger
 
         public static LuaFunctionInfo ReadFunctionInfo(LuaStateWrapper ls, int level)
         {
-            try
-            {
-                DebugInfo i = ls.L.GetStackInfo(level);
-
-                LuaFunctionInfo lfi = new LuaFunctionInfo(ls);
-
-                if (i.Source.Length > 1 && i.Source[0] != '=')
-                {
-                    lfi.Source = i.Source;
-                    lfi.Line = i.CurrentLine;
-                }
-                else
-                {
-                    lfi.Source = "unavailable";
-                    lfi.Line = 0;
-                }
-
-                if (i.What == "C")
-                    lfi.FunctionName = "Game Engine (direct call)";
-                else if (i.What == "main")
-                    lfi.FunctionName = "Game Engine (code outside function)";
-                else if (i.Name != "" && i.NameWhat != "")
-                    lfi.FunctionName = i.NameWhat + " " + i.Name + "()";
-                else if (i.What == "Lua" || i.What == "tail")
-                    lfi.FunctionName = "Lua Code";
-
-                return lfi;
-            }
-            catch (LuaException)
-            {
+            DebugInfo i = ls.L.GetStackInfo(level);
+            if (i == null)
                 return null;
+
+            LuaFunctionInfo lfi = new LuaFunctionInfo(ls);
+
+            if (i.Source.Length > 1 && i.Source[0] != '=')
+            {
+                lfi.Source = i.Source;
+                lfi.Line = i.CurrentLine;
             }
+            else
+            {
+                lfi.Source = "unavailable";
+                lfi.Line = 0;
+            }
+
+            if (i.What == "C")
+                lfi.FunctionName = "Game Engine (direct call)";
+            else if (i.What == "main")
+                lfi.FunctionName = "Game Engine (code outside function)";
+            else if (i.Name != "" && i.NameWhat != "")
+                lfi.FunctionName = i.NameWhat + " " + i.Name + "()";
+            else if (i.What == "Lua" || i.What == "tail")
+                lfi.FunctionName = "Lua Code";
+
+            return lfi;
         }
     }
 }

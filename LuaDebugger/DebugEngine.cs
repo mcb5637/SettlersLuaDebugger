@@ -71,7 +71,8 @@ namespace LuaDebugger
         protected Action ResetStackFunctionCB = null;
         public int CurrentActiveFunction { get; private set; } = -1;
 
-        private LinkedList<Action> ToExecuteInSHoKThread = new LinkedList<Action>();
+        private readonly LinkedList<Action> ToExecuteInSHoKThread = new LinkedList<Action>();
+        public bool HookActive { get; private set; }
 
         public DebugEngine(LuaStateWrapper ls)
         {
@@ -79,7 +80,7 @@ namespace LuaDebugger
             RegisterLibFunctions();
             ErrorHook.SetErrorHandler(ls.L, new ErrorHook.LuaErrorCaught(this.ErrorCaughtHook));
             this.fireStateChangedEvent = new Action(FireStateChangedEvent);
-            SetHook();
+            // set hook, but we cannot have breakpoints here already
         }
 
         protected void RegisterLibFunctions()
@@ -119,7 +120,11 @@ namespace LuaDebugger
         public static int GetLocal(LuaState L)
         {
             int lvl = L.CheckInt(1);
-            DebugInfo i = L.GetStackInfo(lvl, false);
+            DebugInfo i = L.GetStackInfo(lvl, true);
+            if (i == null)
+                throw new LuaException("invalid stack level");
+            if (L.IsCFunction(-1))
+                throw new LuaException("not allowed to access locals/upvalues of c functions");
             string name = L.CheckString(2);
             int l = 1;
             while (true)
@@ -134,7 +139,6 @@ namespace LuaDebugger
                 }
                 l++;
             }
-            L.PushDebugInfoFunc(i);
             l = 1;
             while (true)
             {
@@ -153,7 +157,11 @@ namespace LuaDebugger
         public static int SetLocal(LuaState L)
         {
             int lvl = L.CheckInt(1);
-            DebugInfo i = L.GetStackInfo(lvl, false);
+            DebugInfo i = L.GetStackInfo(lvl, true);
+            if (i == null)
+                throw new LuaException("invalid stack level");
+            if (L.IsCFunction(-1))
+                throw new LuaException("not allowed to access locals/upvalues of c functions");
             string name = L.CheckString(2);
             L.CheckAny(3);
             int l = 1;
@@ -170,7 +178,6 @@ namespace LuaDebugger
                 }
                 l++;
             }
-            L.PushDebugInfoFunc(i);
             l = 1;
             while (true)
             {
@@ -190,6 +197,12 @@ namespace LuaDebugger
         public static int HandleXPCallErrorMessage(LuaState L)
         {
             return ErrorHook.ErrorCatcher(L);
+        }
+        [LuaLibFunction("IsHookActive")]
+        public static int IsHookActive(LuaState L)
+        {
+            L.Push(GlobalState.L2State[L.State].DebugEngine.HookActive);
+            return 1;
         }
 
         protected static void DebugHook(LuaState L, DebugInfo i)
@@ -249,6 +262,7 @@ namespace LuaDebugger
         {
             this.CurrentState = DebugState.Paused;
             this.CurrentStackTrace = new LuaStackTrace(this.ls, 1); //skip LuaDebugger.Break()
+            SetHookForBreakpoints(true);
             FreezeGame();
         }
 
@@ -280,7 +294,10 @@ namespace LuaDebugger
             this.CurrentState = DebugState.Running;
 
             if (this.CurrentRequest == DebugRequest.Resume)
+            {
                 FireStateChangedEvent();
+                SetHookForBreakpoints(false);
+            }
         }
 
         protected void FireStateChangedEvent()
@@ -311,6 +328,7 @@ namespace LuaDebugger
                 this.lineToBP.Add(bp.Line, bpsAtLine);
             }
             bpsAtLine.Add(bp);
+            RunSafely(() => SetHookForBreakpoints(false));
         }
 
         public void RemoveBreakpoint(Breakpoint bp)
@@ -320,6 +338,7 @@ namespace LuaDebugger
                 this.lineToBP.Remove(bp.Line);
             else
                 bpsAtLine.Remove(bp);
+            RunSafely(() => SetHookForBreakpoints(false));
         }
 
         public void ManualPause()
@@ -333,6 +352,7 @@ namespace LuaDebugger
 
             this.CurrentRequest = DebugRequest.Pause;
 
+            RunSafely(() => SetHookForBreakpoints(true));
             for (int timeOut = 0; this.CurrentState != DebugState.Paused && timeOut < 10; timeOut++)
                 Thread.Sleep(10);
 
@@ -416,11 +436,21 @@ namespace LuaDebugger
         public void SetHook()
         {
             ls.L.SetHook(DebugHook, LuaHookMask.Line | LuaHookMask.Call | LuaHookMask.Ret, 0);
+            HookActive = true;
         }
 
         public void RemoveHook()
         {
             ls.L.SetHook(null, LuaHookMask.None, 0);
+            HookActive = false;
+        }
+
+        public void SetHookForBreakpoints(bool overide)
+        {
+            if (overide || lineToBP.Count > 0)
+                SetHook();
+            else
+                RemoveHook();
         }
 
         protected void UnSetActiveStackFunctionIfNeccessary()
@@ -445,6 +475,8 @@ namespace LuaDebugger
             if (lvl < 0)
                 return false;
             DebugInfo i = ls.L.GetStackInfo(lvl, false);
+            if (i == null)
+                return false;
             int l = 1;
             while (true)
             {
