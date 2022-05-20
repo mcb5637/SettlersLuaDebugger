@@ -80,7 +80,6 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
             cam.Point3D = new Point3D((float)numX.Value, (float)numY.Value, (float)numZ.Value);
             cam.PitchAngle = (float)numPitch.Value;
             cam.YawAngle = (float)numYaw.Value;
-            cam.WriteToMemory();
             updateHeight();
         }
 

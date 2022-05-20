@@ -106,7 +106,6 @@
     <Compile Include="UI\CopyChangedTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Helper\IVCThreadPool.cs" />
     <Compile Include="Hooks\GameLoopHook.cs" />
     <Compile Include="Helper\Extensions.cs" />
     <Compile Include="Hooks\ErrorHook.cs" />

@@ -12,19 +12,22 @@ namespace LuaDebugger
     {
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         delegate int LuaPcallHook(IntPtr L, int nargs, int nresults, int errfunc);
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        delegate int LuaLoadHook(IntPtr L, IntPtr chunkreader, IntPtr data, IntPtr chunkname);
 
         public delegate void LuaErrorCaught(string message);
 
         static EasyHook.LocalHook hook;
+        static EasyHook.LocalHook loadHook;
 
         static Dictionary<IntPtr, LuaErrorCaught> stateErrHandler = new Dictionary<IntPtr, LuaErrorCaught>();
 
         public static bool InstallHook()
         {
-            LuaPcallHook pcallHook = new LuaPcallHook(ErrorHook.FakePcall);
-
-            hook = EasyHook.LocalHook.Create(EasyHook.LocalHook.GetProcAddress(GlobalState.LuaDll, "lua_pcall"), pcallHook, null);
+            hook = EasyHook.LocalHook.Create(EasyHook.LocalHook.GetProcAddress(GlobalState.LuaDll, "lua_pcall"), (LuaPcallHook)FakePcall, null);
             hook.ThreadACL.SetExclusiveACL(new int[] { }); // hook all threads
+            loadHook = EasyHook.LocalHook.Create(EasyHook.LocalHook.GetProcAddress(GlobalState.LuaDll, "lua_load"), (LuaLoadHook)FakeLoad, null);
+            loadHook.ThreadACL.SetExclusiveACL(new int[] { }); // hook all threads
             return true;
         }
 
@@ -36,6 +39,25 @@ namespace LuaDebugger
         public static void RemoveErrorHandler(LuaState L)
         {
             stateErrHandler.Remove(L.State);
+        }
+
+
+        [DllImport(Globals.Lua50Dll, EntryPoint = "lua_load", CallingConvention = CallingConvention.Cdecl)]
+        private static extern int Lua_load(IntPtr l, IntPtr chunkreader, IntPtr data, IntPtr chunkname);
+
+        static int FakeLoad(IntPtr L, IntPtr chunkreader, IntPtr data, IntPtr chunkname)
+        {
+            LuaState s = GlobalState.L2State[L].L;
+            int code = Lua_load(L, chunkreader, data, chunkname);
+            if (!GlobalState.CatchErrors)
+            {
+                return code;
+            }
+            if (code != 0)
+            {
+                ErrorCatcher(s);
+            }
+            return code;
         }
 
         static int FakePcall(IntPtr L, int nargs, int nresults, int errfunc)

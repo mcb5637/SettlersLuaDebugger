@@ -5,17 +5,137 @@ using System.Text;
 
 namespace LuaDebugger.Plugins.S5CutsceneEditor
 {
-    [StructLayout(LayoutKind.Sequential)]
     public class S5CameraInfo
     {
-        public float PosX;
-        public float PosY;
-        public float PosZ;
+        [StructLayout(LayoutKind.Sequential)]
+        public struct CameraInfo
+        {
+            public float LookAtX, LookAtY, LookAtZ;
+            public float Distance;
+        };
+        [StructLayout(LayoutKind.Sequential)]
+        public struct CRwCameraHandler {
+            // public int vtIObject // pointer points to icamerahandle, so we just ignore this one
+	        public int vtICameraHandle, vtICameraMovement, vtICameraSettings;
 
-        public float Distance; //should be 0
+            public bool Dirty; // 4
+            public int UpdateZMode; // >= 0 && < 4
+            public bool bScrolling;
+            public float FOV;
+            public CameraInfo CameraInfo; // 8
+            public float HorizontalAngle; // 12
+            public float VerticalAngle;
+            // there is more, but we dont need it
+        }
 
-        public float YawAngle;
-        public float PitchAngle;
+        private unsafe CRwCameraHandler* GetPointer()
+        {
+            return *(CRwCameraHandler**)(0x87EC68);
+        }
+
+        public float PosX
+        {
+            get
+            {
+                unsafe {
+                    return GetPointer()->CameraInfo.LookAtX;
+                }
+            }
+            set
+            {
+                unsafe
+                {
+                    GetPointer()->CameraInfo.LookAtX = value;
+                }
+            }
+        }
+        public float PosY
+        {
+            get
+            {
+                unsafe
+                {
+                    return GetPointer()->CameraInfo.LookAtY;
+                }
+            }
+            set
+            {
+                unsafe
+                {
+                    GetPointer()->CameraInfo.LookAtY = value;
+                }
+            }
+        }
+        public float PosZ
+        {
+            get
+            {
+                unsafe
+                {
+                    return GetPointer()->CameraInfo.LookAtZ;
+                }
+            }
+            set
+            {
+                unsafe
+                {
+                    GetPointer()->CameraInfo.LookAtZ = value;
+                }
+            }
+        }
+
+        public float Distance
+        {
+            get
+            {
+                unsafe
+                {
+                    return GetPointer()->CameraInfo.Distance;
+                }
+            }
+            set
+            {
+                unsafe
+                {
+                    GetPointer()->CameraInfo.Distance = value;
+                }
+            }
+        } //should be 0
+
+        public float YawAngle
+        {
+            get
+            {
+                unsafe
+                {
+                    return GetPointer()->HorizontalAngle;
+                }
+            }
+            set
+            {
+                unsafe
+                {
+                    GetPointer()->HorizontalAngle = value;
+                }
+            }
+        }
+        public float PitchAngle
+        {
+            get
+            {
+                unsafe
+                {
+                    return GetPointer()->VerticalAngle;
+                }
+            }
+            set
+            {
+                unsafe
+                {
+                    GetPointer()->VerticalAngle = value;
+                }
+            }
+        }
 
 
         private static IntPtr CameraInfoPointer = IntPtr.Zero;
@@ -32,19 +152,6 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
                 this.PosY = value.Y;
                 this.PosZ = value.Z;
             }
-        }
-
-        public static S5CameraInfo GetCurrentCamera()
-        {
-            if (CameraInfoPointer == IntPtr.Zero)
-                CameraInfoPointer = new IntPtr(Marshal.ReadInt32(new IntPtr(0x87EC68)) + 0x1C);
-
-            return (S5CameraInfo)Marshal.PtrToStructure(CameraInfoPointer, typeof(S5CameraInfo));
-        }
-
-        public unsafe void WriteToMemory()
-        {
-            Marshal.StructureToPtr(this, CameraInfoPointer, false);
         }
     }
 }

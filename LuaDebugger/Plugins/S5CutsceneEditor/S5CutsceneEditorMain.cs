@@ -111,7 +111,6 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
                             break;
                     }
                 Camera.Point3D = newPos;
-                Camera.WriteToMemory();
                 if (numCamContr.Visible)
                 {
                     numCamContr.updateGUI();
@@ -133,9 +132,8 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
                     Camera.SetControlMode(1);
                     Display.SetRenderSky(1);
                 ", (r, c) => { });
-                Camera = S5CameraInfo.GetCurrentCamera();
+                Camera = new S5CameraInfo();
                 Camera.PosZ += 4000;
-                Camera.WriteToMemory();
                 tmrUpdateCamera.Start();
                 joyStickCutsceneEditor.Enabled = true;
 
@@ -391,7 +389,6 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
                 Camera.Point3D = selectedFlightPoint.CamPos.Position;
                 Camera.PitchAngle = selectedFlightPoint.CamPitch;
                 Camera.YawAngle = selectedFlightPoint.CamYaw;
-                Camera.WriteToMemory();
             }
             else if (e.Location.X < (chJumpTo.Width + chProperties.Width))
             {
