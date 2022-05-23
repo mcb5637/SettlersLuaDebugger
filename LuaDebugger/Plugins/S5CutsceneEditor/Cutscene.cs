@@ -155,11 +155,13 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
                 Point3D middle_c_nex = (c.Position + nex.Position) / 2;
                 Point3D middle_c_prev = (c.Position + prev.Position) / 2;
 
-                c.OutTangent = (middle_c_nex - middle_c_prev);
-                c.InTangent = c.OutTangent;
+                Point3D t = (middle_c_nex - middle_c_prev);
+                t = t / t.Length();
+                c.InTangent = t;
+                prev.OutTangent = -t;
             }
-            pos[0].InTangent = new Point3D(0, 0, 0);
-            pos[pos.Count - 1].OutTangent = new Point3D(0, 0, 0);
+            pos[0].InTangent = new Point3D(1, 1, 1);
+            pos[pos.Count - 1].OutTangent = new Point3D(1, 1, 1);
         }
 
         // get_tangents_lookAt
@@ -170,12 +172,14 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
                 Waypoint c = pos[i];
                 Waypoint nex = pos[i + 1];
 
-                c.OutTangent = nex.Position - c.Position;
-                c.OutTangent = c.OutTangent / c.OutTangent.Length() * 100;
-                nex.InTangent = -c.OutTangent;
+                Point3D t = nex.Position - c.Position;
+                t = t / t.Length();
+
+                c.OutTangent = t;
+                nex.InTangent = -t;
             }
-            pos[0].InTangent = new Point3D(0, 0, 0);
-            pos[pos.Count - 1].OutTangent = new Point3D(0, 0, 0);
+            pos[0].InTangent = new Point3D(1, 1, 1);
+            pos[pos.Count - 1].OutTangent = new Point3D(1, 1, 1);
         }
 
         public FlightXML GetXML(int startFromPoint)
@@ -266,8 +270,8 @@ namespace LuaDebugger.Plugins.S5CutsceneEditor
                 new XElement("Time", this.Time.ToString("e", CultureInfo.InvariantCulture)),
                 new XElement("Data",
                     new XElement("Position", PointToXML(this.Position)),
-                    new XElement("InTangent", PointToXML(this.Position.SubtractAndScale(this.InTangent, 1))),
-                    new XElement("OutTangent", PointToXML(this.OutTangent.SubtractAndScale(this.Position, 1)))
+                    new XElement("InTangent", PointToXML(this.InTangent)),
+                    new XElement("OutTangent", PointToXML(this.OutTangent))
                     ));
 
         }

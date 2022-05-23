@@ -60,14 +60,18 @@ namespace LuaDebugger
                 string result;
                 try
                 {
+                    bool o = GlobalState.CatchErrors;
                     try
                     {
+                        GlobalState.CatchErrors = false;
                         L.LoadBuffer(asExpression, "from console");
                     }
                     catch (LuaException)
                     {
+                        GlobalState.CatchErrors = o;
                         L.LoadBuffer(asStatement, "from console");
                     }
+                    GlobalState.CatchErrors = o;
                     int stackTop = L.Top;
                     L.PCall(0, L.MULTIRETURN);
                     int nResults = 1 + L.Top - stackTop;
