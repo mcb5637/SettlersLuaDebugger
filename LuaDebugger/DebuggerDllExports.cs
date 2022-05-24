@@ -91,6 +91,10 @@ namespace LuaDebugger
                 GlobalState.LuaStates.Add(ls);
                 GlobalState.UpdateStatesView = true;
             }
+            while (GlobalState.UpdateStatesView)
+            {
+                Thread.Sleep(100);
+            }
         }
 #elif S6
         [DllExport("_AddLuaState@8", CallingConvention = CallingConvention.StdCall)]
@@ -104,6 +108,10 @@ namespace LuaDebugger
                 GlobalState.L2State.Add(L, ls);
                 GlobalState.LuaStates.Add(ls);
                 GlobalState.UpdateStatesView = true;
+            }
+            while (GlobalState.UpdateStatesView)
+            {
+                Thread.Sleep(100);
             }
         }
 #endif

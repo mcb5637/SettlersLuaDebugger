@@ -45,9 +45,14 @@ namespace LuaDebugger
         [DllImport(Globals.Lua50Dll, EntryPoint = "lua_load", CallingConvention = CallingConvention.Cdecl)]
         private static extern int Lua_load(IntPtr l, IntPtr chunkreader, IntPtr data, IntPtr chunkname);
 
+        [DllImport(Globals.Lua50Dll, EntryPoint = "lua_pcall", CallingConvention = CallingConvention.Cdecl)]
+        private static extern int Lua_pcall(IntPtr l, int nargs, int nres, int errfunc);
+
         static int FakeLoad(IntPtr L, IntPtr chunkreader, IntPtr data, IntPtr chunkname)
         {
-            LuaState s = GlobalState.L2State[L].L;
+            if (!GlobalState.L2State.TryGetValue(L, out LuaStateWrapper w))
+                return Lua_load(L, chunkreader, data, chunkname);
+            LuaState s = w.L;
             int code = Lua_load(L, chunkreader, data, chunkname);
             if (!GlobalState.CatchErrors)
             {
@@ -62,10 +67,12 @@ namespace LuaDebugger
 
         static int FakePcall(IntPtr L, int nargs, int nresults, int errfunc)
         {
-            LuaState s = GlobalState.L2State[L].L;
+            if (!GlobalState.L2State.TryGetValue(L, out LuaStateWrapper w))
+                return Lua_pcall(L, nargs, nresults, errfunc);
+            LuaState s = w.L;
             if (!GlobalState.CatchErrors)
             {
-                return s.PCall_Debug(nargs, nresults, errfunc);
+                return Lua_pcall(L, nargs, nresults, errfunc);
             }
             int t = s.Top;
 
@@ -74,7 +81,7 @@ namespace LuaDebugger
             s.Insert(ecpos);
 
             t = s.Top;
-            int r = s.PCall_Debug(nargs, nresults, ecpos);
+            int r = Lua_pcall(L, nargs, nresults, ecpos);
             t = s.Top;
 
             if (r != 0)
