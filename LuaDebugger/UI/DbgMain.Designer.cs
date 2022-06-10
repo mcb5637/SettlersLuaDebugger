@@ -112,7 +112,7 @@
             this.toolStripMenuItem4.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
             this.toolStripMenuItem4.Name = "toolStripMenuItem4";
             this.toolStripMenuItem4.Size = new System.Drawing.Size(57, 23);
-            this.toolStripMenuItem4.Text = "© 2017";
+            this.toolStripMenuItem4.Text = "© 2022";
             // 
             // stepOutToolStripMenuItem
             // 

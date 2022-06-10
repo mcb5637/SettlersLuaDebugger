@@ -219,12 +219,12 @@ namespace LuaDebugger
                     th.CurrentState = DebugState.Running;
                     th.FireStateChangedEvent();
                 }
-            }
+            } // event == line
             else if (th.CurrentRequest == DebugRequest.Pause || th.CurrentRequest == DebugRequest.StepIn)
                 th.NormalBreak();
             else if (th.CurrentRequest == DebugRequest.StepToLevel && th.callStack <= th.targetCallStackLevel)
                 th.NormalBreak();
-            else
+            else // request == resume
             {
                 List<Breakpoint> bpsAtLine;
                 if (!th.lineToBP.TryGetValue(i.CurrentLine, out bpsAtLine))
@@ -262,6 +262,7 @@ namespace LuaDebugger
         {
             this.CurrentState = DebugState.Paused;
             this.CurrentStackTrace = new LuaStackTrace(this.ls, 1); //skip LuaDebugger.Break()
+            callStack = CurrentStackTrace.Count + 1;
             SetHookForBreakpoints(true);
             FreezeGame();
         }

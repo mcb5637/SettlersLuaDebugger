@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 
 
 [assembly: AssemblyCompany("d3 Inc.")]
-[assembly: AssemblyCopyright("Copyright yoq © 2018")]
+[assembly: AssemblyCopyright("Copyright yoq/mcb © 2022")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
