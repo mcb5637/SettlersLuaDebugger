@@ -18,12 +18,14 @@ namespace LuaDebugger
         {
             get { return this.lfiStack.Count; }
         }
+        public readonly int LevelOffset;
 
         public LuaStackTrace(LuaStateWrapper ls) : this(ls, 0) { }
 
         public LuaStackTrace(LuaStateWrapper ls, int startLevel)
         {
             lfiStack = new List<LuaFunctionInfo>();
+            LevelOffset = startLevel;
 
             for (int level = startLevel; ; level++)
             {

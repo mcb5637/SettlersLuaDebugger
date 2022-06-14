@@ -50,9 +50,20 @@ namespace LuaDebugger
             {
                 int top = L.Top;
 
-                if (uivarname && DebugEngine.IsLocalOrUpvalueInActiveStack(expression))
+                if (uivarname)
                 {
-                    expression = $"LuaDebugger.GetLocal({DebugEngine.CurrentActiveFunction + 2}, '{expression}')";
+                    string[] expr = expression.Split(new char[] { '.' }, 2);
+                    if (expr.Length > 0)
+                    {
+                        if (DebugEngine.IsLocalOrUpvalueInActiveStack(expr[0]))
+                        {
+                            expression = $"LuaDebugger.GetLocal({DebugEngine.CurrentActiveFunction + 2}, '{expr[0]}')";
+                            if (expr.Length > 1)
+                            {
+                                expression += "." + expr[1];
+                            }
+                        }
+                    }
                 }
                 string asStatement = expression;
                 string asExpression = "return " + expression;

@@ -150,6 +150,7 @@ namespace LuaDebugger
                     L.GetUpvalue(-1, l);
                     return 1;
                 }
+                l++;
             }
             return 0;
         }
@@ -190,6 +191,7 @@ namespace LuaDebugger
                     L.SetUpvalue(-2, l);
                     return 0;
                 }
+                l++;
             }
             return 0;
         }
@@ -502,6 +504,7 @@ namespace LuaDebugger
                     ls.L.Pop(1);
                     return true;
                 }
+                l++;
             }
             ls.L.Pop(1);
             return false;

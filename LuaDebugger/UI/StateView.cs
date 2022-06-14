@@ -103,7 +103,7 @@ namespace LuaDebugger
                 file.Arrow.NormalLineNr = lfi.Line;
                 file.Arrow.IsEnabled = true;
                 SwitchToFile(file, lfi.Line);
-                this.ls.DebugEngine.SetActiveStackFunction(lfi, n);
+                this.ls.DebugEngine.SetActiveStackFunction(lfi, n + debugEngine.CurrentStackTrace.LevelOffset);
             }
             else
                 ShowSourceUnavailable();
