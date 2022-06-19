@@ -31,8 +31,13 @@ namespace LuaDebugger
             return true;
         }
 
+        private const string ErrorHandlerRegKey = "LuaDebugger_ErrorHandler";
+
         public static void SetErrorHandler(LuaState L, LuaErrorCaught callback)
         {
+            L.Push(ErrorHandlerRegKey);
+            L.Push(ErrorCatcher);
+            L.SetTableRaw(L.REGISTRYINDEX);
             stateErrHandler.Add(L.State, callback);
         }
 
@@ -74,15 +79,13 @@ namespace LuaDebugger
             {
                 return Lua_pcall(L, nargs, nresults, errfunc);
             }
-            int t = s.Top;
 
-            s.Push(ErrorCatcher);
+            s.Push(ErrorHandlerRegKey);
+            s.GetTableRaw(s.REGISTRYINDEX);
             int ecpos = s.ToAbsoluteIndex(-nargs - 2);
             s.Insert(ecpos);
 
-            t = s.Top;
             int r = Lua_pcall(L, nargs, nresults, ecpos);
-            t = s.Top;
 
             if (r != 0)
             {
@@ -93,7 +96,6 @@ namespace LuaDebugger
             }
 
             s.Remove(ecpos);
-            t = s.Top;
 
             return 0;
         }

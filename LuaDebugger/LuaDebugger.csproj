@@ -44,7 +44,6 @@
     <DefineConstants>TRACE;DEBUG;S5</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <LangVersion>7.3</LangVersion>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
@@ -82,6 +81,74 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'RelS5|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\RelS5\</OutputPath>
+    <DefineConstants>S5</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'RelS5|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\RelS5\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;S5</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'RelS5|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\RelS5\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;S5</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'RelS6|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\RelS6\</OutputPath>
+    <DefineConstants>S6</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'RelS6|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\RelS6\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;S6</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'RelS6|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\RelS6\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;S6</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="EasyHook, Version=2.7.7097.0, Culture=neutral, PublicKeyToken=4b580fca19d0b0c5, processorArchitecture=MSIL">
       <HintPath>..\packages\EasyHook.2.7.7097\lib\net40\EasyHook.dll</HintPath>
@@ -115,8 +182,8 @@
     <Compile Include="Helper\MySyntaxModeProvider.cs" />
     <Compile Include="Helper\Win32Window.cs" />
     <Compile Include="LuaSharp\LuaState.cs" />
-    <Compile Include="LuaSharp\LuaState50.cs" Condition=" '$(Configuration)' == 'DebugS5' " />
-    <Compile Include="LuaSharp\LuaState51.cs" Condition=" '$(Configuration)' == 'DebugS6' " />
+    <Compile Include="LuaSharp\LuaState50.cs" Condition=" '$(Configuration)' == 'DebugS5' or '$(Configuration)' == 'RelS5' " />
+    <Compile Include="LuaSharp\LuaState51.cs" Condition=" '$(Configuration)' == 'DebugS6' or '$(Configuration)' == 'RelS6' " />
     <Compile Include="LuaStackTrace.cs" />
     <Compile Include="Plugins\PluginSystem.cs" />
     <Compile Include="Plugins\S5CutsceneEditor\Cutscene.cs" />
@@ -293,7 +360,18 @@
    xcopy /y /i "$(TargetDir)LuaDebugger.dll" "$(SolutionDir)dbgenv\"
    xcopy /y /i "$(TargetDir)LuaDebugger.dll" "$(SolutionDir)LuaDebuggerStarter\Unpack\"
    xcopy /y /i "$(TargetDir)LuaDebugger.dll" "C:\games\dedk\dedk_mp\bin\LuaDebuggerOrig.dll"
-) ELSE (
+)
+if "$(ConfigurationName)" == "RelS5" (
+   xcopy /y /i "$(TargetDir)LuaDebugger.dll" "$(SolutionDir)dbgenv\"
+   xcopy /y /i "$(TargetDir)LuaDebugger.dll" "$(SolutionDir)LuaDebuggerStarter\Unpack\"
+   xcopy /y /i "$(TargetDir)LuaDebugger.dll" "C:\games\dedk\dedk_mp\bin\LuaDebuggerOrig.dll"
+)
+if "$(ConfigurationName)" == "DebugS6" (
+   copy /y "$(TargetPath)" "$(TargetDir)BBLuaDebugger.dll"
+   xcopy /y /i "$(TargetDir)BBLuaDebugger.dll" "$(SolutionDir)dbgenv\base\_dbg\bin\release\"
+   xcopy /y /i "$(TargetDir)BBLuaDebugger.dll" "$(SolutionDir)LuaDebuggerStarter\Unpack\"
+)
+if "$(ConfigurationName)" == "RelS6" (
    copy /y "$(TargetPath)" "$(TargetDir)BBLuaDebugger.dll"
    xcopy /y /i "$(TargetDir)BBLuaDebugger.dll" "$(SolutionDir)dbgenv\base\_dbg\bin\release\"
    xcopy /y /i "$(TargetDir)BBLuaDebugger.dll" "$(SolutionDir)LuaDebuggerStarter\Unpack\"
