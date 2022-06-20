@@ -19,7 +19,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'DebugS5|x86' ">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x86\DebugS5\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;S5</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;S5,UNSAFE</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
@@ -30,7 +30,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'DebugS6|x86' ">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x86\DebugS6\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;S6</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;S6,UNSAFE</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
@@ -84,7 +84,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'RelS5|x86'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x86\RelS5\</OutputPath>
-    <DefineConstants>S5</DefineConstants>
+    <DefineConstants>S5,UNSAFE</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
@@ -118,7 +118,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'RelS6|x86'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x86\RelS6\</OutputPath>
-    <DefineConstants>S6</DefineConstants>
+    <DefineConstants>S6,UNSAFE</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
