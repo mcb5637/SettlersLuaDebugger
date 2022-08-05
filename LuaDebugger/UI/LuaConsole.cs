@@ -86,7 +86,7 @@ namespace LuaDebugger
                     tbInput.ReadOnly = false;
                     EndWait();
                 });
-            }, true);
+            }, uivarname);
         }
 
         public void AppendText(string text)
