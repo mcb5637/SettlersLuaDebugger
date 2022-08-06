@@ -99,7 +99,7 @@
     <DefineConstants>TRACE;DEBUG;S5</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <LangVersion>7.3</LangVersion>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
@@ -110,7 +110,7 @@
     <DefineConstants>TRACE;DEBUG;S5</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <LangVersion>7.3</LangVersion>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
@@ -133,7 +133,7 @@
     <DefineConstants>TRACE;DEBUG;S6</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <LangVersion>7.3</LangVersion>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
@@ -144,7 +144,7 @@
     <DefineConstants>TRACE;DEBUG;S6</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <LangVersion>7.3</LangVersion>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
@@ -388,7 +388,8 @@ xcopy /y /i "$(TargetDir)ICSharpCode.TextEditor.dll" "$(SolutionDir)LuaDebuggerS
     <DllExportMetaLibName>DllExport.dll</DllExportMetaLibName>
     <DllExportNamespace>LuaDebugger</DllExportNamespace>
     <DllExportDDNSCecil>false</DllExportDDNSCecil>
-    <PlatformTarget>x86</PlatformTarget>
+    <DllExportSkipOnAnyCpu>false</DllExportSkipOnAnyCpu>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DllExportOrdinalsBase>1</DllExportOrdinalsBase>
     <DllExportGenExpLib>false</DllExportGenExpLib>
     <DllExportOurILAsm>false</DllExportOurILAsm>
