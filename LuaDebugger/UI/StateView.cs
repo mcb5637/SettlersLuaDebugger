@@ -56,6 +56,7 @@ namespace LuaDebugger
             mapScripts = this.tvFiles.Nodes["MapScripts"];
             internalScripts = this.tvFiles.Nodes["Internal"];
             this.tvFiles.TreeViewNodeSorter = new MyNodeSorter(mapScripts);
+            LuaConsole.CB_Locals.Visible = false;
         }
 
         void debugEngine_OnDebugStateChange(object sender, DebugStateChangedEventArgs e)
@@ -72,11 +73,13 @@ namespace LuaDebugger
                 }
                 this.errorView.Visible2 = false;
                 this.stackTraceView.Visible = false;
+                LuaConsole.CB_Locals.Visible = false;
             }
             else
             {
                 this.stackTraceView.ShowStackTrace(this.debugEngine.CurrentStackTrace);
                 this.stackTraceView.Visible = true;
+                LuaConsole.CB_Locals.Visible = true;
 
                 if (e.State == DebugState.CaughtError)
                 {

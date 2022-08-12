@@ -329,8 +329,8 @@
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Label label10;
-        private ErrorView errorView;
-        private StackTraceView stackTraceView;
-        public LuaConsole LuaConsole;
+        private LuaDebugger.ErrorView errorView;
+        private LuaDebugger.StackTraceView stackTraceView;
+        public LuaDebugger.LuaConsole LuaConsole;
     }
 }

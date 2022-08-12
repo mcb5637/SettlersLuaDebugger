@@ -125,6 +125,20 @@ namespace LuaDebugger
                 throw new LuaException("invalid stack level");
             if (L.IsCFunction(-1))
                 throw new LuaException("not allowed to access locals/upvalues of c functions");
+            if (L.IsNumber(2))
+            {
+                int lv = L.CheckInt(2);
+                if (lv > 0)
+                {
+                    L.GetLocal(i, lv);
+                    return 1;
+                }
+                else
+                {
+                    L.GetUpvalue(-1, -lv);
+                    return 1;
+                }
+            }
             string name = L.CheckString(2);
             int l = 1;
             while (true)
@@ -163,8 +177,24 @@ namespace LuaDebugger
                 throw new LuaException("invalid stack level");
             if (L.IsCFunction(-1))
                 throw new LuaException("not allowed to access locals/upvalues of c functions");
-            string name = L.CheckString(2);
             L.CheckAny(3);
+            if (L.IsNumber(2))
+            {
+                int lv = L.CheckInt(2);
+                if (lv > 0)
+                {
+                    L.PushValue(3);
+                    L.SetLocal(i, lv);
+                    return 1;
+                }
+                else
+                {
+                    L.PushValue(3);
+                    L.SetUpvalue(-2, -lv);
+                    return 1;
+                }
+            }
+            string name = L.CheckString(2);
             int l = 1;
             while (true)
             {

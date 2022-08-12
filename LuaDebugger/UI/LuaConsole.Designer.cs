@@ -31,6 +31,7 @@
             this.components = new System.ComponentModel.Container();
             this.tbInput = new LuaDebugger.CopyChangedTextBox();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.CB_Locals = new System.Windows.Forms.CheckBox();
             this.tbSpinner = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
             this.tbPrompt = new System.Windows.Forms.TextBox();
@@ -57,6 +58,7 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.CB_Locals);
             this.panel1.Controls.Add(this.tbSpinner);
             this.panel1.Controls.Add(this.button1);
             this.panel1.Controls.Add(this.tbInput);
@@ -68,6 +70,20 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(471, 124);
             this.panel1.TabIndex = 2;
+            // 
+            // CB_Locals
+            // 
+            this.CB_Locals.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.CB_Locals.AutoSize = true;
+            this.CB_Locals.BackColor = System.Drawing.SystemColors.Control;
+            this.CB_Locals.Checked = true;
+            this.CB_Locals.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.CB_Locals.Location = new System.Drawing.Point(401, 26);
+            this.CB_Locals.Name = "CB_Locals";
+            this.CB_Locals.Size = new System.Drawing.Size(53, 17);
+            this.CB_Locals.TabIndex = 5;
+            this.CB_Locals.Text = "locals";
+            this.CB_Locals.UseVisualStyleBackColor = false;
             // 
             // tbSpinner
             // 
@@ -175,5 +191,6 @@
         private System.Windows.Forms.Timer tmrSpinner;
         private System.Windows.Forms.TextBox tbSpinner;
         private System.Windows.Forms.Timer tmrWaitForSpinner;
+        internal System.Windows.Forms.CheckBox CB_Locals;
     }
 }

@@ -64,7 +64,7 @@ namespace LuaDebugger
             rtbOutput.BackColor = bgCol;
         }
 
-        public void RunCommand(string cmd, bool uivarname = false)
+        public void RunCommand(string cmd, bool locals = false)
         {
 
             tbInput.ReadOnly = true;
@@ -86,7 +86,7 @@ namespace LuaDebugger
                     tbInput.ReadOnly = false;
                     EndWait();
                 });
-            }, uivarname);
+            }, locals);
         }
 
         public void AppendText(string text)
@@ -144,7 +144,7 @@ namespace LuaDebugger
                 tbInput.Text = "";
 
                 if (cmd != "")
-                    RunCommand(cmd);
+                    RunCommand(cmd, CB_Locals.Visible && CB_Locals.Checked);
                 else
                     this.AppendText(">");
 

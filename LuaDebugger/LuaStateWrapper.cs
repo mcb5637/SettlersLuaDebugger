@@ -44,30 +44,65 @@ namespace LuaDebugger
             this.DebugEngine = new DebugEngine(this);
         }
 
-        public void EvaluateLua(string expression, Action<string, string> onDone, bool uivarname = false)
+        public void EvaluateLua(string expression, Action<string, string> onDone, bool locals = false)
         {
             DebugEngine.RunSafely(() =>
             {
                 int top = L.Top;
 
-                if (uivarname)
+                string pre = "";
+                string post = "";
+                string var = "r";
+
+                if (locals && DebugEngine.CurrentActiveFunction >= 0)
                 {
-                    string[] expr = expression.Split(new char[] { '.' }, 2);
-                    if (expr.Length > 0)
+                    DebugInfo i = L.GetStackInfo(DebugEngine.CurrentActiveFunction, false);
+                    if (i != null)
                     {
-                        if (DebugEngine.IsLocalOrUpvalueInActiveStack(expr[0]))
+                        List<string> variablestaken = new List<string>();
+                        int l = 1;
+                        while (true)
                         {
-                            expression = $"LuaDebugger.GetLocal({DebugEngine.CurrentActiveFunction + 2}, '{expr[0]}')";
-                            if (expr.Length > 1)
+                            string n = L.GetLocalName(i, l);
+                            if (n == null)
+                                break;
+                            if (variablestaken.Contains(n))
                             {
-                                expression += "." + expr[1];
+                                l++;
+                                continue;
                             }
+                            variablestaken.Add(n);
+                            pre += $"local {n} = LuaDebugger.GetLocal({DebugEngine.CurrentActiveFunction + 2}, {l})\r\n";
+                            post += $"LuaDebugger.SetLocal({DebugEngine.CurrentActiveFunction + 2}, {l}, {n})\r\n";
+                            l++;
+                        }
+                        l = 1;
+                        L.PushDebugInfoFunc(i);
+                        while (true)
+                        {
+                            string n = L.GetUpvalueName(-1, l);
+                            if (n == null)
+                                break;
+                            if (variablestaken.Contains(n))
+                            {
+                                l++;
+                                continue;
+                            }
+                            variablestaken.Add(n);
+                            pre += $"local {n} = LuaDebugger.GetLocal({DebugEngine.CurrentActiveFunction + 2}, -{l})\r\n";
+                            post += $"LuaDebugger.SetLocal({DebugEngine.CurrentActiveFunction + 2}, -{l}, {n})\r\n";
+                            l++;
+                        }
+                        L.Pop(1);
+                        while (variablestaken.Contains(var))
+                        {
+                            var += "r";
                         }
                     }
                 }
-                string asStatement = expression;
-                string asExpression = "return " + expression;
-
+                string asStatement = $"{pre}local {var} = function()\r\n{expression}\r\nend\r\n{var} = {{{var}()}}\r\n{post}return unpack(r)";
+                string asExpression = $"{pre}local {var} = function()\r\nreturn {expression}\r\nend\r\n{var} = {{{var}()}}\r\n{post}return unpack(r)";
+                
                 string result;
                 try
                 {
