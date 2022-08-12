@@ -44,6 +44,13 @@ namespace LuaDebugger
             this.DebugEngine = new DebugEngine(this);
         }
 
+
+        private static readonly Regex IdentifierRegex = new Regex("^[a-zA-Z_][a-zA-Z_0-9]*$");
+        private static bool IsIdentifier(string s)
+        {
+            return IdentifierRegex.IsMatch(s);
+        }
+
         public void EvaluateLua(string expression, Action<string, string> onDone, bool locals = false)
         {
             DebugEngine.RunSafely(() =>
@@ -66,7 +73,7 @@ namespace LuaDebugger
                             string n = L.GetLocalName(i, l);
                             if (n == null)
                                 break;
-                            if (variablestaken.Contains(n))
+                            if (variablestaken.Contains(n) || !IsIdentifier(n))
                             {
                                 l++;
                                 continue;
@@ -83,7 +90,7 @@ namespace LuaDebugger
                             string n = L.GetUpvalueName(-1, l);
                             if (n == null)
                                 break;
-                            if (variablestaken.Contains(n))
+                            if (variablestaken.Contains(n) || !IsIdentifier(n))
                             {
                                 l++;
                                 continue;
