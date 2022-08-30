@@ -237,12 +237,16 @@ namespace LuaDebugger
             return 1;
         }
 
-        protected static void DebugHook(LuaState L, DebugInfo i)
+#if S5
+        protected unsafe static void DebugHook(LuaState50 L, LuaState50.LuaDebugRecord* i)
+#else
+        protected unsafe static void DebugHook(LuaState51 L, LuaState51.LuaDebugRecord* i)
+#endif
         {
             DebugEngine th = GlobalState.L2State[L.State].DebugEngine;
-            if (i.Event == LuaHook.Call)
+            if (i->debugEvent == LuaHook.Call)
                 th.callStack++;
-            else if (i.Event == LuaHook.Ret || i.Event == LuaHook.TailRet)
+            else if (i->debugEvent == LuaHook.Ret || i->debugEvent == LuaHook.TailRet)
             {
                 th.callStack--;
                 if (th.callStack == 0 && (th.CurrentRequest == DebugRequest.StepIn || th.CurrentRequest == DebugRequest.StepToLevel))
@@ -259,11 +263,12 @@ namespace LuaDebugger
             else // request == resume
             {
                 List<Breakpoint> bpsAtLine;
-                if (!th.lineToBP.TryGetValue(i.CurrentLine, out bpsAtLine))
+                if (!th.lineToBP.TryGetValue(L.HookGetLineNumber(i), out bpsAtLine))
                     return;
+                L.HookFillInfo(i);
                 foreach (Breakpoint bp in bpsAtLine)
                 {
-                    if (bp.File.Filename == i.Source)
+                    if (bp.File.Filename == ((IntPtr)i->source).MarshalToString())
                     {
                         th.NormalBreak();
                         break;
@@ -466,9 +471,13 @@ namespace LuaDebugger
             this.surpressStateChangedEvent = false;
         }
 
-        public void SetHook()
+        public unsafe void SetHook()
         {
-            ls.L.SetHook(DebugHook, LuaHookMask.Line | LuaHookMask.Call | LuaHookMask.Ret, 0);
+#if S5
+            ((LuaState50)ls.L).SetHook(DebugHook, LuaHookMask.Line | LuaHookMask.Call | LuaHookMask.Ret, 0);
+#else
+            ((LuaState51)ls.L).SetHook(DebugHook, LuaHookMask.Line | LuaHookMask.Call | LuaHookMask.Ret, 0);
+#endif
             HookActive = true;
         }
 
