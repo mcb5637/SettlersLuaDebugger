@@ -115,43 +115,41 @@ namespace LuaDebugger
             File.WriteAllText(file, name + " = " + txt);
             return 0;
         }
-
-        [LuaLibFunction("GetLocal")]
-        public static int GetLocal(LuaState L)
+        [LuaLibFunction("SearchLocal")]
+        public static int SearchLocal(LuaState L)
         {
-            int lvl = L.CheckInt(1);
-            DebugInfo i = L.GetStackInfo(lvl, true);
-            if (i == null)
-                throw new LuaException("invalid stack level");
+            DebugInfo i = null;
+            if (L.IsNumber(1))
+            {
+                int lvl = L.CheckInt(1);
+                i = L.GetStackInfo(lvl, true);
+                if (i == null)
+                    throw new LuaException("invalid stack level");
+            }
+            else
+            {
+                L.CheckType(1, LuaType.Function);
+                L.PushValue(1);
+            }
             if (L.IsCFunction(-1))
                 throw new LuaException("not allowed to access locals/upvalues of c functions");
-            if (L.IsNumber(2))
-            {
-                int lv = L.CheckInt(2);
-                if (lv > 0)
-                {
-                    L.GetLocal(i, lv);
-                    return 1;
-                }
-                else
-                {
-                    L.GetUpvalue(-1, -lv);
-                    return 1;
-                }
-            }
             string name = L.CheckString(2);
             int l = 1;
-            while (true)
+            if (i != null)
             {
-                string ln = L.GetLocalName(i, l);
-                if (ln == null)
-                    break;
-                if (ln.Equals(name))
+                while (true)
                 {
-                    L.GetLocal(i, l);
-                    return 1;
+                    string ln = L.GetLocalName(i, l);
+                    if (ln == null)
+                        break;
+                    if (ln.Equals(name))
+                    {
+                        L.GetLocal(i, l);
+                        L.Push(l);
+                        return 2;
+                    }
+                    l++;
                 }
-                l++;
             }
             l = 1;
             while (true)
@@ -162,11 +160,26 @@ namespace LuaDebugger
                 if (up.Equals(name))
                 {
                     L.GetUpvalue(-1, l);
-                    return 1;
+                    L.Push(-l);
+                    return 2;
                 }
                 l++;
             }
             return 0;
+        }
+        [LuaLibFunction("GetLocal")]
+        public static int GetLocal(LuaState L)
+        {
+            int lvl = L.CheckInt(1);
+            DebugInfo i = L.GetStackInfo(lvl, true);
+            if (i == null)
+                throw new LuaException("invalid stack level");
+            if (L.IsCFunction(-1))
+                throw new LuaException("not allowed to access locals/upvalues of c functions");
+            int lv = L.CheckInt(2);
+            L.GetLocal(i, lv);
+            L.Push(L.GetLocalName(i, lv));
+            return 2;
         }
         [LuaLibFunction("SetLocal")]
         public static int SetLocal(LuaState L)
@@ -178,51 +191,53 @@ namespace LuaDebugger
             if (L.IsCFunction(-1))
                 throw new LuaException("not allowed to access locals/upvalues of c functions");
             L.CheckAny(3);
-            if (L.IsNumber(2))
+            int lv = L.CheckInt(2);
+            L.PushValue(3);
+            L.SetLocal(i, lv);
+            return 0;
+        }
+        [LuaLibFunction("GetUpvalue")]
+        public static int GetUpvalue(LuaState L)
+        {
+            if (L.IsNumber(1))
             {
-                int lv = L.CheckInt(2);
-                if (lv > 0)
-                {
-                    L.PushValue(3);
-                    L.SetLocal(i, lv);
-                    return 1;
-                }
-                else
-                {
-                    L.PushValue(3);
-                    L.SetUpvalue(-2, -lv);
-                    return 1;
-                }
+                int lvl = L.CheckInt(1);
+                DebugInfo i = L.GetStackInfo(lvl, true);
+                if (i == null)
+                    throw new LuaException("invalid stack level");
             }
-            string name = L.CheckString(2);
-            int l = 1;
-            while (true)
+            else
             {
-                string ln = L.GetLocalName(i, l);
-                if (ln == null)
-                    break;
-                if (ln.Equals(name))
-                {
-                    L.PushValue(3);
-                    L.SetLocal(i, l);
-                    return 0;
-                }
-                l++;
+                L.CheckType(1, LuaType.Function);
+                L.PushValue(1);
             }
-            l = 1;
-            while (true)
+            if (L.IsCFunction(-1))
+                throw new LuaException("not allowed to access locals/upvalues of c functions");
+            int lv = L.CheckInt(2);
+            L.GetUpvalue(-1, lv);
+            L.Push(L.GetUpvalueName(-2, lv));
+            return 2;
+        }
+        [LuaLibFunction("SetUpvalue")]
+        public static int SetUpvalue(LuaState L)
+        {
+            if (L.IsNumber(1))
             {
-                string up = L.GetUpvalueName(-1, l);
-                if (up == null)
-                    break;
-                if (up.Equals(name))
-                {
-                    L.PushValue(3);
-                    L.SetUpvalue(-2, l);
-                    return 0;
-                }
-                l++;
+                int lvl = L.CheckInt(1);
+                DebugInfo i = L.GetStackInfo(lvl, true);
+                if (i == null)
+                    throw new LuaException("invalid stack level");
             }
+            else
+            {
+                L.CheckType(1, LuaType.Function);
+                L.PushValue(1);
+            }
+            if (L.IsCFunction(-1))
+                throw new LuaException("not allowed to access locals/upvalues of c functions");
+            int lv = L.CheckInt(2);
+            L.PushValue(3);
+            L.SetUpvalue(-2, lv);
             return 0;
         }
         [LuaLibFunction("HandleXPCallErrorMessage")]

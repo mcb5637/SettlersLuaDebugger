@@ -96,8 +96,8 @@ namespace LuaDebugger
                                 continue;
                             }
                             variablestaken.Add(n);
-                            pre += $"local {n} = LuaDebugger.GetLocal({DebugEngine.CurrentActiveFunction + 2}, -{l})\r\n";
-                            post += $"LuaDebugger.SetLocal({DebugEngine.CurrentActiveFunction + 2}, -{l}, {n})\r\n";
+                            pre += $"local {n} = LuaDebugger.GetUpvalue({DebugEngine.CurrentActiveFunction + 2}, {l})\r\n";
+                            post += $"LuaDebugger.SetUpvalue({DebugEngine.CurrentActiveFunction + 2}, {l}, {n})\r\n";
                             l++;
                         }
                         L.Pop(1);
@@ -107,8 +107,8 @@ namespace LuaDebugger
                         }
                     }
                 }
-                string asStatement = $"{pre}local {var} = function()\r\n{expression}\r\nend\r\n{var} = {{{var}()}}\r\n{post}return unpack(r)";
-                string asExpression = $"{pre}local {var} = function()\r\nreturn {expression}\r\nend\r\n{var} = {{{var}()}}\r\n{post}return unpack(r)";
+                string asStatement = $"{pre}local {var} = function()\r\n{expression}\r\nend\r\n{var} = {{{var}()}}\r\n{post}return unpack({var})";
+                string asExpression = $"{pre}local {var} = function()\r\nreturn {expression}\r\nend\r\n{var} = {{{var}()}}\r\n{post}return unpack({var})";
                 
                 string result;
                 try
