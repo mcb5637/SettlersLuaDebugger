@@ -312,11 +312,12 @@ namespace LuaDebugger
 
         public void BreakFromGameEngine()
         {
-            this.CurrentState = DebugState.Paused;
-            this.CurrentStackTrace = new LuaStackTrace(this.ls, 1); //skip LuaDebugger.Break()
-            callStack = CurrentStackTrace.Count + 1;
+            //this.CurrentState = DebugState.Paused;
+            CurrentRequest = DebugRequest.Pause;
+            this.CurrentStackTrace = new LuaStackTrace(this.ls); //skip LuaDebugger.Break()
+            callStack = CurrentStackTrace.Count;
             SetHookForBreakpoints(true);
-            FreezeGame();
+            //FreezeGame();
         }
 
         protected void NormalBreak()
