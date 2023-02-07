@@ -365,6 +365,7 @@ if "$(ConfigurationName)" == "RelS5" (
    xcopy /y /i "$(TargetDir)LuaDebugger.dll" "$(SolutionDir)dbgenv\"
    xcopy /y /i "$(TargetDir)LuaDebugger.dll" "$(SolutionDir)LuaDebuggerStarter\Unpack\"
    xcopy /y /i "$(TargetDir)LuaDebugger.dll" "C:\games\dedk\dedk_mp\bin\LuaDebuggerOrig.dll"
+   xcopy /y /i "$(TargetDir)LuaDebugger.dll" "C:\games\dedk\dedk_mp\bin\LuaDebuggerFile.dll"
 )
 if "$(ConfigurationName)" == "DebugS6" (
    copy /y "$(TargetPath)" "$(TargetDir)BBLuaDebugger.dll"
