@@ -17,7 +17,7 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision 
 
-[assembly: AssemblyVersion("0.6.2")]
+[assembly: AssemblyVersion("0.6.3")]
 
 public static class VersionHelper
 {

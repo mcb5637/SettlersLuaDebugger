@@ -83,12 +83,69 @@ namespace LuaDebugger
             // set hook, but we cannot have breakpoints here already
         }
 
+#if S5
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate void IgnoreForSaves(IntPtr p);
+        static private bool AddedLuaDebuggerToNotSave = false;
+#else
+
+        [DllImport(Globals.Lua51Dll, EntryPoint = "lua_pushcclosure", CallingConvention = CallingConvention.Cdecl)]
+        private static extern void Lua_pushcclosure_(IntPtr l, IntPtr f, int n);
+#endif
+
+        public const string DebuggerGlobal = "LuaDebugger";
         protected void RegisterLibFunctions()
         {
-            ls.L.Push("LuaDebugger");
-            ls.L.NewTable();
+            int top = ls.L.Top;
+
+            ls.L.Push(DebuggerGlobal);
+            ls.L.GetTableRaw(ls.L.GLOBALSINDEX);
+            if (!ls.L.IsTable(-1))
+            {
+                ls.L.NewTable();
+                ls.L.Push(DebuggerGlobal);
+                ls.L.PushValue(-2);
+                ls.L.SetTableRaw(ls.L.GLOBALSINDEX);
+            }
+            ls.L.Push("Log");
+            ls.L.GetTableRaw(-2);
+            if (ls.L.IsFunction(-1))
+            {
+                ls.L.Top = top;
+                return;
+            }
+            ls.L.Pop(1);
             ls.L.RegisterFuncLib<DebugEngine>(-3);
-            ls.L.SetTableRaw(ls.L.GLOBALSINDEX);
+
+#if S5
+            if (!AddedLuaDebuggerToNotSave)
+            {
+                AddedLuaDebuggerToNotSave = true;
+                var del = Marshal.GetDelegateForFunctionPointer<IgnoreForSaves>(new IntPtr(0x5A1E0C));
+                var s = DebuggerGlobal.MarshalFromString();
+                del(s.String);
+            }
+#else
+            ls.L.Push("Break");
+            ls.L.GetTableRaw(-2);
+            if (ls.L.IsFunction(-1))
+            {
+                ls.L.Top = top;
+                return;
+            }
+            ls.L.Pop(1);
+
+            ls.L.Push("Break");
+            Lua_pushcclosure_(ls.L.State, new IntPtr(0x4155B8), 0);
+            ls.L.SetTableRaw(-3);
+            ls.L.Push("Show");
+            Lua_pushcclosure_(ls.L.State, new IntPtr(0x4155AE), 0);
+            ls.L.SetTableRaw(-3);
+            ls.L.Push("ShowExecuteLineDialog");
+            Lua_pushcclosure_(ls.L.State, new IntPtr(0x4155C2), 0);
+            ls.L.SetTableRaw(-3);
+#endif
+            ls.L.Top = top;
         }
 
         [LuaLibFunction("Log")]
@@ -588,6 +645,9 @@ namespace LuaDebugger
                     r = ToExecuteInSHoKThread.First.Value;
                     ToExecuteInSHoKThread.RemoveFirst();
                 }
+#if S6
+                RegisterLibFunctions();
+#endif
                 r();
             }
         }
