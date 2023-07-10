@@ -1,9 +1,12 @@
-﻿using ICSharpCode.TextEditor.Document;
+﻿using bbaToolS5;
+using ICSharpCode.TextEditor.Document;
 using LuaSharp;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
@@ -307,6 +310,22 @@ namespace LuaDebugger
         {
             L.Push(GlobalState.L2State[L.State].DebugEngine.HookActive);
             return 1;
+        }
+        [LuaLibFunction("ViewSetFileContents")]
+        public static int ViewSetFileContents(LuaState L)
+        {
+            var filename = L.CheckString(1);
+            var fileContents = L.CheckString(2);
+            LuaStateWrapper ls = GlobalState.L2State[L.State];
+
+            lock (GlobalState.GuiUpdateLock)
+            {
+                if (ls.LoadedFiles.ContainsKey(filename))
+                    ls.LoadedFiles.Remove(filename);
+                ls.LoadedFiles.Add(filename, new LuaFile(filename, fileContents));
+                ls.UpdateFileList = true;
+            }
+            return 0;
         }
 
 #if S5
@@ -649,6 +668,148 @@ namespace LuaDebugger
                 RegisterLibFunctions();
 #endif
                 r();
+            }
+        }
+
+        internal void QueryNotLoadedScripts()
+        {
+            var s = GetNotLoadedScripts();
+            if (s.Count == 0)
+                return;
+            int t = ls.L.Top;
+            ls.L.DoString("return Framework.GetCurrentMapName(), Framework.GetCurrentMapTypeAndCampaignName()");
+            string s5x = ls.L.CheckInt(t + 2) == 3 ? ls.L.CheckString(t + 1) : null;
+            ls.L.DoString("return Framework.GetProgramVersion()");
+            int ex = 0;
+            string verstring = ls.L.CheckString(-1);
+            if (verstring.Contains("Extra"))
+                ex = verstring[verstring.Length - 1] - '0';
+            ls.L.Top = t;
+            ls.StateView.BeginInvoke((MethodInvoker)delegate
+            {
+                string st = "the files may have been modified since they have been loaded\r\n";
+                foreach (var str in s.Take(10))
+                {
+                    st += str + "\r\n";
+                }
+                if (s.Count > 10)
+                    st += "...";
+                if (MessageBox.Show(st, "try to find lua files?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                    TryToLoadScripts(s, s5x, ex);
+            });
+        }
+
+        internal List<string> GetNotLoadedScripts()
+        {
+            List<string> s = new List<string>();
+            List<IntPtr> tablesDone = new List<IntPtr>();
+            var L = ls.L;
+            int top = L.Top;
+            traverse(L.GLOBALSINDEX);
+            L.Top = top;
+            return s;
+
+            void traverse(int i)
+            {
+                IntPtr p = L.ToPointer(i);
+                if (tablesDone.Contains(p))
+                    return;
+                tablesDone.Add(p);
+                try
+                {
+                    L.CheckStack(3);
+                }
+                catch (LuaException)
+                {
+                    return;
+                }
+                foreach (LuaType l in L.Pairs(i))
+                {
+                    if (L.IsFunction(-1) && !L.IsCFunction(-1))
+                    {
+                        L.PushValue(-1);
+                        DebugInfo f = L.GetFuncInfo();
+                        if (ls.LoadedFiles.ContainsKey(f.Source))
+                            continue;
+                        if (!s.Contains(f.Source))
+                            s.Add(f.Source);
+                    }
+                    else if (L.IsTable(-1))
+                    {
+                        traverse(-1);
+                    }
+                }
+            }
+        }
+
+        private BbaArchive LoadBbas(string s5x, int extra)
+        {
+            BbaArchive a = new BbaArchive();
+            Func<string, bool> lua = (string fn) => fn.EndsWith(".lua");
+            a.ReadBba(".\\base\\data.bba", lua);
+            string s5xpath;
+            if (extra == 2)
+            {
+                a.ReadBba(".\\extra2\\bba\\patch.bba", lua);
+                a.ReadBba(".\\extra2\\bba\\data.bba", lua);
+                a.ReadBba(".\\extra2\\bba\\patche2.bba", lua);
+                s5xpath = ".\\extra2\\shr\\maps\\user\\";
+            }
+            else if (extra == 1)
+            {
+                a.ReadBba(".\\extra1\\bba\\patch.bba", lua);
+                a.ReadBba(".\\extra1\\bba\\data.bba", lua);
+                a.ReadBba(".\\extra1\\bba\\patchex.bba", lua);
+                s5xpath = ".\\extra1\\shr\\maps\\user\\";
+            }
+            else
+            {
+                a.ReadBba(".\\base\\patch.bba", lua);
+                s5xpath = ".\\base\\shr\\maps\\user\\";
+            }
+            s5xpath = s5xpath + s5x + ".s5x";
+            if (s5x != null && File.Exists(s5xpath))
+                a.ReadBba(s5xpath, lua);
+            return a;
+        }
+
+        internal void TryToLoadScripts(List<string> l, string s5x, int extra)
+        {
+            BbaArchive a = null;
+            try
+            {
+                a = LoadBbas(s5x, extra);
+                lock (GlobalState.GuiUpdateLock)
+                {
+                    foreach (string s in l)
+                    {
+                        string n = s.Replace('/', '\\').ToLower();
+                        if (n.StartsWith("data\\"))
+                            n = n.Substring(5);
+                        if (s == "Map Script")
+                            n = "maps\\externalmap\\mapscript.lua";
+                        using (Stream stream = a.GetFileByName(n)?.GetStream())
+                        {
+                            if (stream == null)
+                                continue;
+                            using (StreamReader sr = new StreamReader(stream))
+                            {
+                                if (ls.LoadedFiles.ContainsKey(s))
+                                    ls.LoadedFiles.Remove(s);
+                                ls.LoadedFiles.Add(s, new LuaFile(s, sr.ReadToEnd()));
+                            }
+                        }
+                    }
+                    ls.UpdateFileList = true;
+                }
+            }
+            catch (IOException e)
+            {
+                MessageBox.Show(e.ToString());
+            }
+            finally
+            {
+                a?.Clear();
             }
         }
     }

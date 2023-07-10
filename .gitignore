@@ -163,3 +163,4 @@ LuaDebugger/EasyHook64Svc.exe
 LuaDebugger/EasyLoad32.dll
 LuaDebugger/EasyLoad64.dll
 /DllExport.bat
+/LuaDebugger/Resources/bbaToolS5.exe
