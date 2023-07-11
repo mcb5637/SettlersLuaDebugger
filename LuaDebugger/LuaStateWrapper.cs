@@ -262,7 +262,6 @@ namespace LuaDebugger
                 if (L.Type(-1) != LuaType.Table)
                 {
                     L.Pop(1);
-                    DebugEngine.QueryNotLoadedScripts();
                     done();
                     return;
                 }
@@ -282,7 +281,6 @@ namespace LuaDebugger
                 }
 
                 RestoreFromFileString(sb.ToString());
-                DebugEngine.QueryNotLoadedScripts();
                 done();
             });
         }

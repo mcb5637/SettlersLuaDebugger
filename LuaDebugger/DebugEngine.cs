@@ -311,20 +311,11 @@ namespace LuaDebugger
             L.Push(GlobalState.L2State[L.State].DebugEngine.HookActive);
             return 1;
         }
-        [LuaLibFunction("ViewSetFileContents")]
-        public static int ViewSetFileContents(LuaState L)
+        [LuaLibFunction("QueryNotLoadedScripts")]
+        public static int QueryNotLoadedScripts(LuaState L)
         {
-            var filename = L.CheckString(1);
-            var fileContents = L.CheckString(2);
             LuaStateWrapper ls = GlobalState.L2State[L.State];
-
-            lock (GlobalState.GuiUpdateLock)
-            {
-                if (ls.LoadedFiles.ContainsKey(filename))
-                    ls.LoadedFiles.Remove(filename);
-                ls.LoadedFiles.Add(filename, new LuaFile(filename, fileContents));
-                ls.UpdateFileList = true;
-            }
+            ls.DebugEngine.QueryNotLoadedScripts();
             return 0;
         }
 
@@ -675,7 +666,13 @@ namespace LuaDebugger
         {
             var s = GetNotLoadedScripts();
             if (s.Count == 0)
+            {
+                ls.StateView.BeginInvoke((MethodInvoker)delegate
+                {
+                    MessageBox.Show("no unknown scripts");
+                });
                 return;
+            }
             int t = ls.L.Top;
             ls.L.DoString("return Framework.GetCurrentMapName(), Framework.GetCurrentMapTypeAndCampaignName()");
             string s5x = ls.L.CheckInt(t + 2) == 3 ? ls.L.CheckString(t + 1) : null;
@@ -695,7 +692,24 @@ namespace LuaDebugger
                 if (s.Count > 10)
                     st += "...";
                 if (MessageBox.Show(st, "try to find lua files?", MessageBoxButtons.YesNo) == DialogResult.Yes)
-                    TryToLoadScripts(s, s5x, ex);
+                {
+                    var notfound = TryToLoadScripts(s, s5x, ex);
+                    if (notfound.Count > 0)
+                    {
+                        st = "";
+                        foreach (var str in notfound.Take(10))
+                        {
+                            st += str + "\r\n";
+                        }
+                        if (notfound.Count > 10)
+                            st += "...";
+                        MessageBox.Show(st, "files not found:");
+                    }
+                    else
+                    {
+                        MessageBox.Show("everything found");
+                    }
+                }
             });
         }
 
@@ -773,8 +787,9 @@ namespace LuaDebugger
             return a;
         }
 
-        internal void TryToLoadScripts(List<string> l, string s5x, int extra)
+        internal List<string> TryToLoadScripts(List<string> l, string s5x, int extra)
         {
+            List<string> r = new List<string>();
             BbaArchive a = null;
             try
             {
@@ -791,7 +806,10 @@ namespace LuaDebugger
                         using (Stream stream = a.GetFileByName(n)?.GetStream())
                         {
                             if (stream == null)
+                            {
+                                r.Add(s);
                                 continue;
+                            }
                             using (StreamReader sr = new StreamReader(stream))
                             {
                                 if (ls.LoadedFiles.ContainsKey(s))
@@ -811,6 +829,7 @@ namespace LuaDebugger
             {
                 a?.Clear();
             }
+            return r;
         }
     }
 }
