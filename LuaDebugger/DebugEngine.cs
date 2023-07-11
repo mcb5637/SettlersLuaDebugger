@@ -311,6 +311,7 @@ namespace LuaDebugger
             L.Push(GlobalState.L2State[L.State].DebugEngine.HookActive);
             return 1;
         }
+#if S5
         [LuaLibFunction("QueryNotLoadedScripts")]
         public static int QueryNotLoadedScripts(LuaState L)
         {
@@ -318,6 +319,7 @@ namespace LuaDebugger
             ls.DebugEngine.QueryNotLoadedScripts();
             return 0;
         }
+#endif
 
 #if S5
         protected unsafe static void DebugHook(LuaState50 L, LuaState50.LuaDebugRecord* i)
