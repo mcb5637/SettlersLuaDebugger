@@ -386,7 +386,9 @@ xcopy /y /i "$(TargetDir)EasyHook.dll" "$(SolutionDir)LuaDebuggerStarter\Unpack\
 xcopy /y /i "$(TargetDir)EasyHook32.dll" "$(SolutionDir)dbgenv\"
 xcopy /y /i "$(TargetDir)EasyHook32.dll" "$(SolutionDir)LuaDebuggerStarter\Unpack\"
 xcopy /y /i "$(TargetDir)ICSharpCode.TextEditor.dll" "$(SolutionDir)dbgenv\"
-xcopy /y /i "$(TargetDir)ICSharpCode.TextEditor.dll" "$(SolutionDir)LuaDebuggerStarter\Unpack\"</PostBuildEvent>
+xcopy /y /i "$(TargetDir)ICSharpCode.TextEditor.dll" "$(SolutionDir)LuaDebuggerStarter\Unpack\"
+xcopy /y /i "$(TargetDir)bbaToolS5.exe" "$(SolutionDir)dbgenv\"
+xcopy /y /i "$(TargetDir)bbaToolS5.exe" "$(SolutionDir)LuaDebuggerStarter\Unpack\"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <DllExportIdent>8FF0D3BF-79BA-479A-AF5E-1C0E3C5605C6</DllExportIdent>

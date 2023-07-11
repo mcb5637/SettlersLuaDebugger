@@ -136,6 +136,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="bug.ico" />
+    <EmbeddedResource Include="Unpack\bbaToolS5.exe" />
     <EmbeddedResource Include="Unpack\ICSharpCode.TextEditor.dll" />
     <EmbeddedResource Include="Unpack\EasyHook.dll" />
     <EmbeddedResource Include="Unpack\EasyHook32.dll" />
