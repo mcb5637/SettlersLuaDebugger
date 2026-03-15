@@ -144,7 +144,7 @@ namespace LuaDebugger
             {
                 if (ls.LoadedFiles.ContainsKey(filename))
                     ls.LoadedFiles.Remove(filename);
-                string fileContents = content.MarshalToString(contentLen);
+                string fileContents = (contentLen >= 1 * 1024 * 1024) ? "file too big" : content.MarshalToString(contentLen);
                 ls.LoadedFiles.Add(filename, new LuaFile(filename, fileContents));
                 ls.UpdateFileList = true;
             }
